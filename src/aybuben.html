@@ -6,6 +6,7 @@
 <style>
 /* Layout: sticky header + single-column app (bottom tab bar on phones). Home: hero card with Ciro the apricot, then a dotted trail of lesson stones in ornament-patterned unit bands. Lessons open full-screen with a chunky footer. */
 :root{
+  --on-good:#fff;--on-bad:#fff;
   --bg:#EEE6E3;--surface:#FBF8F7;--sunk:#E3D8D4;--ink:#241A1E;--muted:#6C5C62;--line:#D6C8C3;
   --accent:#D06A1C;--accent-deep:#9E4D0E;--accent-soft:#F7E0CB;--accent-ink:#FFFFFF;
   --gold:#E2A72E;--gold-deep:#A87812;
@@ -23,13 +24,13 @@
   --accent:#F0A04B;--accent-deep:#B96E22;--accent-soft:#4A3220;--accent-ink:#1A1416;
   --gold:#F2C14E;--gold-deep:#B88A20;
   --good:#6CC79C;--good-deep:#3E9A6E;--good-soft:#1F3A2D;--bad:#F07A8E;--bad-deep:#B84A5E;--bad-soft:#47222A;--heart:#F0647E;
-  --b0:#C9762E;--b1:#A2506F;--b2:#4E9482;--b3:#6680B3;color-scheme:dark}}
+  --b0:#C9762E;--b1:#A2506F;--b2:#4E9482;--b3:#6680B3;--on-good:#0D2419;--on-bad:#2A0A12;color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#1A1416;--surface:#251D20;--sunk:#31272B;--ink:#F2EAE7;--muted:#A8989D;--line:#3F3438;
   --accent:#F0A04B;--accent-deep:#B96E22;--accent-soft:#4A3220;--accent-ink:#1A1416;
   --gold:#F2C14E;--gold-deep:#B88A20;
   --good:#6CC79C;--good-deep:#3E9A6E;--good-soft:#1F3A2D;--bad:#F07A8E;--bad-deep:#B84A5E;--bad-soft:#47222A;--heart:#F0647E;
-  --b0:#C9762E;--b1:#A2506F;--b2:#4E9482;--b3:#6680B3;color-scheme:dark}
+  --b0:#C9762E;--b1:#A2506F;--b2:#4E9482;--b3:#6680B3;--on-good:#0D2419;--on-bad:#2A0A12;color-scheme:dark}
 
 *{box-sizing:border-box}
 html,body{min-height:100%}
@@ -47,7 +48,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1.5px solid var(--line);
   margin:-14px calc(-1 * max(16px,env(safe-area-inset-right,0px))) 22px calc(-1 * max(16px,env(safe-area-inset-left,0px)));
   padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
-.top-in{max-width:960px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.top-in{max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
 .brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1;margin:0}
 .brand .mascot{width:40px;height:40px}
 .brand b{font-weight:800}.brand b span{color:var(--accent)}
@@ -64,7 +65,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tabs button[aria-selected="true"]{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--ink)}
 .tabs button[aria-selected="true"] svg{color:var(--accent)}
 .tabs .abc{font-family:var(--f-display);font-weight:800;font-size:21px;width:22px;text-align:center;line-height:22px}
-@media (max-width:1080px){.tabs{order:4;flex-basis:100%}}
+@media (max-width:1000px){.tabs{order:4;flex-basis:100%}}
 @media (max-width:640px){
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1.5px solid var(--line);gap:0;justify-content:space-around;
     padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
@@ -80,8 +81,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 var(--accent-deep);transition:transform .06s,box-shadow .06s}
 .btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--accent-deep)}
 .btn:disabled{background:var(--sunk);color:var(--muted);box-shadow:0 4px 0 var(--line);cursor:default}
-.btn.good{background:var(--good);box-shadow:0 4px 0 var(--good-deep);color:#fff}
-.btn.bad{background:var(--bad);box-shadow:0 4px 0 var(--bad-deep);color:#fff}
+.btn.good{background:var(--good);box-shadow:0 4px 0 var(--good-deep);color:var(--on-good)}
+.btn.bad{background:var(--bad);box-shadow:0 4px 0 var(--bad-deep);color:var(--on-bad)}
 .btn.plain{background:var(--surface);color:var(--ink);box-shadow:0 4px 0 var(--line);border:1.5px solid var(--line)}
 .btn.wide{width:100%}
 .link{border:0;background:none;color:var(--accent);font-weight:700;padding:6px}
@@ -407,6 +408,36 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .vtab td{padding:7px 6px}.vtab td.a{font-size:19px}.vtab .vr{color:var(--muted);font-size:13.5px}
 .box{border-radius:20px}
 @media (max-width:520px){.gopts{grid-template-columns:repeat(2,minmax(0,1fr))}.memo{grid-template-columns:repeat(3,minmax(0,1fr))}.tabs button{padding:8px 2px;font-size:13px}.sheet{padding:18px}.big{min-height:100px}.opt{font-size:16px}.foot-in .btn{width:100%}}
+/* полировка */
+.ex>*{animation:rise .28s ease both}
+.ex>*:nth-child(3){animation-delay:.04s}.ex>*:nth-child(4){animation-delay:.08s}.ex>*:nth-child(5){animation-delay:.12s}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.l-foot.good .foot-in,.l-foot.bad .foot-in{animation:rise .22s ease both}
+.opt,.mi,.tile,.key,.wr-item,.gcard,.at,.tile2.fact{transition:transform .08s,box-shadow .08s,border-color .15s,background .15s}
+.opt:hover:not(:disabled),.mi:hover,.tile:hover,.at:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.opt:active:not(:disabled),.mi:active,.tile:active,.key:active:not(:disabled),.at:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.opt:focus-visible,.mi:focus-visible,.tile:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mi.long{font-size:15.5px}.mi.arm.long{font-size:16.5px;overflow-wrap:normal;word-break:keep-all;hyphens:none}
+.mi.ok{animation:matched .35s ease}
+@keyframes matched{40%{transform:scale(1.05)}}
+.spk.slow{width:auto;padding:0 12px;flex-direction:column;gap:0;line-height:1.05}
+.spk.slow b{font-size:15px}.spk.slow span{font-size:10.5px;font-weight:600;opacity:.85}
+.spk.huge+.spk.slow{height:56px}
+.node.done .stone::before{content:"";position:absolute;right:-2px;bottom:4px;width:22px;height:22px;border-radius:50%;background:var(--good) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/15px no-repeat;border:2.5px solid var(--bg)}
+.l-top .x{width:44px;height:44px}
+.prog i::after{animation:shine 2.4s ease-in-out infinite}
+@keyframes shine{0%,100%{opacity:.18}50%{opacity:.42}}
+.scrim{animation:fade .2s ease both}.sheet{animation:sheetin .24s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes fade{from{opacity:0}}
+@keyframes sheetin{from{opacity:0;transform:translateY(14px) scale(.98)}}
+@media (max-width:640px){
+  .scrim{align-items:flex-end;padding:0}
+  .sheet{width:100%;border-radius:24px 24px 0 0;max-height:88%;padding:14px max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
+  .sheet::before{content:"";align-self:center;width:42px;height:5px;border-radius:9px;background:var(--line);flex:none}
+  @keyframes sheetin{from{transform:translateY(40%)}}
+  .foot-in .gbig{width:auto}
+}
+.gamefoot{display:flex;gap:10px;width:100%}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -676,7 +707,11 @@ function sndOpts(l,pool){const out=[];if(l.p&&BY[l.p])out.push(BY[l.p].s);for(co
 function letOpts(l,pool){const out=[];if(l.p&&BY[l.p])out.push(BY[l.p]);for(const x of shuffle(pool.length>=4?pool:LETTERS))if(x!==l&&!out.includes(x)&&x.s!==l.s)out.push(x);return out.slice(0,3)}
 function qL2S(l,pool){const up=l.U!==l.k&&l.U.length===1&&Math.random()<.5;return CH('Как читается эта буква?',up?l.U:l.k,l.s,sndOpts(l,pool),{bigCls:'glyph',explain:esc(tipOf(l))})}
 function qS2L(l,pool){const up=Math.random()<.5&&l.U!=='և';const d=x=>up&&x.U!=='և'?x.U:x.k;return CH('Какая буква даёт этот звук?',l.s,d(l),letOpts(l,pool).map(d),{bigCls:'snd',optArm:true,explain:`<span class="a">${l.U}${l.U!==l.k?' '+l.k:''}</span> — «${esc(l.s)}»`})}
-function qRead(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>x.m!==w.m).map(x=>x.m)).slice(0,3);return CH('Что значит это слово?',w.a,w.m,wr,{bigCls:'word',tag:'read',explain:`читается «${esc(w.r)}»`,after:bd(w.a)})}
+const SYN=[['мать','мама'],['отец','папа'],['деньги','драм'],['день','день (время суток)'],['хорошо','хороший'],['холод','холодный'],['ребёнок','дитя']];
+function senses(m){const out=new Set(m.toLowerCase().split(/[,;]/).map(x=>x.replace(/\(.*?\)/g,'').trim()).filter(Boolean));for(const g of SYN)if(g.some(x=>out.has(x)))g.forEach(x=>out.add(x));return out}
+function clash(a,b){if(a===b)return true;const A=senses(a);for(const x of senses(b))if(A.has(x))return true;return false}
+function pairsOf(ws,n){const out=[],ms=[];for(const w of shuffle(ws)){if(out.length>=n)break;if(ms.some(m=>clash(m,w.m)))continue;ms.push(w.m);out.push([w.a,w.m])}return out}
+function qRead(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>!clash(x.m,w.m)).map(x=>x.m)).slice(0,3);return CH('Что значит это слово?',w.a,w.m,wr,{bigCls:'word',tag:'read',explain:`читается «${esc(w.r)}»`,after:bd(w.a)})}
 function qWrite(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>x.a!==w.a).map(x=>x.a)).slice(0,3);return CH(`Как пишется «${w.m}»?`,w.r,w.a,wr,{bigCls:'snd',optArm:true,explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`})}
 function qBuildWord(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2).map(l=>l.k);return {type:'build',prompt:'Напишите армянскими буквами',sub:`${w.m} — звучит «${w.r}»`,tiles:[...w.u,...extra],answers:[w.u],joiner:'',letters:true,show:w.a,tag:'read'}}
 function genLetters(group){
@@ -694,12 +729,12 @@ function genWords(n){
   return ()=>{const pool=wordsUpTo(n),fresh=pool.filter(w=>w.L===n),lp=lettersUpTo(n);
     const pickW=k=>{const a=sample(fresh,Math.ceil(k*.6));return uniq([...a,...sample(pool,k)]).slice(0,k)};
     const items=[];
-    items.push(MT(sample(pool,4).map(w=>[w.a,w.m])));
+    items.push(MT(pairsOf(pool,4)));
     pickW(3).forEach(w=>items.push(qRead(w,pool)));
     pickW(2).forEach(w=>items.push(qWrite(w,pool)));
     sample(pool.filter(w=>hasAudio(w.a)),2).forEach(w=>items.push(qListen(w,pool)));
     pickW(3).filter(w=>w.u.length<=8).forEach(w=>items.push(qBuildWord(w,lp)));
-    items.push(MT(sample(pool,5).map(w=>[w.a,w.m])));
+    items.push(MT(pairsOf(pool,5)));
     return [items[0],...shuffle(items.slice(1,-1)),items[items.length-1]]}
 }
 
@@ -707,7 +742,7 @@ function vocabCard(ws){return `<p>Новые слова этого урока. �
 function genTheme(th,part){
   return ()=>{const all=th.words,h=Math.ceil(all.length/2),mine=part===1?all.slice(0,h):part===2?all.slice(h):all;
     const pool=all.length>=6?all:WORDS,lp=LETTERS,items=[];
-    const pairs=n=>{const out=[],seen=new Set();for(const w of shuffle(mine)){if(out.length>=n)break;if(seen.has(w.m))continue;seen.add(w.m);out.push([w.a,w.m])}return out};
+    const pairs=n=>pairsOf(mine,n);
     if(part!==3)items.push({type:'teach',title:`${th.t}: новые слова`,html:vocabCard(mine)});
     items.push(MT(pairs(4)));
     sample(mine,4).forEach(w=>items.push(qRead(w,pool)));
@@ -1065,23 +1100,28 @@ function checkAch(){const n=[];ACH.forEach(a=>{if(!S.ach[a.id]&&a.ok()){S.ach[a.
 
 /* ================= ЗВУК ================= */
 let AC=null;
-function tone(seq){if(!S.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime;seq.forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.18,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.8})}catch(e){}}
+function tone(seq){if(!S.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime;seq.forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.09,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.8})}catch(e){}}
 /* ================= ОЗВУЧКА ================= */
 const AUDIO_KEYS=new Set(["աղ", "աղջիկ", "աղջիկը", "աղջիկներ", "ամառ", "այդ", "այն", "այո", "այս", "այս տունը մեծ է", "այսպես", "այստեղ", "այսօր", "անուն", "ասացի", "ասում է", "արդեն", "արև", "բարի գիշեր", "բարի երեկո", "բարի լույս", "բարև", "բոլոր", "գալիս", "գետ", "գինի", "գինին", "գիրք", "գիրքը", "գիրքը սեղանին է", "գիրքը տալիս եմ արամին", "գնում եմ ավտոբուսով", "գրել", "գրիչ", "գրում", "գրում եմ գրիչով", "գրքեր", "դու", "դու բժիշկ ես", "դու խմում ես ջուր", "դու հայ ես", "դու հայերեն խոսում ես", "դու ուսանող չես", "դու չես կարդում", "դու ջուր ես խմում", "դուռ", "դուք բժիշկ չեք", "դուք երևանից եք", "ե՞րբ", "եկեք գնանք", "եղբայր", "եղբայրդ", "ենք", "ես", "ես ապրում եմ երևանում", "ես ապրում եմ մոսկվայում", "ես արդեն ասացի", "ես բժիշկ չեմ", "ես գալիս եմ", "ես երևանից եմ", "ես խոսում եմ հայերեն", "ես հայ եմ", "ես հայ չեմ", "ես հայերեն եմ խոսում", "ես հաց չեմ ուտում", "ես մոսկվայից եմ", "ես մոսկվայում եմ ապրում", "ես նամակ գրում եմ", "ես ուսանող եմ", "ես չգիտեմ", "ես չեմ հասկանում", "ես սիրում եմ քեզ", "ես տանն եմ", "երազ", "երեք", "երկու", "երևան", "եք", "զանգ", "էջ", "ընկեր", "ընկերդ", "ընկերներ", "թագավոր", "թութ", "թև", "ժամ", "ի՞նչ", "ի՞նչ ես անում", "ի՞նչ է սա", "իմ", "իմ անունը արամ է", "ինը", "ինչ", "ինչո՞ւ", "ինչո՞ւ ես ուշանում", "ինչպե՞ս", "ինչպե՞ս ես", "ինչպե՞ս եք", "լավ", "լավ եմ", "լավաշ", "լինել", "լուսին", "խաղ", "խնդրեմ", "խնձոր", "խնձորներ", "խոսում", "խորոված", "ծառ", "ծառեր", "ծառը", "ծիրան", "ծով", "կատու", "կատուդ", "կատուն", "կատուներ", "կարգ", "կարդում", "կարդում եմ", "կարճ ասած", "կարմիր", "կարող եմ", "կին", "հայ", "հայաստան", "հայր", "հաց", "հինգ", "ձեռք", "ձեր", "ձեր անունը ի՞նչ է", "ձու", "ձուկ", "ձուն", "ճաշ", "մածուն", "մայր", "մայրը", "մայրս", "մատ", "մարդ", "մարտ", "մեծ", "մեկ", "մենք", "մենք ապրում ենք երևանում", "մենք դպրոցում ենք", "մենք երևանում ենք ապրում", "մենք ընկերներ ենք", "մենք հաց ուտում ենք", "մենք ուսանող ենք", "մենք ուսանողներ չենք", "մենք ռուսերեն չենք խոսում", "մեր", "մեր տունը մեծ է", "մի աղջիկ", "մի գիրք", "մկրատ", "մնալ", "մուկ", "յոթ", "նա", "նա բժիշկ է", "նա բժիշկ չէ", "նա գալիս է դպրոցից", "նա գինի չի խմում", "նա գիրք կարդում է", "նա ուսանող չէ", "նա չի գրում", "նա տանը չէ", "ներողություն", "նուռ", "նրանց", "նրանք", "նրանք ապրում են երևանում", "նրանք երևանից չեն", "նրանք չեն խոսում ռուսերեն", "նրանք ռուսերեն չեն խոսում", "նրանք տանն են", "շատ", "շնորհակալություն", "շուն", "շտապել", "ո՞վ", "ո՞վ է նա", "ո՞ւր", "ո՞ւր ես գնում", "ոչ", "ոսկի", "ոտք", "որ", "որտե՞ղ", "որտե՞ղ ես ապրում", "ութ", "ուս", "ուտել", "ուտում", "ուրախ եմ ծանոթանալ", "չեմ", "չեն", "չենք", "չեք", "չէ", "չի", "չորս", "պանիր", "պարզապես", "ջուր", "սա արամի գիրքն է", "սա իմ մայրն է", "սա իմ տունն է", "սար", "սարեր", "սեր", "սիրտ", "սպասել", "ստանալ", "վարդ", "վեց", "տասը", "տատ", "տեսնել", "տղա", "տներ", "տնից", "տուն", "տունս", "ցուրտ", "ցտեսություն", "փող", "փոքր", "քանի՞", "քանի՞ տարեկան ես", "քար", "քո", "քույր", "քույրեր", "քույրս", "օր", "ֆուտբոլ"]);
 const akey=t=>String(t).replace(/։/g,'').trim().toLowerCase();
 function fnv(t){let h=0x811C9DC5;for(const ch of t){h^=ch.codePointAt(0);h=Math.imul(h,0x01000193)>>>0}return h.toString(16).padStart(8,'0')}
 const hasAudio=t=>t!=null&&AUDIO_KEYS.has(akey(t));
 let curAud=null;
-function say(t,rate=1){if(!hasAudio(t))return false;try{if(curAud){curAud.pause();curAud.dispatchEvent(new Event('ended'))}const a=new Audio('audio/'+fnv(akey(t))+'.mp3');a.playbackRate=rate;curAud=a;
+const PLAYER=new Audio();PLAYER.preload='auto';let audioReady=false;
+function unlockAudio(){if(audioReady)return;audioReady=true;
+  try{PLAYER.src='data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAABAAAAlgAenp6enp6enp6enp6enp6enp6enp6enp6pqampqampqampqampqampqampqampqamptPT09PT09PT09PT09PT09PT09PT09PT09P/////////////////////////////////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQCcQAAAAAAAAJY+/rsqgAAAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NCxKMAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';PLAYER.play().then(()=>PLAYER.pause()).catch(()=>{})}catch(e){}
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
+document.addEventListener('pointerdown',unlockAudio,{capture:true,once:false});
+function say(t,rate=1){if(!hasAudio(t))return false;try{if(curAud){curAud.pause();curAud.dispatchEvent(new Event('ended'))}const a=PLAYER;a.pause();a.src='audio/'+fnv(akey(t))+'.mp3';a.playbackRate=rate;a.defaultPlaybackRate=rate;curAud=a;
   const btns=[...document.querySelectorAll('.spk')].filter(b=>b.dataset.say===t);btns.forEach(b=>b.classList.add('playing'));
-  a.addEventListener('ended',()=>btns.forEach(b=>b.classList.remove('playing')));a.addEventListener('pause',()=>btns.forEach(b=>b.classList.remove('playing')));
+  const off=()=>btns.forEach(b=>b.classList.remove('playing'));a.onended=off;a.onpause=off;
   a.play().catch(()=>btns.forEach(b=>b.classList.remove('playing')));return true}catch(e){return false}}
 const SPK_SVG='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-const SLOW_SVG='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 15c0-4 3-7 7-7s6 3 6 5h2a2 2 0 0 1 0 4H5a1 1 0 0 1-1-1z"/><circle cx="8" cy="18.5" r="1.5"/><circle cx="15" cy="18.5" r="1.5"/></svg>';
+const SLOW_SVG_OLD='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 15c0-4 3-7 7-7s6 3 6 5h2a2 2 0 0 1 0 4H5a1 1 0 0 1-1-1z"/><circle cx="8" cy="18.5" r="1.5"/><circle cx="15" cy="18.5" r="1.5"/></svg>';
 function spk(t,cls=''){return hasAudio(t)?`<button class="spk ${cls}" data-say="${esc(t)}" aria-label="Послушать">${SPK_SVG}</button>`:''}
-function spkSlow(t){return hasAudio(t)?`<button class="spk slow" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно">${SLOW_SVG}</button>`:''}
+function spkSlow(t){return hasAudio(t)?`<button class="spk slow" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно"><b>0,7×</b><span>медленно</span></button>`:''}
 document.addEventListener('click',e=>{const b=e.target.closest('.spk');if(!b)return;e.stopPropagation();say(b.dataset.say,+(b.dataset.rate||1))},true);
-const autoSay=t=>{if(S.voice!==false)setTimeout(()=>say(t),120)};
+const autoSay=(t,ms=120)=>{if(S.voice!==false)setTimeout(()=>say(t),ms)};
 const haptic=t=>{if(window.__haptic)window.__haptic(t)};
 const sGood=()=>{tone([[660,.12],[990,.2]]);haptic('ok')},sBad=()=>{tone([[220,.18],[180,.25]]);haptic('bad')},sWin=()=>tone([[523,.14],[659,.14],[784,.14],[1046,.35]]);
 
@@ -1232,14 +1272,14 @@ function renderBuild(ex,box){
 function renderMatch(ex,box){
   const left=shuffle(ex.pairs.map((p,i)=>({t:p[0],i}))),right=shuffle(ex.pairs.map((p,i)=>({t:p[1],i})));
   const armL=/[Ա-֏]/.test(ex.pairs[0][0]),armR=/[Ա-֏]/.test(ex.pairs[0][1]);
-  box.insertAdjacentHTML('beforeend',`<h2>Найдите пары</h2><div class="match"><div class="col">${left.map(o=>`<button class="mi ${armL?'arm':''}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map(o=>`<button class="mi ${armR?'arm':''}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
+  box.insertAdjacentHTML('beforeend',`<h2>Найдите пары</h2><div class="match"><div class="col">${left.map(o=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map(o=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
   let selL=null,selR=null,matched=0,errs=0;
   box.querySelectorAll('.mi').forEach(b=>b.onclick=()=>{
     if(ARMRE.test(b.textContent)&&S.voice!==false)say(b.textContent.trim());
     if(b.dataset.s==='L'){selL=b;box.querySelectorAll('.mi[data-s="L"]').forEach(x=>x.setAttribute('aria-pressed',x===b))}else{selR=b;box.querySelectorAll('.mi[data-s="R"]').forEach(x=>x.setAttribute('aria-pressed',x===b))}
     if(selL&&selR){const ok=selL.dataset.i===selR.dataset.i,a=selL,c=selR;selL=selR=null;
       [a,c].forEach(x=>x.setAttribute('aria-pressed','false'));
-      if(ok){a.classList.add('ok');c.classList.add('ok');matched++;tone([[700+matched*60,.1]]);
+      if(ok){a.classList.add('ok');c.classList.add('ok');matched++;if(!(S.voice!==false&&(ARMRE.test(a.textContent)||ARMRE.test(c.textContent))))tone([[700+matched*60,.1]]);
         if(matched===ex.pairs.length){LS.state='checked';LS.done++;LS.combo++;if(errs===0){}feedback(true,errs?`Ошибок в парах: ${errs}`:'Все пары найдены')}}
       else{errs++;a.classList.add('no');c.classList.add('no');sBad();setTimeout(()=>{a.classList.remove('no');c.classList.remove('no')},450)}}
   });
@@ -1258,7 +1298,7 @@ function check(){
   if(ex.explain)detail+=(detail?'<br>':'')+ex.explain;
   if(ok&&ex.type==='build'&&ex.answers.length>1)detail=(detail?detail+'<br>':'')+'Можно и так: <span class="a">'+esc(ex.answers.map(a=>a.join(' ')).filter(a=>a!==LS.built.map(i=>ex.tiles[i]).join(' '))[0]||'')+'</span>';
   if(ex.after)detail+=ex.after;
-  const ps=postSay(ex);if(ps){detail=`<span style="display:inline-flex;gap:8px;align-items:center;vertical-align:middle">${spk(ps,'sm')}</span> `+detail;autoSay(ps)}
+  const ps=postSay(ex);if(ps){detail=`<span style="display:inline-flex;gap:8px;align-items:center;vertical-align:middle">${spk(ps,'sm')}</span> `+detail;autoSay(ps,420)}
   feedback(ok,detail);
 }
 function feedback(ok,detail){
@@ -1342,7 +1382,7 @@ function gameOver(score,xp,title){gStop();const g=G.g,st=S.games[g.id]||{best:nu
   const lvBefore=level();if(xp>0)addXP(xp);const newA=checkAch();save();
   if(xp>0)sWin();if(rec&&st.plays>1)confetti();
   gstat('');
-  $('#gbody').innerHTML=`<div class="end"><span id="go-ciro">${mascot(xp>0?(rec&&st.plays>1?'cheer':'happy'):'sad',xp>0?'m-jump':'m-shake')}</span><h2 style="color:var(--c)">${title||'Игра окончена'}</h2>${rec&&st.plays>1?'<span class="chip">Новый рекорд!</span>':''}${levelUps(lvBefore)}
+  $('#gbody').innerHTML=`<div class="end"><span id="go-ciro">${mascot(xp>0?(rec&&st.plays>1?'cheer':'happy'):'sad',xp>0?'m-jump':'m-shake')}</span><h2 style="color:var(--c)">${title||'Игра окончена'}</h2><div class="bubble">${rec&&st.plays>1?'Новый рекорд! <b class="arm">Կեցցե՛ս!</b>':st.plays===1?'Первая игра — и уже очки! Сыграем ещё?':xp>0?'Неплохо! Рекорд — '+st.best+'. Догонишь?':'Ничего, в следующий раз получится. Попробуем ещё?'}</div>${levelUps(lvBefore)}
    <div class="tiles3"><div class="stat"><div class="h">Счёт</div><div class="v">${score}</div></div><div class="stat" style="--c:var(--b3)"><div class="h">Рекорд</div><div class="v">${st.best}</div></div><div class="stat" style="--c:var(--gold-deep)"><div class="h">XP</div><div class="v">+${xp}</div></div></div>
    ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<span class="chip">${IC[a.ic]} ${esc(a.t)}</span>`).join('')}</div></div>`:''}</div>`;
   gfoot(`<button class="btn plain" id="gout">Выйти</button><button class="btn" id="gagain">Ещё раз</button>`);
@@ -1371,9 +1411,9 @@ PLAY.fall=function(){gStop();const pool=lettersUpTo(G.lvl);let score=0,lives=3,s
 /* Спринт */
 PLAY.sprint=function(){gStop();const pool=wordsUpTo(G.lvl);let score=0,combo=0,left=60,cur,truth;
   $('#gbody').innerHTML=`<div class="timebar"><i id="tb"></i></div><div class="sprint" id="spr"><div class="big word" id="sw"></div><div class="eq">это значит</div><div class="big ru" id="sm"></div><div class="combo" id="sc" style="text-align:center"></div></div>`;
-  gfoot(`<button class="btn bad gbig" id="sno">✕ Неверно</button><button class="btn good gbig" id="syes">✓ Верно</button>`);
+  gfoot(`<div class="gamefoot"><button class="btn bad gbig" id="sno">✕ Неверно</button><button class="btn good gbig" id="syes">✓ Верно</button></div>`);
   const stat=()=>gstat(`<span class="pill">${IC.star}${score}</span><span class="pill" style="color:var(--c)">${IC.bolt}${left} с</span>`);
-  function nextQ(){cur=pick(pool);if(S.voice!==false)say(cur.a);truth=Math.random()<.5;const o=pool.filter(w=>w.m!==cur.m);$('#sw').textContent=cur.a;$('#sm').textContent=truth||!o.length?cur.m:pick(o).m;if(!o.length)truth=true}
+  function nextQ(){cur=pick(pool);if(S.voice!==false)setTimeout(()=>{if(G&&G.answer)say(cur.a)},260);truth=Math.random()<.5;const o=pool.filter(w=>!clash(w.m,cur.m));$('#sw').textContent=cur.a;$('#sm').textContent=truth||!o.length?cur.m:pick(o).m;if(!o.length)truth=true}
   G.answer=v=>{if(left<=0)return;const ok=v===truth,sp=$('#spr');
     if(ok){combo++;score+=combo>=5?2:1;tone([[700,.07]])}else{combo=0;sBad()}
     sp.classList.remove('ok','no');void sp.offsetWidth;sp.classList.add(ok?'ok':'no');
@@ -1384,7 +1424,7 @@ PLAY.sprint=function(){gStop();const pool=wordsUpTo(G.lvl);let score=0,combo=0,l
   G.timers.push(iv);stat();nextQ()};
 
 /* Найди пары */
-PLAY.memo=function(){gStop();const ws=[];for(const w of shuffle(wordsUpTo(G.lvl))){if(ws.length>=6)break;if(!ws.some(x=>x.m===w.m))ws.push(w)}
+PLAY.memo=function(){gStop();const ws=[];for(const w of shuffle(wordsUpTo(G.lvl))){if(ws.length>=6)break;if(!ws.some(x=>clash(x.m,w.m)||x.a===w.a))ws.push(w)}
   const cards=shuffle(ws.flatMap((w,i)=>[{p:i,t:w.a,arm:1},{p:i,t:w.m,arm:0}]));let open=[],moves=0,found=0,lock=false;const t0=Date.now();
   $('#gbody').innerHTML=`<div class="memo">${cards.map((c,i)=>`<button class="mcard" data-i="${i}" aria-label="Карточка ${i+1}"><span class="mf back arm">Ա</span><span class="mf face ${c.arm?'arm':''}">${esc(c.t)}</span></button>`).join('')}</div>`;
   const stat=()=>{const s=Math.floor((Date.now()-t0)/1000);gstat(`<span class="pill">${IC.target}${moves}</span><span class="pill">${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}</span>`)};
