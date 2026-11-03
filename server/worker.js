@@ -4,7 +4,7 @@
  * Принимает события из Mini App и показывает страницу статистики с паролем.
  * Привязки (Settings → Bindings / Variables and Secrets):
  *   DB              — база D1 (обязательно)
- *   ADMIN_PASSWORD  — пароль страницы статистики (секрет, обязательно)
+ *   ADMIN_PASSWORD  — пароль страницы статистики (секрет, необязательно: без него страница открыта всем, кто знает адрес)
  *   BOT_TOKEN       — токен бота (секрет, желательно): проверка, что события пришли из настоящего Телеграма
  *   SALT            — необязательно: соль для обезличивания id (по умолчанию выводится из BOT_TOKEN)
  * Имена и ники пользователей не сохраняются: только обезличенный хэш id.
@@ -177,7 +177,7 @@ export default {
     }
     if (url.pathname === '/logout') return new Response(null, { status: 303, headers: { Location: '/', 'Set-Cookie': 'ays=; Path=/; Max-Age=0' } });
     if (url.pathname === '/' || url.pathname === '/stats') {
-      if (!(await authed(req, env))) return new Response(loginPage(false), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+      if (env.ADMIN_PASSWORD && !(await authed(req, env))) return new Response(loginPage(false), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
       return new Response(statsPage(await gather(env)), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
     }
     if (url.pathname === '/health') return new Response('ok');
