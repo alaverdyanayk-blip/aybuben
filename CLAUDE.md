@@ -13,6 +13,12 @@
 - `audio/*.mp3` — озвучка (ElevenLabs, eleven_v3). Имя файла = FNV-1a от ключа: текст без «։», trim, lowercase (см. `fnv`/`akey` в приложении).
 - `src/avatar.png`, `src/banner.png` — аватар бота и баннер Mini App.
 
+## Статистика
+- Страница: https://aybuben-stats.alaverdyanayk.workers.dev (пароль не задан — открыта по ссылке; можно добавить секрет ADMIN_PASSWORD).
+- `server/worker.js` + `server/wrangler.toml` — Cloudflare Worker `aybuben-stats` + D1 `aybuben`. Cloudflare сам собирает его из GitHub при push (Workers Builds, Root directory = server).
+- Приложение шлёт события через `src/stats-sender.js`; адрес сервера — в `src/analytics.json`, build.py вставляет отправщик. События: open, lesson, lesson_first, practice, fail, game (`track()` в приложении).
+- Секреты (вводит только пользователь, в панели Cloudflare): ADMIN_PASSWORD, BOT_TOKEN (проверка подписи Telegram), SALT — все необязательны.
+
 ## Как выкатить обновление
 1. Изменить `src/aybuben.html` (и при необходимости опубликовать его же как артефакт по ссылке выше).
 2. `python3 src/build.py`
