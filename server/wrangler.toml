@@ -1,4 +1,5 @@
 # Сервер статистики Айбубена. Cloudflare собирает его из этой папки (Workers Builds, Root directory = server).
+# Сборка: Cloudflare Workers Builds из GitHub при каждом push в main.
 name = "aybuben-stats"
 main = "worker.js"
 compatibility_date = "2025-06-01"
