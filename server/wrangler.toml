@@ -1,0 +1,12 @@
+# Сервер статистики Айбубена. Cloudflare собирает его из этой папки (Workers Builds, Root directory = server).
+name = "aybuben-stats"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aybuben"
+database_id = "8e5ecb9e-050d-4263-8829-06e9d21025c2"
+
+# Секреты ADMIN_PASSWORD, BOT_TOKEN, SALT задаются в панели Cloudflare (Settings → Variables and Secrets), не здесь.
