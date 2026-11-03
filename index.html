@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="f0c25f2a0d"</script>
+<script>window.BUILD_ID="e670be0e96"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1335,7 +1335,8 @@ function guideSheet(ui){const u=UNITS[ui];
 
 /* ================= УРОК ================= */
 let LS=null;
-function track(path,title){try{if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:path,title:title||path,event:true})}catch(e){}}
+function track(ev,p){try{if(window.__stats)window.__stats(ev,p)}catch(e){}}
+const lref=l=>`${LESSONS.indexOf(l)}|${l.id}|${l.t}`;
 function startPractice(){const pool=LESSONS.filter(l=>S.done[l.id]);const src=pool.length?pool:[LESSONS[0]];
   let items=[];shuffle(src).slice(0,4).forEach(l=>items.push(...l.gen().filter(x=>x.type!=='teach'&&x.type!=='letter')));
   startLesson({id:'practice',t:'Тренировка',gen:()=>sample(items,10)},true)}
@@ -1447,7 +1448,7 @@ function feedback(ok,detail){
 function finishLesson(){
   LS.state='end';const prac=LS.practice,perfect=LS.mistakes===0;
   const xp=prac?5:10+(perfect?5:0);
-  track(prac?'тренировка':'урок/'+LS.lesson.id,prac?'Тренировка пройдена':'Урок пройден: '+LS.lesson.t);if(!prac&&!S.done[LS.lesson.id])track('урок-впервые/'+LS.lesson.id,'Урок пройден впервые: '+LS.lesson.t);
+  if(prac)track('practice');else{track('lesson',lref(LS.lesson));if(!S.done[LS.lesson.id])track('lesson_first',lref(LS.lesson))}
   if(prac){S.hearts=Math.min(MAXH,hearts()+1)}else{S.done[LS.lesson.id]=(S.done[LS.lesson.id]||0)+1;if(perfect)S.perfect++}
   const goalBefore=todayXP()>=S.goal,lvBefore=level();addXP(xp);const goalNow=!goalBefore&&todayXP()>=S.goal;
   const newA=checkAch();save();
@@ -1462,7 +1463,7 @@ function finishLesson(){
   $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);$('#nxt').onclick=closeLesson;$('#nxt').focus();
   wireWear('#end-ciro');sWin();confetti();
 }
-function failLesson(){LS.state='end';track('сердца-кончились/'+LS.lesson.id,'Сердца кончились: '+LS.lesson.t);
+function failLesson(){LS.state='end';if(LS.lesson.id!=='practice')track('fail',lref(LS.lesson));
   $('#ex').innerHTML=`<div class="end">${mascot('sleep','m-idle')}<h2 style="color:var(--bad)">Сердца закончились</h2><div class="bubble">Сердечко восстанавливается за 30 минут. Или давай потренируемся на пройденном — сразу получишь одно.</div></div>`;
   $('#lfoot').className='l-foot';foot(`<button class="btn plain" id="out">Выйти</button><button class="btn" id="pr">Тренировка</button>`);
   $('#out').onclick=closeLesson;$('#pr').onclick=()=>{const el=$('#lesson');el&&el.remove();LS=null;startPractice()}}
@@ -1548,7 +1549,7 @@ function missLetter(l){if(l&&!G.miss.some(x=>x.k===l.k))G.miss.push(l)}
 function reviewHtml(){const m=G.miss.slice(0,10);if(!m.length)return '';
   return `<div class="review"><b>Повторим</b>${m.map(x=>x.U?`<div class="rv"><span class="rv-a gl">${x.U}${x.U!==x.k?' '+x.k:''}</span><span class="rv-m">«${esc(x.s)}»</span></div>`:`<div class="rv">${spk(x.a,'sm')}<span class="rv-a">${esc(x.a)}</span><span class="rv-m"><b>${esc(x.m)}</b> · «${esc(x.r)}»</span></div>`).join('')}</div>`}
 function starsHtml(n){return `<div class="stars" aria-label="${n} из 3 звёзд">${[1,2,3].map(i=>`<span class="${i<=n?'on':''}">${IC.star}</span>`).join('')}</div>`}
-function gameOver(score,xp,title,o={}){gStop();track('игра/'+G.g.id+(G.mode?'-'+G.mode:''),'Игра: '+G.g.t);const g=G.g,rk=recKey(g.id,G.mode),st=S.games[rk]||{best:null,plays:0};
+function gameOver(score,xp,title,o={}){gStop();track('game',G.g.id+(G.mode?'-'+G.mode:''));const g=G.g,rk=recKey(g.id,G.mode),st=S.games[rk]||{best:null,plays:0};
   const rec=st.best==null||(g.low?score<st.best:score>st.best);if(rec)st.best=score;st.plays++;S.games[rk]=st;
   if(o.stars===3)S.memo3=true;
   const lvBefore=level();if(xp>0)addXP(xp);const newA=checkAch();save();
