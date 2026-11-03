@@ -396,6 +396,15 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .wr-item:disabled{cursor:default}.wr-item:disabled .mascot{filter:grayscale(1);opacity:.45}
 @media (max-width:520px){.wr{grid-template-columns:1fr}.wr-prev{flex-direction:row;text-align:left}.wr-prev .mascot{width:96px;height:96px}}
 .box,.card{box-shadow:0 3px 0 var(--line)}
+.contact{flex-direction:row;align-items:center;gap:14px}
+.contact .mascot{width:76px;height:76px}
+.c-tx{display:flex;flex-direction:column;gap:8px;min-width:0}
+.c-tx p{margin:0;color:var(--muted);font-size:14px}
+.btn.tg{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:fit-content;text-decoration:none;background:#2AABEE;box-shadow:0 4px 0 #1C86BE;color:#fff;text-transform:none;letter-spacing:0;font-size:15px}
+.btn.tg svg{width:20px;height:20px}
+.homefoot{text-align:center;color:var(--muted);font-size:13.5px;margin:34px 0 0}
+.homefoot a{color:var(--accent);font-weight:700;text-decoration:none}
+@media (max-width:520px){.contact{flex-direction:column;align-items:flex-start}.btn.tg{width:100%}}
 .reftabs{background:var(--sunk);padding:4px;border-radius:14px;width:fit-content}
 .reftabs button{border:0;border-radius:11px;padding:7px 16px;background:transparent}
 .reftabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgb(0 0 0/.12)}
@@ -522,6 +531,8 @@ function mascot(mood='happy',cls='',outfit){
 }
 function ciroSay(mood,html,cls=''){return `<div class="ciro-say ${cls}">${mascot(mood,'m-idle')}<div class="bubble">${html}</div></div>`}
 function bounce(el,cls='m-jump'){if(!el)return;el.classList.remove('m-jump','m-shake');void el.getBoundingClientRect();el.classList.add(cls);el.addEventListener('animationend',()=>el.classList.remove(cls),{once:true})}
+const CONTACT={tg:'ggayk',url:'https://t.me/ggayk'};
+function contactBox(){return `<div class="box contact">${mascot('wink','m-idle')}<div class="c-tx"><h3>Идеи и ошибки</h3><p>Нашли ошибку, странный звук или придумали, что добавить? Напишите автору приложения — каждое сообщение читается.</p><a class="btn tg" href="${CONTACT.url}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.4 4.3 18.3 19c-.2 1-.9 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.8 8.8-7.9c.4-.3-.1-.5-.6-.2L6.2 12.9l-4.6-1.4c-1-.3-1-1 .2-1.5l18-6.9c.8-.3 1.6.2 1.6 1.2z"/></svg>Написать @${CONTACT.tg}</a></div></div>`}
 const FACTS=[
  'Моё имя — от слова <b>ծիրան</b>, «абрикос». Циро — это я, только короче.',
  'По-латыни абрикос — <i>Prunus armeniaca</i>, то есть «армянская слива». Мы, абрикосы, отсюда родом.',
@@ -1194,7 +1205,7 @@ function renderLearn(){
         <button class="stone" data-l="${gi}" aria-label="${esc(l.t)}${open?'':' (закрыто)'}" ${l.g.length>2?'style="font-size:19px"':''}>${open||done?esc(l.g):'<svg class="i" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</button>
         <span class="lv">${[0,1,2].map(i=>`<b class="${i<Math.min(3,done)?'on':''}"></b>`).join('')}</span><span class="cap">${esc(l.t)}</span></div>`});
     html+='</div></section>'});
-  html+='</div>';
+  html+=`</div><p class="homefoot">Есть идея или нашли ошибку? <a href="${CONTACT.url}" target="_blank" rel="noopener">Напишите @${CONTACT.tg}</a></p>`;
   $('#view').innerHTML=html;
   document.querySelectorAll('.stone').forEach(b=>b.onclick=()=>lessonSheet(+b.dataset.l));
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>guideSheet(+b.dataset.guide));
@@ -1560,6 +1571,7 @@ function renderProfile(){
    <div class="box week"><h3>Неделя</h3>${chart}</div>
    <div class="box"><h3>Цель дня</h3><div class="goals">${[[10,'Лёгкая','1 урок'],[20,'Обычная','2 урока'],[30,'Серьёзная','3 урока'],[50,'Интенсив','5 уроков']].map(([v,t,d])=>`<button data-g="${v}" aria-pressed="${S.goal===v}"><b>${t} · ${v} XP</b><span>около ${d} в день</span></button>`).join('')}</div></div>
    <div class="box"><h3>Достижения · ${Object.keys(S.ach).length} из ${ACH.length}</h3><div class="agrid2">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?'on':''}"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></div>
+   ${contactBox()}
    <div class="box"><h3>Настройки</h3>
     <div class="toggle"><span>Произносить слова автоматически<br><span class="note">Кнопка с динамиком работает всегда</span></span><button class="switch" role="switch" id="sw-voice" aria-checked="${S.voice!==false}" aria-label="Автоозвучка"></button></div>
     <div class="toggle"><span>Звуки в уроках</span><button class="switch" role="switch" id="sw-sound" aria-checked="${S.sound}" aria-label="Звуки"></button></div>

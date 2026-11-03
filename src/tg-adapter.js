@@ -16,6 +16,9 @@
   // Вибро-отклик на ответы
   window.__haptic=function(t){try{var H=tg.HapticFeedback;if(t==='ok')H.notificationOccurred('success');else if(t==='bad')H.notificationOccurred('error');else H.impactOccurred('light')}catch(e){}};
 
+  // Ссылки на t.me открываем внутри Телеграма, а не во внешнем браузере
+  document.addEventListener('click',function(e){var l=e.target.closest&&e.target.closest('a[href^="https://t.me/"]');if(!l)return;try{e.preventDefault();tg.openTelegramLink(l.href)}catch(x){window.open(l.href,'_blank')}},true);
+
   // Кнопка «Назад» в шапке Телеграма закрывает урок, игру или окно
   var layer=document.getElementById('layer'),BB=tg.BackButton;
   function syncBack(){layer&&layer.children.length?BB.show():BB.hide()}
