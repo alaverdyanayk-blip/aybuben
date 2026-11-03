@@ -6,7 +6,7 @@
  *   DB              — база D1 (обязательно)
  *   ADMIN_PASSWORD  — пароль страницы статистики (секрет, обязательно)
  *   BOT_TOKEN       — токен бота (секрет, желательно): проверка, что события пришли из настоящего Телеграма
- *   SALT            — любая длинная строка (секрет, желательно): соль для обезличивания id пользователей
+ *   SALT            — необязательно: соль для обезличивания id (по умолчанию выводится из BOT_TOKEN)
  * Имена и ники пользователей не сохраняются: только обезличенный хэш id.
  */
 const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game']);
@@ -56,7 +56,7 @@ async function collect(req, env) {
   let body; try { body = JSON.parse(await req.text()); } catch (e) { return new Response('bad json', { status: 400, headers: CORS }); }
   const ev = String(body.ev || ''); if (!EVENTS.has(ev)) return new Response('bad event', { status: 400, headers: CORS });
   const p = body.p == null ? null : String(body.p).slice(0, 160);
-  const salt = env.SALT || 'aybuben-default-salt';
+  const salt = env.SALT || (env.BOT_TOKEN ? hex(await hmac(env.BOT_TOKEN, 'aybuben-salt-v1')) : 'aybuben-default-salt');
   let uid = null, src = 'web', lang = null;
   if (body.init) {
     const user = env.BOT_TOKEN ? await verifyInitData(String(body.init), env.BOT_TOKEN) : unsafeUser(String(body.init));
