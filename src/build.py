@@ -27,5 +27,10 @@ page = f'''<!doctype html>
 </body>
 </html>
 '''
+import hashlib, json
+build_id = hashlib.sha1((html + adapter).encode('utf-8')).hexdigest()[:10]
+page = page.replace('<script src="https://telegram.org/js/telegram-web-app.js"></script>', '<script>window.BUILD_ID=' + json.dumps(build_id) + '</script>\n<script src="https://telegram.org/js/telegram-web-app.js"></script>', 1)
 open(os.path.join(root, 'index.html'), 'w', encoding='utf-8').write(page)
+open(os.path.join(root, 'version.json'), 'w', encoding='utf-8').write(json.dumps({'build': build_id}))
+print('версия сборки:', build_id)
 print(f'index.html собран: {len(page)//1024} КБ')

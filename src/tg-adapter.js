@@ -16,6 +16,17 @@
   // Вибро-отклик на ответы
   window.__haptic=function(t){try{var H=tg.HapticFeedback;if(t==='ok')H.notificationOccurred('success');else if(t==='bad')H.notificationOccurred('error');else H.impactOccurred('light')}catch(e){}};
 
+  // Свежая версия: если на сайте уже новая сборка, а Телеграм показал старую из кэша — перезагрузиться на новую
+  function checkFresh(){
+    if(!window.BUILD_ID)return;
+    fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(v){
+      if(v&&v.build&&v.build!==window.BUILD_ID&&!(window.LS||document.getElementById('lesson')||document.getElementById('game'))){
+        var k='aybuben_reload_'+v.build;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}
+        location.replace(location.pathname+'?v='+v.build+location.hash)}
+    }).catch(function(){});
+  }
+  checkFresh();document.addEventListener('visibilitychange',function(){if(!document.hidden)checkFresh()});
+
   // Ссылки на t.me открываем внутри Телеграма, а не во внешнем браузере
   document.addEventListener('click',function(e){var l=e.target.closest&&e.target.closest('a[href^="https://t.me/"]');if(!l)return;try{e.preventDefault();tg.openTelegramLink(l.href)}catch(x){window.open(l.href,'_blank')}},true);
 
