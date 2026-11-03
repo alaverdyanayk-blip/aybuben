@@ -396,6 +396,38 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .wr-item:disabled{cursor:default}.wr-item:disabled .mascot{filter:grayscale(1);opacity:.45}
 @media (max-width:520px){.wr{grid-template-columns:1fr}.wr-prev{flex-direction:row;text-align:left}.wr-prev .mascot{width:96px;height:96px}}
 .box,.card{box-shadow:0 3px 0 var(--line)}
+/* свёрнутые разделы */
+.band.mini{width:100%;border:0;text-align:left;padding:12px 16px;gap:12px;font:inherit;color:#fff;cursor:pointer}
+.band.mini.lock{background:var(--sunk);color:var(--muted);box-shadow:0 4px 0 var(--line)}
+.band.mini.lock::after{display:none}
+.band.mini .mi-ic{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgb(255 255 255/.22)}
+.band.mini.lock .mi-ic{background:var(--surface)}
+.band.mini .mi-ic svg{width:18px;height:18px}
+.band.mini .mi-tx{display:flex;flex-direction:column;min-width:0;flex:1}
+.band.mini .mi-tx b{font-size:16.5px;line-height:1.25;overflow-wrap:anywhere}
+.band.mini .mi-r{display:flex;align-items:center;gap:4px;font-weight:700;font-size:13px;white-space:nowrap;opacity:.95}
+.band.mini .mi-r svg{width:20px;height:20px}
+.band.mini:hover{filter:brightness(1.05)}
+.band-side{display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex:none}
+.uline{height:6px;border-radius:9px;background:rgb(0 0 0/.18);overflow:hidden;margin-top:10px;max-width:260px}
+.uline i{display:block;height:100%;background:#fff;border-radius:9px;opacity:.9}
+/* кнопка «к уроку» */
+.jump{position:fixed;z-index:22;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:6px;border:0;border-radius:99px;padding:11px 16px 11px 13px;background:var(--ink);color:var(--surface);font-weight:800;font-size:14px;box-shadow:0 6px 18px rgb(0 0 0/.25);animation:rise .25s ease both}
+.jump svg{width:18px;height:18px}.jump.up svg{transform:rotate(180deg)}
+@media (max-width:640px){.jump{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}
+/* тренировка на главной */
+.prac{cursor:pointer;font:inherit;color:inherit}
+.prac .pic{flex:none;width:52px;height:52px;border-radius:16px;background:var(--b3);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 color-mix(in srgb,var(--b3) 65%,#000)}
+.prac .pic svg{width:26px;height:26px}
+.prac .pt{font-size:16px;font-weight:700}.prac .m{color:var(--muted);font-size:13.5px}
+.prac:hover{border-color:var(--b3)}
+/* алфавит: изученные */
+.abc-head{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:0 3px 0 var(--line)}
+.ah-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}.ah-top b{font-size:17px}.ah-top>span{color:var(--muted);font-size:13px}
+.at{position:relative}
+.at.learned{border-color:color-mix(in srgb,var(--gold) 70%,var(--line));box-shadow:0 3px 0 var(--gold-deep);background:color-mix(in srgb,var(--gold) 9%,var(--surface))}
+.at.learned::after{content:"";position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--good)}
+.at:not(.learned) .gl{opacity:.8}
 /* игры 2.0 */
 .gintro{gap:14px}
 .gpick{display:flex;flex-direction:column;gap:7px;align-items:center;width:100%}
@@ -1229,10 +1261,14 @@ function renderLearn(){
    <div class="duo">
     <div class="tile2 wod"><div class="tx"><span class="lbl">Слово дня</span><span class="w">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></div>${spk(wod.a)}</div>
     <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button>
+    ${Object.keys(S.done).length?`<button class="tile2 prac" id="prac"><span class="pic">${IC.bolt}</span><span class="tx"><span class="lbl">Тренировка</span><span class="pt">10 заданий из пройденного</span><span class="m">+5 XP и +1 сердце</span></span></button>`:''}
    </div></div>
   <div style="display:flex;flex-direction:column;gap:30px;margin-top:30px">`;
-  UNITS.forEach((u,ui)=>{const dn=u.lessons.filter(l=>S.done[l.id]).length;
-    html+=`<section class="unit" style="--band:var(--b${ui%4})"><div class="band"><div><div class="k">${u.k}<span class="uprog">${dn}/${u.lessons.length}</span></div><h2>${u.t}</h2><p>${u.d}</p></div>${u.lessons.some(l=>l.teach)?`<button class="guide" data-guide="${ui}">${IC.book.replace('class="i"','class="i" style="width:18px;height:18px;vertical-align:-4px"')} Правило</button>`:''}</div><div class="nodes">`;
+  const curUnit=curIdx<0?-1:LESSONS[curIdx].unit;
+  UNITS.forEach((u,ui)=>{const dn=u.lessons.filter(l=>S.done[l.id]).length,all=dn===u.lessons.length,locked=u.lessons.every(l=>!unlocked(LESSONS.indexOf(l)));
+    const compact=!EXPANDED.has(ui)&&((all&&ui!==curUnit)||(locked&&curUnit>=0&&ui>curUnit+1));
+    if(compact){html+=`<section class="unit" style="--band:var(--b${ui%4})"><button class="band mini ${all?'fin':'lock'}" data-exp="${ui}" aria-expanded="false"><span class="mi-ic">${all?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</span><span class="mi-tx"><span class="k">${u.k}</span><b>${esc(u.t)}</b></span><span class="mi-r">${all?'Пройден':`${u.lessons.length} ${plural(u.lessons.length,'урок','урока','уроков')}`}<svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></section>`;return}
+    html+=`<section class="unit" style="--band:var(--b${ui%4})"><div class="band"><div><div class="k">${u.k}<span class="uprog">${dn}/${u.lessons.length}</span></div><h2>${u.t}</h2><p>${u.d}</p><div class="uline"><i style="width:${Math.round(dn/u.lessons.length*100)}%"></i></div></div><div class="band-side">${EXPANDED.has(ui)?`<button class="guide" data-col="${ui}" aria-label="Свернуть раздел">Свернуть</button>`:''}${u.lessons.some(l=>l.teach)?`<button class="guide" data-guide="${ui}">${IC.book.replace('class="i"','class="i" style="width:18px;height:18px;vertical-align:-4px"')} Правило</button>`:''}</div></div><div class="nodes">`;
     u.lessons.forEach((l,li)=>{const gi=LESSONS.indexOf(l),open=unlocked(gi),done=S.done[l.id]||0,cur=gi===curIdx;
       const off=OFF[(gi)%OFF.length];
       html+=`<div class="node ${done?'done':open?'open':''} ${cur?'cur':''}" style="transform:translateX(${off}px)">${cur?`<span class="start-tag">${done?'Повтор':'Начать'}</span><span class="buddy ${off>0?'l':'r'}">${mascot('happy','m-idle')}</span>`:''}
@@ -1246,8 +1282,19 @@ function renderLearn(){
   $('#ciro').onclick=()=>{bounce($('#ciro .mascot'));say(g.hy)};
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
+  const pr=$('#prac');if(pr)pr.onclick=startPractice;
+  document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{EXPANDED.add(+b.dataset.exp);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
+  document.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{EXPANDED.delete(+b.dataset.col);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
+  setupJump();
   requestAnimationFrame(drawTrails);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if($('.nodes'))drawTrails()});
 }
+const EXPANDED=new Set();let jumpObs=null;
+function setupJump(){let fab=$('#jump');if(!fab){fab=document.createElement('button');fab.id='jump';fab.className='jump';fab.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>К уроку</span>';document.body.appendChild(fab)}
+  if(jumpObs)jumpObs.disconnect();const cur=$('.node.cur');fab.hidden=true;if(!cur||!('IntersectionObserver' in window))return;
+  fab.onclick=()=>cur.scrollIntoView({block:'center',behavior:'smooth'});
+  let curIn=true,ctaIn=true;const upd=()=>{const onLearn=(location.hash.slice(1)||'learn')==='learn';fab.hidden=!onLearn||curIn||ctaIn};
+  jumpObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.target===cur){curIn=e.isIntersecting;fab.classList.toggle('up',e.boundingClientRect.top<0)}else ctaIn=e.isIntersecting});upd()});jumpObs.observe(cur);const cta=$('#cta');if(cta)jumpObs.observe(cta)}
+window.addEventListener('hashchange',()=>{const f=$('#jump');if(f&&(location.hash.slice(1)||'learn')!=='learn')f.hidden=true});
 function drawTrails(){document.querySelectorAll('.nodes').forEach(n=>{const old=n.querySelector('.trail');if(old)old.remove();const r=n.getBoundingClientRect();if(!r.width)return;
   const ss=[...n.querySelectorAll('.node')].map(nd=>{const b=nd.querySelector('.stone').getBoundingClientRect(),nb=nd.getBoundingClientRect(),tg=nd.querySelector('.start-tag');const top=tg?tg.getBoundingClientRect().top:b.top;
     return {x:b.left-r.left+b.width/2,top:top-r.top-5,bot:nb.bottom-r.top+5,d:nd.classList.contains('done')}});
@@ -1642,9 +1689,12 @@ document.addEventListener('keydown',e=>{if(!G||$('.scrim'))return;const id=G.g.i
   else if(e.key==='Enter'){const b=$('#gnext')||$('#gplay')||$('#gagain');if(b&&!b.disabled&&document.activeElement!==b){e.preventDefault();b.click()}}});
 
 /* ================= АЛФАВИТ (справочник) ================= */
-function renderAlphabet(){
-  $('#view').innerHTML=`<div style="display:flex;flex-direction:column;gap:22px"><p class="intro">Все 39 букв восточноармянского алфавита в реформированной орфографии. Нажмите на букву, чтобы увидеть подсказку и прописать её.</p>
-  ${GROUPS.map((g,i)=>`<div class="grp"><h3>${i+1}. ${g} <span>· ${LETTERS.filter(l=>l.L===i+1).length} букв</span></h3><div class="agrid">${LETTERS.filter(l=>l.L===i+1).map(l=>`<button class="at" data-k="${l.k}"><span class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</span><span class="sd">${esc(l.s)}</span></button>`).join('')}</div></div>`).join('')}</div>`;
+function letterLearned(l){const grp=LETTERS.filter(x=>x.L===l.L);if(grp.length>3){const [a]=half(grp);return !!S.done[`a${l.L}${a.includes(l)?'a':'b'}`]}return !!S.done[`a${l.L}a`]}
+function renderAlphabet(){const nL=LETTERS.filter(letterLearned).length;
+  $('#view').innerHTML=`<div style="display:flex;flex-direction:column;gap:22px">
+  <div class="abc-head"><div class="ah-top"><b>Изучено ${nL} из ${LETTERS.length}</b><span>${nL===LETTERS.length?'Весь алфавит! <span class="arm">Կեցցե՛ս!</span>':'буквы отмечаются после урока'}</span></div><div class="bar ${nL===LETTERS.length?'good':''}"><i style="width:${Math.round(nL/LETTERS.length*100)}%"></i></div></div>
+  <p class="intro">Все 39 букв восточноармянского алфавита в реформированной орфографии. Нажмите на букву, чтобы увидеть подсказку и прописать её.</p>
+  ${GROUPS.map((g,i)=>{const ls=LETTERS.filter(l=>l.L===i+1),k=ls.filter(letterLearned).length;return `<div class="grp"><h3>${i+1}. ${g} <span>· ${k===ls.length?'все изучены':`${k} из ${ls.length}`}</span></h3><div class="agrid">${ls.map(l=>`<button class="at ${letterLearned(l)?'learned':''}" data-k="${l.k}"><span class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</span><span class="sd">${esc(l.s)}</span></button>`).join('')}</div></div>`}).join('')}</div>`;
   document.querySelectorAll('.at').forEach(b=>b.onclick=()=>letterSheet(b.dataset.k));
 }
 let traceCase='U';
@@ -1702,7 +1752,7 @@ function renderProfile(){
     <div class="wr-grid">${OUTFITS.map(o=>{const op=lv>=o.lv,on=(S.outfit||null)===o.id;return `<button class="wr-item ${on?'on':''}" data-o="${o.id||''}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',o.id)}<b>${o.t}</b><span>${op?o.d:`Откроется на уровне ${o.lv}`}</span></button>`}).join('')}</div>
    </div></div>
    <div class="cards">
-    <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">дней подряд · рекорд ${S.best||0}</div></div></div>
+    <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div></div></div>
     <div class="card"><span style="color:var(--gold-deep)">${IC.bolt}</span><div><div class="v">${S.xp}</div><div class="l">всего XP</div></div></div>
     <div class="card"><span style="color:var(--b1)">${IC.crown}</span><div><div class="v">${level()}</div><div class="l">уровень · до следующего ${100-S.xp%100} XP</div></div></div>
     <div class="card"><span style="color:var(--b2)">${IC.book}</span><div><div class="v">${doneL}/${LESSONS.length}</div><div class="l">уроков пройдено</div></div></div>
