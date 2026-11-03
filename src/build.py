@@ -28,8 +28,6 @@ page = f'''<!doctype html>
 </html>
 '''
 import hashlib, json
-build_id = hashlib.sha1((html + adapter).encode('utf-8')).hexdigest()[:10]
-page = page.replace('<script src="https://telegram.org/js/telegram-web-app.js"></script>', '<script>window.BUILD_ID=' + json.dumps(build_id) + '</script>\n<script src="https://telegram.org/js/telegram-web-app.js"></script>', 1)
 an_path = os.path.join(src, 'analytics.json')
 if os.path.exists(an_path):
     server = json.load(open(an_path, encoding='utf-8')).get('server', '').strip().rstrip('/')
@@ -37,6 +35,8 @@ if os.path.exists(an_path):
         sender = open(os.path.join(src, 'stats-sender.js'), encoding='utf-8').read().replace('__SERVER__', server)
         page = page.replace('</body>', '<script>\n' + sender + '</script>\n</body>', 1)
         print('статистика:', server)
+build_id = hashlib.sha1(page.encode('utf-8')).hexdigest()[:10]  # хэш всей страницы, включая подключённую статистику
+page = page.replace('<script src="https://telegram.org/js/telegram-web-app.js"></script>', '<script>window.BUILD_ID=' + json.dumps(build_id) + '</script>\n<script src="https://telegram.org/js/telegram-web-app.js"></script>', 1)
 open(os.path.join(root, 'index.html'), 'w', encoding='utf-8').write(page)
 open(os.path.join(root, 'version.json'), 'w', encoding='utf-8').write(json.dumps({'build': build_id}))
 print('версия сборки:', build_id)
