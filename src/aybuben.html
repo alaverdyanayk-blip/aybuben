@@ -601,6 +601,7 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .syls{display:flex;flex-wrap:wrap;gap:8px}
 .syl{display:flex;flex-direction:column;align-items:center;min-width:56px;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface)}
 .syl b{font-size:24px;font-weight:600;color:var(--accent)}.syl small{color:var(--muted);font-size:13px}
+.rv-tag{display:inline-block;margin-bottom:6px;padding:3px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
 </style>
 
 <header class="top"><div class="top-in">
@@ -750,7 +751,7 @@ function ciroGreet(){const h=new Date().getHours();
 
 /* ================= АЛФАВИТ ================= */
 const GROUPS=['Первые слова','Скажи «привет»','Мама, папа, Армения','Скажи «спасибо»','Рычим по-армянски','Финал алфавита'];
-const GDESC=['Первые 7 букв — и уже читаются <b class="arm">տուն</b> (дом) и <b class="arm">սար</b> (гора).',
+const GDESC_OLD=['Первые 7 букв — и уже читаются <b class="arm">տուն</b> (дом) и <b class="arm">սար</b> (гора).',
  'Напишете <b class="arm">բարև</b> — привет, прочитаете <b class="arm">կատու</b> — кошка и <b class="arm">Երևան</b>.',
  'Откроются <b class="arm">մայր</b> — мама, <b class="arm">հայր</b> — папа и <b class="arm">Հայաստան</b>.',
  'Звуки с придыханием и без. Прочитаете <b class="arm">հաց</b>, <b class="arm">պանիր</b> и <b class="arm">ծիրան</b>.',
@@ -896,6 +897,11 @@ const THEMES=[
 // Слияние с базовым списком слов: новые слова добавляются, у старых появляется тема
 (function(){const by={};WORDS.forEach(w=>by[w.a]=w);
   THEMES.forEach(th=>{th.words=th.w.map(([a,r,m])=>{let w=by[a];if(!w){w={a,r,m};WORDS.push(w);by[a]=w}w.th=w.th||th.id;return w})})})();
+/* Порядок изучения букв (v2): сначала самые «урожайные» — из них складывается больше всего слов,
+   поэтому настоящие слова появляются уже в первом уроке. Прежний порядок нужен для пересчёта прогресса. */
+const OLD_GROUPS=[1,2,3,4,5,6].map(n=>LETTERS.filter(l=>l.L===n).map(l=>l.k));
+const ABC_STEPS=['ա մ տ ի ս ր ու','կ ե լ ն գ բ և','ո հ դ յ ք վ օ','շ պ չ ց թ ծ փ','ղ խ ռ ջ ձ զ ճ','ժ է ը ֆ'].map(s=>s.split(' '));
+{const ord=ABC_STEPS.flat();LETTERS.sort((a,b)=>ord.indexOf(a.k)-ord.indexOf(b.k));ABC_STEPS.forEach((st,i)=>st.forEach(k=>{LETTERS.find(l=>l.k===k).L=i+1}))}
 const BY={};LETTERS.forEach(l=>BY[l.k]=l);
 function units(w){const s=w.toLowerCase(),o=[];for(let i=0;i<s.length;i++){if(s[i]==='ո'&&s[i+1]==='ւ'){o.push('ու');i++}else o.push(s[i])}return o}
 WORDS.forEach(w=>{w.u=units(w.a);w.L=Math.max(...w.u.map(u=>BY[u]?BY[u].L:9))});
@@ -924,16 +930,18 @@ const lettersUpTo=n=>LETTERS.filter(l=>l.L<=n);
 const wordsUpTo=n=>WORDS.filter(w=>w.L<=n);
 function sndOpts(l,pool,strict){const out=[];if(l.p&&BY[l.p]&&(!strict||pool.includes(BY[l.p])))out.push(BY[l.p].s);for(const x of shuffle(strict||pool.length>=4?pool:LETTERS))if(x.s!==l.s&&!out.includes(x.s))out.push(x.s);return out.slice(0,3)}
 function letOpts(l,pool,strict){const out=[];if(l.p&&BY[l.p]&&(!strict||pool.includes(BY[l.p])))out.push(BY[l.p]);for(const x of shuffle(strict||pool.length>=4?pool:LETTERS))if(x!==l&&!out.includes(x)&&x.s!==l.s)out.push(x);return out.slice(0,3)}
-function qL2S(l,pool,strict){const up=l.U!==l.k&&l.U.length===1&&Math.random()<.5;return CH('Как читается эта буква?',up?l.U:l.k,l.s,sndOpts(l,pool,strict),{bigCls:'glyph',explain:esc(tipOf(l))})}
-function qS2L(l,pool,strict){const up=Math.random()<.5&&l.U!=='և';const d=x=>up&&x.U!=='և'?x.U:x.k;return CH('Какая буква даёт этот звук?',l.s,d(l),letOpts(l,pool,strict).map(d),{bigCls:'snd',optArm:true,explain:`<span class="a">${l.U}${l.U!==l.k?' '+l.k:''}</span> — «${esc(l.s)}»`})}
+function qL2S(l,pool,strict){const up=l.U!==l.k&&l.U.length===1&&Math.random()<.5;return CH('Как читается эта буква?',up?l.U:l.k,l.s,sndOpts(l,pool,strict),{item:'#'+l.k,bigCls:'glyph',explain:esc(tipOf(l))})}
+function qS2L(l,pool,strict){const up=Math.random()<.5&&l.U!=='և';const d=x=>up&&x.U!=='և'?x.U:x.k;return CH('Какая буква даёт этот звук?',l.s,d(l),letOpts(l,pool,strict).map(d),{item:'#'+l.k,bigCls:'snd',optArm:true,explain:`<span class="a">${l.U}${l.U!==l.k?' '+l.k:''}</span> — «${esc(l.s)}»`})}
 const SYN=[['мать','мама'],['отец','папа'],['деньги','драм'],['день','день (время суток)'],['хорошо','хороший'],['холод','холодный'],['ребёнок','дитя']];
 function senses(m){const out=new Set(m.toLowerCase().split(/[,;]/).map(x=>x.replace(/\(.*?\)/g,'').trim()).filter(Boolean));for(const g of SYN)if(g.some(x=>out.has(x)))g.forEach(x=>out.add(x));return out}
 function clash(a,b){if(a===b)return true;const A=senses(a);for(const x of senses(b))if(A.has(x))return true;return false}
 function pairsOf(ws,n){const out=[],ms=[];for(const w of shuffle(ws)){if(out.length>=n)break;if(ms.some(m=>clash(m,w.m)))continue;ms.push(w.m);out.push([w.a,w.m])}return out}
-function qRead(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>!clash(x.m,w.m)).map(x=>x.m)).slice(0,3);return CH('Что значит это слово?',w.a,w.m,wr,{bigCls:'word',tag:'read',explain:`читается «${esc(w.r)}»`,after:bd(w.a)})}
-function qWrite(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>x.a!==w.a&&!clash(x.m,w.m)).map(x=>x.a)).slice(0,3);return CH(`Как пишется «${w.m}»?`,w.r,w.a,wr,{bigCls:'snd',optArm:true,explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`})}
+function qRead(w,pool,strict){const wr=uniq(shuffle(strict||pool.length>=6?pool:WORDS).filter(x=>!clash(x.m,w.m)).map(x=>x.m)).slice(0,3);return CH('Что значит это слово?',w.a,w.m,wr,{item:w.a,bigCls:'word',tag:'read',explain:`читается «${esc(w.r)}»`,after:bd(w.a)})}
+function qWrite(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>x.a!==w.a&&!clash(x.m,w.m)).map(x=>x.a)).slice(0,3);return CH(`Как пишется «${w.m}»?`,w.r,w.a,wr,{item:w.a,bigCls:'snd',optArm:true,explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`})}
 const sameSound=w=>{const n=x=>x.toLowerCase().replace(/\(.*?\)/g,'').replace(/[ʰ\s]/g,'').replace(/һ/g,'х').replace(/ё/g,'е').trim();return n(w.r)===n(w.m)};
-function qBuildWord(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2).map(l=>l.k);return {type:'build',prompt:'Напишите армянскими буквами',sub:sameSound(w)?w.m:`${w.m} — звучит «${w.r}»`,tiles:[...w.u,...extra],answers:[w.u],joiner:'',letters:true,show:w.a,tag:'read'}}
+function qBuildWord(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2).map(l=>l.k);return {type:'build',prompt:'Напишите армянскими буквами',sub:sameSound(w)?w.m:`${w.m} — звучит «${w.r}»`,tiles:[...w.u,...extra],answers:[w.u],joiner:'',letters:true,show:w.a,tag:'read',item:w.a}}
+/* Диктант: слышим знакомое слово и собираем его из букв — главный навык для тех, кто говорит, но не пишет */
+function qDict(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2).map(l=>l.k);return {type:'build',prompt:'Напишите, что услышали',listen:w.a,tiles:[...w.u,...extra],answers:[w.u],joiner:'',letters:true,show:w.a,tag:'read',item:w.a,explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`}}
 /* Принцип: в уроке встречаются только слова из уже пройденных букв.
    known — буквы прошлых уроков + буквы этого урока (по мере появления карточек). */
 const EXTRA_EX=[['նա','на','он, она'],['մամա','мама','мама (по-домашнему)'],['Արամ','арам','Арам (имя)']].map(([a,r,m])=>({a,r,m,u:units(a)}));
@@ -948,21 +956,22 @@ function genLetters(group){
     group.forEach(l=>{known.add(l.k);const ex=pickExample(l,known);items.push({type:'letter',l,ex,syl:ex?null:syllables(l,known)});items.push(qL2S(l,pool,true))});
     shuffle(group).forEach(l=>items.push(Math.random()<.5?qS2L(l,pool,true):qL2S(l,pool,true)));
     const okW=WORDS.filter(w=>readable(w,known)),ws=okW.filter(w=>w.u.some(u=>group.some(g=>g.k===u)));
-    if(okW.length>=4){sample(ws,2).forEach(w=>items.push(qRead(w,okW)));
-      sample(ws.filter(w=>hasAudio(w.a)),1).forEach(w=>items.push(qListen(w,okW)))}
+    if(okW.length>=3){sample(ws,2).forEach(w=>items.push(qRead(w,okW,true)));
+      sample(ws.filter(w=>hasAudio(w.a)),1).forEach(w=>items.push(qListen(w,okW,true)))}
     return items}
 }
-function qListen(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>x.a!==w.a&&!clash(x.m,w.m)).sort((a,b)=>Math.abs(a.u.length-w.u.length)-Math.abs(b.u.length-w.u.length)).slice(0,6).map(x=>x.a)).slice(0,3);
-  return CH('Что вы услышали?','',w.a,wr,{listen:w.a,optArm:true,tag:'read',explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`})}
+function qListen(w,pool,strict){const wr=uniq(shuffle(strict||pool.length>=6?pool:WORDS).filter(x=>x.a!==w.a&&!clash(x.m,w.m)).sort((a,b)=>Math.abs(a.u.length-w.u.length)-Math.abs(b.u.length-w.u.length)).slice(0,6).map(x=>x.a)).slice(0,3);
+  return CH('Что вы услышали?','',w.a,wr,{item:w.a,listen:w.a,optArm:true,tag:'read',explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`})}
 function genWords(n){
   return ()=>{const pool=wordsUpTo(n),fresh=pool.filter(w=>w.L===n),lp=lettersUpTo(n);
     const pickW=k=>{const a=sample(fresh,Math.ceil(k*.6));return uniq([...a,...sample(pool,k)]).slice(0,k)};
     const items=[];
     items.push(MT(pairsOf(pool,4)));
-    pickW(3).forEach(w=>items.push(qRead(w,pool)));
-    pickW(2).forEach(w=>items.push(qWrite(w,pool)));
+    pickW(2).forEach(w=>items.push(qRead(w,pool)));
+    pickW(1).forEach(w=>items.push(qWrite(w,pool)));
     sample(pool.filter(w=>hasAudio(w.a)),2).forEach(w=>items.push(qListen(w,pool)));
-    pickW(3).filter(w=>w.u.length<=8).forEach(w=>items.push(qBuildWord(w,lp)));
+    const da=pickW(5).filter(w=>hasAudio(w.a)&&w.u.length<=8).slice(0,2);da.forEach(w=>items.push(qDict(w,lp)));
+    pickW(3).filter(w=>w.u.length<=8&&!da.includes(w)).slice(0,2).forEach(w=>items.push(qBuildWord(w,lp)));
     items.push(MT(pairsOf(pool,5)));
     return [items[0],...shuffle(items.slice(1,-1)),items[items.length-1]]}
 }
@@ -974,10 +983,11 @@ function genTheme(th,part){
     const pairs=n=>pairsOf(mine,n);
     if(part!==3)items.push({type:'teach',title:`${th.t}: новые слова`,html:vocabCard(mine)});
     items.push(MT(pairs(4)));
-    sample(mine,4).forEach(w=>items.push(qRead(w,pool)));
-    sample(mine,2).forEach(w=>items.push(qWrite(w,pool)));
+    sample(mine,3).forEach(w=>items.push(qRead(w,pool)));
+    sample(mine,1).forEach(w=>items.push(qWrite(w,pool)));
     sample(mine.filter(w=>hasAudio(w.a)),2).forEach(w=>items.push(qListen(w,pool)));
-    sample(mine.filter(w=>w.u.length<=9),2).forEach(w=>items.push(qBuildWord(w,lp)));
+    const da=sample(mine.filter(w=>hasAudio(w.a)&&w.u.length<=9),2);da.forEach(w=>items.push(qDict(w,lp)));
+    sample(mine.filter(w=>w.u.length<=9&&!da.includes(w)),1).forEach(w=>items.push(qBuildWord(w,lp)));
     items.push(MT(pairs(5)));
     const head=items[0].type==='teach'?[items[0],items[1]]:[items[0]];
     return [...head,...shuffle(items.slice(head.length,-1)),items[items.length-1]]}
@@ -1068,13 +1078,14 @@ lit2:RP('Русские слова в армянской речи понятны
 function half(arr){const h=Math.ceil(arr.length/2);return [arr.slice(0,h),arr.slice(h)]}
 const UNITS=[];
 const READW=['Читаем первые слова','Читаем «привет»','Читаем «мама» и «папа»','Читаем «спасибо»','Читаем трудные звуки','Читаем всё'];
+const GDESC=GDESC_OLD;
 {const lessons=[];
 GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n);const first=lessons.length;
   if(grp.length>3){const [a,b]=half(grp);
-    lessons.push({id:`a${n}a`,t:`Буквы ${a.map(l=>l.U).join(' ')}`,g:a[0].U,gen:genLetters(a)});
-    lessons.push({id:`a${n}b`,t:`Буквы ${b.map(l=>l.U).join(' ')}`,g:b[0].U,gen:genLetters(b)});
-  }else lessons.push({id:`a${n}a`,t:`Буквы ${grp.map(l=>l.U).join(' ')}`,g:grp[0].U,gen:genLetters(grp)});
-  lessons.push({id:`a${n}w`,t:READW[i],g:'Բառ',gen:genWords(n)});
+    lessons.push({id:`ab${n}a`,t:`Буквы ${a.map(l=>l.U).join(' ')}`,g:a[0].U,gen:genLetters(a),abc:a.map(l=>l.k)});
+    lessons.push({id:`ab${n}b`,t:`Буквы ${b.map(l=>l.U).join(' ')}`,g:b[0].U,gen:genLetters(b),abc:b.map(l=>l.k)});
+  }else lessons.push({id:`ab${n}a`,t:`Буквы ${grp.map(l=>l.U).join(' ')}`,g:grp[0].U,gen:genLetters(grp),abc:grp.map(l=>l.k)});
+  lessons.push({id:`ab${n}w`,t:READW[i],g:'Բառ',gen:genWords(n),abc:grp.map(l=>l.k)});
   lessons[first].sub={n,t:g,d:GDESC[i],letters:grp.map(l=>l.U).join(' ')};
 });
 UNITS.push({k:'Алфавит',t:'Армянский алфавит',d:'Все буквы за 6 шагов — от первых слов до свободного чтения.',lessons,alpha:true});}
@@ -1304,8 +1315,8 @@ UNITS.push({k:'Раздел 16',t:'Литературный язык',d:'Как 
 (function(){
   const alpha=UNITS.filter(u=>u.alpha),gram=UNITS.filter(u=>!u.alpha);
   const tu=THEMES.map(th=>({t:th.t,d:`${th.d} ${th.words.length} слов.`,theme:th.id,lessons:th.words.length>14?[
-      {id:`v_${th.id}_1`,t:`${th.t} · часть 1`,g:th.g,gen:genTheme(th,1)},{id:`v_${th.id}_2`,t:`${th.t} · часть 2`,g:th.g,gen:genTheme(th,2)},{id:`v_${th.id}_r`,t:'Повторим всё',g:'★',gen:genTheme(th,3)}]
-     :[{id:`v_${th.id}_1`,t:th.t,g:th.g,gen:genTheme(th,0)},{id:`v_${th.id}_r`,t:'Повторим всё',g:'★',gen:genTheme(th,3)}]}));
+      {id:`v_${th.id}_1`,t:`${th.t} · часть 1`,g:th.g,gen:genTheme(th,1),th},{id:`v_${th.id}_2`,t:`${th.t} · часть 2`,g:th.g,gen:genTheme(th,2),th},{id:`v_${th.id}_r`,t:'Повторим всё',g:'★',gen:genTheme(th,3),th}]
+     :[{id:`v_${th.id}_1`,t:th.t,g:th.g,gen:genTheme(th,0),th},{id:`v_${th.id}_r`,t:'Повторим всё',g:'★',gen:genTheme(th,3),th}]}));
   const order=[...alpha,gram[0]];let ti=0;
   gram.slice(1).forEach(g=>{order.push(g);if(ti<tu.length)order.push(tu[ti++])});
   while(ti<tu.length)order.push(tu[ti++]);
@@ -1316,13 +1327,18 @@ const LESSONS=[];UNITS.forEach((u,ui)=>u.lessons.forEach(l=>{l.unit=ui;LESSONS.p
 
 /* ================= СОСТОЯНИЕ ================= */
 const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
-let S={xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:Date.now(),done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{}};
+let S={xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:Date.now(),done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},memV:0};
 const S0=JSON.parse(JSON.stringify(S));
 try{const r=localStorage.getItem(KEY);if(r)Object.assign(S,JSON.parse(r))}catch(e){}
 // Защита от повреждённого сохранения: неверные типы возвращаем к значениям по умолчанию
 function fixState(){try{for(const k in S0){const v=S[k],d=S0[k];if(d!==null&&(v==null||typeof v!==typeof d||Array.isArray(v)!==Array.isArray(d)||(typeof d==='number'&&!isFinite(v))))S[k]=JSON.parse(JSON.stringify(d))}
   S.hearts=Math.max(0,Math.min(MAXH,S.hearts|0));S.xp=Math.max(0,S.xp|0);
-  if(S.outfit!=null&&typeof S.outfit!=='string')S.outfit=null}catch(e){}}
+  if(S.outfit!=null&&typeof S.outfit!=='string')S.outfit=null;migrateAbc();try{seedMem()}catch(e){}}catch(e){}}
+/* Пересчёт прогресса алфавита из прежнего порядка букв: по старым отметкам (a1a…a6w) узнаём,
+   какие буквы человек уже прошёл, и отмечаем новые уроки, где все буквы ему знакомы. Отметки только добавляются. */
+function migrateAbc(){const d=S.done;const old=Object.keys(d).filter(k=>/^a[1-6][abw]$/.test(k));if(!old.length)return;
+  const known=new Set();old.forEach(id=>{const g=OLD_GROUPS[+id[1]-1];let ks=g;if(g.length>3&&id[2]!=='w'){const [a,b]=half(g);ks=id[2]==='a'?a:b}ks.forEach(k=>known.add(k))});
+  LESSONS.forEach(l=>{if(l.abc&&!d[l.id]&&l.abc.every(k=>known.has(k)))d[l.id]=1})}
 window.fixState=fixState;fixState();
 const save=()=>{S.ts=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.__onSave)window.__onSave(S)};
 const dstr=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1626,6 +1642,30 @@ function renderPhrases(sub){const P=PHR.find(p=>p.id===sub);
   const w=$('#ph-wear');if(w)w.onclick=()=>{S.outfit=c.id;save();renderPhrases(P.id)};
   $('#ph-art').onclick=()=>bounce($('#ph-art .mascot'))}
 
+/* ================= ПАМЯТЬ: умное повторение =================
+   Для каждого слова и буквы храним [период полураспада памяти в днях, время последнего ответа в секундах].
+   Вероятность вспомнить p = 2^(−прошло/период). Повторять пора, когда p < 0,5.
+   Верный ответ удлиняет период, ошибка — сокращает (как модель half-life regression у Duolingo, только проще). */
+const nowS=()=>Date.now()/1000|0;
+function memUpdate(key,ok){if(!key)return;const t=nowS(),m=S.mem[key];let h;
+  if(!m)h=ok?1:0.3;else{const el=(t-m[1])/86400;h=m[0];h=ok?Math.min(180,h*(el>=h*0.5?2.2:1.2)):Math.max(0.2,h*0.4)}
+  S.mem[key]=[+h.toFixed(2),t]}
+const recall=m=>Math.pow(2,-((nowS()-m[1])/86400)/Math.max(0.05,m[0]));
+function dueKeys(){const kn=learnedSet();return Object.keys(S.mem).filter(k=>Array.isArray(S.mem[k])&&recall(S.mem[k])<0.5&&(k[0]==='#'?kn.has(k.slice(1)):(WORDS.find(w=>w.a===k)&&readable(WORDS.find(w=>w.a===k),kn)))).sort((a,b)=>recall(S.mem[a])-recall(S.mem[b]))}
+function learnedSet(){return new Set(LETTERS.filter(letterLearned).map(l=>l.k))}
+function reviewEx(key){const kn=learnedSet(),lp=LETTERS.filter(x=>kn.has(x.k));
+  if(key[0]==='#'){const l=BY[key.slice(1)];if(!l)return null;const st=lp.length>=4;return Math.random()<.5?qS2L(l,st?lp:LETTERS,st):qL2S(l,st?lp:LETTERS,st)}
+  const w=WORDS.find(x=>x.a===key);if(!w)return null;const pool=WORDS.filter(x=>readable(x,kn)),pl=pool.length>=6?pool:WORDS;
+  const f=[()=>qRead(w,pl),()=>qWrite(w,pl)];if(hasAudio(w.a)){f.push(()=>qListen(w,pl));if(w.u.length<=8)f.push(()=>qDict(w,lp.length>=4?lp:LETTERS))}
+  return pick(f)()}
+/* Для тех, кто учился до появления памяти: всё пройденное считаем «виденным», чтобы повторение сразу заработало */
+function seedMem(){/* идемпотентно: только добавляет недостающие, старые записи не трогает (нужно и после восстановления из облака) */const t=nowS(),kn=new Set();
+  LESSONS.forEach(l=>{if(l.abc&&S.done[l.id]&&!/w$/.test(l.id))l.abc.forEach(k=>kn.add(k))});
+  kn.forEach(k=>{S.mem['#'+k]=S.mem['#'+k]||[+(2+Math.random()*5).toFixed(2),t-86400*(1+Math.random()*3)|0]});
+  const ws=new Set();LESSONS.forEach(l=>{if(!S.done[l.id])return;if(l.abc&&/w$/.test(l.id))WORDS.filter(w=>readable(w,kn)).forEach(w=>ws.add(w));if(l.th)l.th.words.forEach(w=>ws.add(w))});
+  ws.forEach(w=>{if(readable(w,kn))S.mem[w.a]=S.mem[w.a]||[+(1.5+Math.random()*6).toFixed(2),t-86400*(1+Math.random()*3)|0]});S.memV=1}
+try{seedMem()}catch(e){}
+
 /* ================= HUD и роутинг ================= */
 function ring(v,max){const p=Math.min(1,v/max),c=2*Math.PI*9;return `<svg class="ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle cx="12" cy="12" r="9" fill="none" stroke="var(--good)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 12 12)"/></svg>`}
 function drawHud(){const st=streakNow();
@@ -1659,7 +1699,7 @@ function renderLearn(){
     ${wod?`<div class="tile2 wod"><div class="tx"><span class="lbl">Слово дня</span><span class="w">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></div>${spk(wod.a)}</div>`:`<div class="tile2 wod"><div class="tx"><span class="lbl">Слово дня</span><span class="m">Появится, когда вы выучите первые буквы: здесь будут только слова, которые вы уже можете прочитать.</span></div></div>`}
     <button class="tile2 phr" id="phr-tile">${mascot('happy','','taxi')}<span class="tx"><span class="lbl">Фразы для поездки</span><span class="pt">Такси, рынок, кафе, аэропорт…</span><span class="m">${PHR.filter(p=>phDone(p.id)).length} из ${PHR.length} ситуаций · костюмы для Циро</span></span></button>
     <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button>
-    ${Object.keys(S.done).length?`<button class="tile2 prac" id="prac"><span class="pic">${IC.bolt}</span><span class="tx"><span class="lbl">Тренировка</span><span class="pt">10 заданий из пройденного</span><span class="m">+5 XP и +1 сердце</span></span></button>`:''}
+    ${Object.keys(S.done).length?`<button class="tile2 prac" id="prac"><span class="pic">${IC.bolt}</span><span class="tx"><span class="lbl">Тренировка</span><span class="pt">${(()=>{const n=dueKeys().length;return n>30?'Пора освежить пройденное':n?`${n} ${plural(n,'слово пора','слова пора','слов пора')} повторить`:'10 заданий из пройденного'})()}</span><span class="m">+5 XP и +1 сердце</span></span></button>`:''}
    </div></div>
   <div style="display:flex;flex-direction:column;gap:30px;margin-top:30px">`;
   const curUnit=curIdx<0?-1:LESSONS[curIdx].unit;
@@ -1724,11 +1764,15 @@ function guideSheet(ui){const u=UNITS[ui];
 let LS=null;
 function track(ev,p){try{if(window.__stats)window.__stats(ev,p)}catch(e){}}
 const lref=l=>`${LESSONS.indexOf(l)}|${l.id}|${l.t}`;
-function startPractice(){const pool=LESSONS.filter(l=>S.done[l.id]);const src=pool.length?pool:[LESSONS[0]];
-  let items=[];shuffle(src).slice(0,4).forEach(l=>items.push(...l.gen().filter(x=>x.type!=='teach'&&x.type!=='letter')));
-  startLesson({id:'practice',t:'Тренировка',gen:()=>sample(items,10)},true)}
+function startPractice(){let items=[];
+  for(const k of dueKeys()){if(items.length>=10)break;const ex=reviewEx(k);if(ex)items.push(ex)}
+  if(items.length<10){const pool=LESSONS.filter(l=>S.done[l.id]);const src=pool.length?pool:[LESSONS[0]];let more=[];
+    shuffle(src).slice(0,4).forEach(l=>more.push(...l.gen().filter(x=>x.type!=='teach'&&x.type!=='letter')));items.push(...sample(more,10-items.length))}
+  startLesson({id:'practice',t:'Тренировка',gen:()=>shuffle(items)},true)}
 function startLesson(lesson,practice){
   const items=lesson.gen();
+  if(!practice&&LESSONS.includes(lesson)){const rv=dueKeys().filter(k=>!items.some(x=>x.item===k)).slice(0,2).map(reviewEx).filter(Boolean).map(x=>({...x,review:true}));
+    if(rv.length)items.splice(Math.max(1,items.length-1),0,...rv)}
   LS={lesson,practice,queue:items.slice(),total:items.filter(x=>x.type!=='teach'&&x.type!=='letter').length,done:0,mistakes:0,combo:0,best:0,start:Date.now(),cur:null,state:'answer'};
   const el=document.createElement('div');el.className='lesson';el.id='lesson';
   el.innerHTML=`<div class="l-top"><button class="x" id="lquit" aria-label="Выйти из урока">✕</button><div class="prog"><i id="lprog" style="width:0"></i></div><span class="pill heart" id="lhearts"></span></div><div class="l-body"><div class="ex" id="ex"></div></div><div class="l-foot" id="lfoot"></div>`;
@@ -1753,6 +1797,7 @@ function next(){
   else if(ex.type==='choice')renderChoice(ex,box);
   else if(ex.type==='build')renderBuild(ex,box);
   else if(ex.type==='match')renderMatch(ex,box);
+  if(ex.review)box.querySelector('h2')&&box.querySelector('h2').insertAdjacentHTML('beforebegin','<span class="rv-tag">Повторение</span>');
   $('.l-body').scrollTop=0;
 }
 function foot(html){$('#lfoot').innerHTML=`<div class="foot-in">${html}</div>`}
@@ -1818,6 +1863,7 @@ function check(){
     document.querySelectorAll('#ex .opt').forEach((b,j)=>{b.disabled=true;if(LS.opts[j]===ex.correct)b.classList.add('good');else if(j===LS.sel)b.classList.add('bad')})}
   else if(ex.type==='build'){if(!LS.built.length)return;const got=LS.built.map(i=>ex.tiles[i]).join('|');ok=ex.answers.some(a=>a.join('|')===got)}
   LS.state='checked';
+  if(ex.item)memUpdate(ex.item,ok);
   if(ok){LS.done++;LS.combo++;LS.best=Math.max(LS.best,LS.combo);if(ex.tag==='read')S.read++}
   else{LS.mistakes++;LS.combo=0;if(!LS.practice){S.hearts=Math.max(0,hearts()-1);if(S.hearts===MAXH-1)S.heartsTs=Date.now()}save();LS.queue.push(ex)}
   let detail='';
@@ -1887,7 +1933,7 @@ const GAMES=[
  {id:'spell',t:'Слово по буквам',d:'Угадайте слово по переводу, нажимая армянские буквы. 6 ошибок на слово, есть подсказка.',g:'Գր',c:'--b1',unit:'слов из 5'}
 ];
 let G=null;
-function gameMax(){if(S.unlockAll)return 6;let m=1;for(let n=1;n<=6;n++){const i=LESSONS.findIndex(l=>l.id===`a${n}a`);if(i>=0&&unlocked(i))m=n}return m}
+function gameMax(){if(S.unlockAll)return 6;let m=1;for(let n=1;n<=6;n++){const i=LESSONS.findIndex(l=>l.id===`ab${n}a`);if(i>=0&&unlocked(i))m=n}return m}
 function recKey(id,mode){if(id==='memo')return mode&&mode!=='w6'?'memo_'+mode:'memo';if(id==='fall')return mode==='words'?'fall_words':'fall';return id}
 function defMode(g){return g.modes?(((S.gameMode||{})[g.id])||g.modes[0][0]):null}
 /* наборы слов */
@@ -2101,7 +2147,7 @@ document.addEventListener('keydown',e=>{if(!G||$('.scrim'))return;const id=G.g.i
   else if(e.key==='Enter'){const b=$('#gnext')||$('#gplay')||$('#gagain');if(b&&!b.disabled&&document.activeElement!==b){e.preventDefault();b.click()}}});
 
 /* ================= АЛФАВИТ (справочник) ================= */
-function letterLearned(l){const grp=LETTERS.filter(x=>x.L===l.L);if(grp.length>3){const [a]=half(grp);return !!S.done[`a${l.L}${a.includes(l)?'a':'b'}`]}return !!S.done[`a${l.L}a`]}
+function letterLearned(l){return LESSONS.some(x=>x.abc&&x.abc.includes(l.k)&&!/w$/.test(x.id)&&S.done[x.id])}
 function renderAlphabet(){const nL=LETTERS.filter(letterLearned).length;
   $('#view').innerHTML=`<div style="display:flex;flex-direction:column;gap:22px">
   <div class="abc-head"><div class="ah-top"><b>Изучено ${nL} из ${LETTERS.length}</b><span>${nL===LETTERS.length?'Весь алфавит! <span class="arm">Կեցցե՛ս!</span>':'буквы отмечаются после урока'}</span></div><div class="bar ${nL===LETTERS.length?'good':''}"><i style="width:${Math.round(nL/LETTERS.length*100)}%"></i></div></div>
