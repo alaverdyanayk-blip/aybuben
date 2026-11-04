@@ -169,16 +169,16 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tile{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 14px;font-family:var(--f-arm);font-size:20px;font-weight:500;box-shadow:0 3px 0 var(--line);min-width:46px}
 .tile.l{font-size:26px;min-width:52px;padding:6px 10px}
 .spk{display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;border-radius:12px;border:0;background:var(--b3);color:#fff;box-shadow:0 3px 0 rgb(0 0 0/.25);vertical-align:middle}
-.spk svg{width:22px;height:22px}.spk.sm{width:32px;height:32px;border-radius:9px}.spk.sm svg{width:17px;height:17px}
+.spk svg{display:block;flex:0 0 auto;width:22px;height:22px;min-width:22px;min-height:22px;pointer-events:none}.spk.sm{width:32px;height:32px;border-radius:9px}.spk.sm svg{width:17px;height:17px;min-width:17px;min-height:17px}
 .spk.playing{animation:pulse .6s ease-in-out infinite alternate}
 @keyframes pulse{to{transform:scale(1.08);filter:brightness(1.15)}}
-.spk.huge{width:110px;height:110px;border-radius:28px}.spk.huge svg{width:52px;height:52px}
+.spk.huge{width:110px;height:110px;border-radius:28px}.spk.huge svg{width:52px;height:52px;min-width:52px;min-height:52px}
 .listen-row{display:flex;gap:12px;justify-content:center;align-items:center}
 .spk.slow{background:var(--surface);color:var(--b3);border:2px solid var(--b3);box-shadow:0 3px 0 var(--line)}
 .tile.ghost{color:transparent;background:var(--sunk);box-shadow:none;border-color:var(--sunk);pointer-events:none}
-.match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.match .col{display:flex;flex-direction:column;gap:10px}
-.mi{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:12px;min-height:54px;font-weight:600;box-shadow:0 3px 0 var(--line);overflow-wrap:anywhere}
+.match{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px}
+.match .col{display:contents}
+.mi{display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 12px;min-height:58px;font-weight:600;box-shadow:0 3px 0 var(--line);overflow-wrap:anywhere}
 .mi.arm{font-family:var(--f-arm);font-size:20px;font-weight:500}
 .mi[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .mi.ok{border-color:var(--good);background:var(--good-soft);opacity:.5;pointer-events:none}
@@ -1220,7 +1220,7 @@ function say(t,rate=1){if(!hasAudio(t))return false;try{if(curAud){curAud.pause(
   const btns=[...document.querySelectorAll('.spk')].filter(b=>b.dataset.say===t);btns.forEach(b=>b.classList.add('playing'));
   const off=()=>btns.forEach(b=>b.classList.remove('playing'));a.onended=off;a.onpause=off;
   a.play().catch(()=>btns.forEach(b=>b.classList.remove('playing')));return true}catch(e){return false}}
-const SPK_SVG='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const SPK_SVG='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const SLOW_SVG_OLD='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 15c0-4 3-7 7-7s6 3 6 5h2a2 2 0 0 1 0 4H5a1 1 0 0 1-1-1z"/><circle cx="8" cy="18.5" r="1.5"/><circle cx="15" cy="18.5" r="1.5"/></svg>';
 function spk(t,cls=''){return hasAudio(t)?`<button class="spk ${cls}" data-say="${esc(t)}" aria-label="Послушать">${SPK_SVG}</button>`:''}
 function spkSlow(t){return hasAudio(t)?`<button class="spk slow" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно"><b>0,7×</b><span>медленно</span></button>`:''}
@@ -1292,8 +1292,8 @@ const EXPANDED=new Set();let jumpObs=null;
 function setupJump(){let fab=$('#jump');if(!fab){fab=document.createElement('button');fab.id='jump';fab.className='jump';fab.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>К уроку</span>';document.body.appendChild(fab)}
   if(jumpObs)jumpObs.disconnect();const cur=$('.node.cur');fab.hidden=true;if(!cur||!('IntersectionObserver' in window))return;
   fab.onclick=()=>cur.scrollIntoView({block:'center',behavior:'smooth'});
-  let curIn=true,ctaIn=true;const upd=()=>{const onLearn=(location.hash.slice(1)||'learn')==='learn';fab.hidden=!onLearn||curIn||ctaIn};
-  jumpObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.target===cur){curIn=e.isIntersecting;fab.classList.toggle('up',e.boundingClientRect.top<0)}else ctaIn=e.isIntersecting});upd()});jumpObs.observe(cur);const cta=$('#cta');if(cta)jumpObs.observe(cta)}
+  let curIn=true,ctaIn=true,footIn=false;const foot=$('.homefoot');const upd=()=>{const onLearn=(location.hash.slice(1)||'learn')==='learn';fab.hidden=!onLearn||curIn||ctaIn||footIn};
+  jumpObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.target===cur){curIn=e.isIntersecting;fab.classList.toggle('up',e.boundingClientRect.top<0)}else if(e.target===foot)footIn=e.isIntersecting;else ctaIn=e.isIntersecting});upd()});jumpObs.observe(cur);const cta=$('#cta');if(cta)jumpObs.observe(cta);if(foot)jumpObs.observe(foot)}
 window.addEventListener('hashchange',()=>{const f=$('#jump');if(f&&(location.hash.slice(1)||'learn')!=='learn')f.hidden=true});
 function drawTrails(){document.querySelectorAll('.nodes').forEach(n=>{const old=n.querySelector('.trail');if(old)old.remove();const r=n.getBoundingClientRect();if(!r.width)return;
   const ss=[...n.querySelectorAll('.node')].map(nd=>{const b=nd.querySelector('.stone').getBoundingClientRect(),nb=nd.getBoundingClientRect(),tg=nd.querySelector('.start-tag');const top=tg?tg.getBoundingClientRect().top:b.top;
@@ -1395,7 +1395,7 @@ function renderBuild(ex,box){
 function renderMatch(ex,box){
   const left=shuffle(ex.pairs.map((p,i)=>({t:p[0],i}))),right=shuffle(ex.pairs.map((p,i)=>({t:p[1],i})));
   const armL=/[Ա-֏]/.test(ex.pairs[0][0]),armR=/[Ա-֏]/.test(ex.pairs[0][1]);
-  box.insertAdjacentHTML('beforeend',`<h2>Найдите пары</h2><div class="match"><div class="col">${left.map(o=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map(o=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
+  box.insertAdjacentHTML('beforeend',`<h2>Найдите пары</h2><div class="match"><div class="col">${left.map((o,k)=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:1;grid-row:${k+1}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map((o,k)=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:2;grid-row:${k+1}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
   let selL=null,selR=null,matched=0,errs=0;
   box.querySelectorAll('.mi').forEach(b=>b.onclick=()=>{
     if(ARMRE.test(b.textContent)&&S.voice!==false)say(b.textContent.trim());
