@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="37ac21aa91"</script>
+<script>window.BUILD_ID="4b5963fa3c"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -609,6 +609,9 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .sg .e{font-family:var(--f-arm);font-size:16px;margin-top:2px}
 .teach td .a{font-size:16px}
 @media (max-width:389px){.top-in{gap:8px 10px}.brand{font-size:22px}.brand .mascot{width:30px;height:30px}.hud{gap:4px}.hud .pill{padding:4px 7px}.hud .gtxt{display:none}}
+.syls{display:flex;flex-wrap:wrap;gap:8px}
+.syl{display:flex;flex-direction:column;align-items:center;min-width:56px;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface)}
+.syl b{font-size:24px;font-weight:600;color:var(--accent)}.syl small{color:var(--muted);font-size:13px}
 </style>
 
 </head>
@@ -808,7 +811,7 @@ const LETTERS=[
  {k:'ֆ',U:'Ֆ',nm:'фе',s:'ф',tip:'Как русское «ф». Встречается в заимствованных словах.',w:'ֆուտբոլ',m:'футбол',L:6}
 ];
 const WORDS=[
- ['տուն','тун','дом'],['սար','сар','гора'],['տատ','тат','бабушка'],['մատ','мат','палец'],['մարտ','март','март'],['ուս','ус','плечо'],['նա','на','он / она'],['ամառ','амарр','лето'],
+ ['տուն','тун','дом'],['սար','сар','гора'],['տատ','тат','бабушка'],['մատ','мат','палец'],['մարտ','март','март (месяц)'],['ուս','ус','плечо'],['նա','на','он / она'],['ամառ','амарр','лето'],
  ['բարև','барев','привет'],['արև','арев','солнце'],['կատու','кату','кошка'],['լուսին','лусин','луна'],['լավ','лав','хорошо'],['կին','кин','женщина'],['մեկ','мек','один'],['ես','йес','я'],['անուն','анун','имя'],['մուկ','мук','мышь'],['սեր','сер','любовь'],['իմ','им','мой'],['Երևան','Йереван','Ереван'],['ուտել','утел','есть, кушать'],
  ['մայր','майр','мать'],['հայր','һайр','отец'],['վարդ','вартʰ','роза'],['շուն','шун','собака'],['ոսկի','воски','золото'],['օր','ор','день'],['դու','ду','ты'],['շատ','шат','много'],['գետ','гет','река'],['այո','айо','да'],['գինի','гини','вино'],['հայ','һай','армянин'],['Հայաստան','һайастан','Армения'],['երազ','йераз','мечта, сон'],
  ['քույր','кʰуйр','сестра'],['գիրք','гиркʰ','книга'],['թութ','тʰутʰ','тутовник'],['չորս','чʰорс','четыре'],['հաց','һацʰ','хлеб'],['ճաշ','чаш','обед'],['քար','кʰар','камень'],['ծով','цов','море'],['պանիր','панир','сыр'],['փոքր','пʰокʰр','маленький'],['թև','тʰев','крыло'],['յոթ','йотʰ','семь'],['ինչ','инчʰ','что'],['ոչ','вочʰ','нет'],['մեծ','мец','большой'],['կարմիր','кармир','красный'],['սիրտ','сирт','сердце'],['ծիրան','циран','абрикос'],['մածուն','мацун','мацун'],['շնորհակալություն','шнорһакалутʰюн','спасибо'],
@@ -932,24 +935,34 @@ const LIT=(col,lit,ru,wrong)=>CH('Как сказать на литератур�
 /* ================= ГЕНЕРАТОРЫ АЛФАВИТНЫХ УРОКОВ ================= */
 const lettersUpTo=n=>LETTERS.filter(l=>l.L<=n);
 const wordsUpTo=n=>WORDS.filter(w=>w.L<=n);
-function sndOpts(l,pool){const out=[];if(l.p&&BY[l.p])out.push(BY[l.p].s);for(const x of shuffle(pool.length>=4?pool:LETTERS))if(x.s!==l.s&&!out.includes(x.s))out.push(x.s);return out.slice(0,3)}
-function letOpts(l,pool){const out=[];if(l.p&&BY[l.p])out.push(BY[l.p]);for(const x of shuffle(pool.length>=4?pool:LETTERS))if(x!==l&&!out.includes(x)&&x.s!==l.s)out.push(x);return out.slice(0,3)}
-function qL2S(l,pool){const up=l.U!==l.k&&l.U.length===1&&Math.random()<.5;return CH('Как читается эта буква?',up?l.U:l.k,l.s,sndOpts(l,pool),{bigCls:'glyph',explain:esc(tipOf(l))})}
-function qS2L(l,pool){const up=Math.random()<.5&&l.U!=='և';const d=x=>up&&x.U!=='և'?x.U:x.k;return CH('Какая буква даёт этот звук?',l.s,d(l),letOpts(l,pool).map(d),{bigCls:'snd',optArm:true,explain:`<span class="a">${l.U}${l.U!==l.k?' '+l.k:''}</span> — «${esc(l.s)}»`})}
+function sndOpts(l,pool,strict){const out=[];if(l.p&&BY[l.p]&&(!strict||pool.includes(BY[l.p])))out.push(BY[l.p].s);for(const x of shuffle(strict||pool.length>=4?pool:LETTERS))if(x.s!==l.s&&!out.includes(x.s))out.push(x.s);return out.slice(0,3)}
+function letOpts(l,pool,strict){const out=[];if(l.p&&BY[l.p]&&(!strict||pool.includes(BY[l.p])))out.push(BY[l.p]);for(const x of shuffle(strict||pool.length>=4?pool:LETTERS))if(x!==l&&!out.includes(x)&&x.s!==l.s)out.push(x);return out.slice(0,3)}
+function qL2S(l,pool,strict){const up=l.U!==l.k&&l.U.length===1&&Math.random()<.5;return CH('Как читается эта буква?',up?l.U:l.k,l.s,sndOpts(l,pool,strict),{bigCls:'glyph',explain:esc(tipOf(l))})}
+function qS2L(l,pool,strict){const up=Math.random()<.5&&l.U!=='և';const d=x=>up&&x.U!=='և'?x.U:x.k;return CH('Какая буква даёт этот звук?',l.s,d(l),letOpts(l,pool,strict).map(d),{bigCls:'snd',optArm:true,explain:`<span class="a">${l.U}${l.U!==l.k?' '+l.k:''}</span> — «${esc(l.s)}»`})}
 const SYN=[['мать','мама'],['отец','папа'],['деньги','драм'],['день','день (время суток)'],['хорошо','хороший'],['холод','холодный'],['ребёнок','дитя']];
 function senses(m){const out=new Set(m.toLowerCase().split(/[,;]/).map(x=>x.replace(/\(.*?\)/g,'').trim()).filter(Boolean));for(const g of SYN)if(g.some(x=>out.has(x)))g.forEach(x=>out.add(x));return out}
 function clash(a,b){if(a===b)return true;const A=senses(a);for(const x of senses(b))if(A.has(x))return true;return false}
 function pairsOf(ws,n){const out=[],ms=[];for(const w of shuffle(ws)){if(out.length>=n)break;if(ms.some(m=>clash(m,w.m)))continue;ms.push(w.m);out.push([w.a,w.m])}return out}
 function qRead(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>!clash(x.m,w.m)).map(x=>x.m)).slice(0,3);return CH('Что значит это слово?',w.a,w.m,wr,{bigCls:'word',tag:'read',explain:`читается «${esc(w.r)}»`,after:bd(w.a)})}
 function qWrite(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>x.a!==w.a&&!clash(x.m,w.m)).map(x=>x.a)).slice(0,3);return CH(`Как пишется «${w.m}»?`,w.r,w.a,wr,{bigCls:'snd',optArm:true,explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`})}
-function qBuildWord(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2).map(l=>l.k);return {type:'build',prompt:'Напишите армянскими буквами',sub:`${w.m} — звучит «${w.r}»`,tiles:[...w.u,...extra],answers:[w.u],joiner:'',letters:true,show:w.a,tag:'read'}}
+const sameSound=w=>{const n=x=>x.toLowerCase().replace(/\(.*?\)/g,'').replace(/[ʰ\s]/g,'').replace(/һ/g,'х').replace(/ё/g,'е').trim();return n(w.r)===n(w.m)};
+function qBuildWord(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2).map(l=>l.k);return {type:'build',prompt:'Напишите армянскими буквами',sub:sameSound(w)?w.m:`${w.m} — звучит «${w.r}»`,tiles:[...w.u,...extra],answers:[w.u],joiner:'',letters:true,show:w.a,tag:'read'}}
+/* Принцип: в уроке встречаются только слова из уже пройденных букв.
+   known — буквы прошлых уроков + буквы этого урока (по мере появления карточек). */
+const EXTRA_EX=[['նա','на','он, она'],['մամա','мама','мама (по-домашнему)'],['Արամ','арам','Арам (имя)']].map(([a,r,m])=>({a,r,m,u:units(a)}));
+const readable=(w,known)=>w.u.every(u=>known.has(u));
+function pickExample(l,known){const c=[...WORDS,...EXTRA_EX].filter(w=>w.u.includes(l.k)&&readable(w,known));
+  if(!c.length)return null;const st=w=>w.u[0]===l.k?1:0,amb=w=>w.a==='մարտ'?1:0;c.sort((a,b)=>(amb(a)-amb(b))||(st(b)-st(a))||(hasAudio(b.a)-hasAudio(a.a))||(Math.abs(a.u.length-4)-Math.abs(b.u.length-4)));return c[0]}
+function syllables(l,known){const V=['ա','ե','ի','ո','ու','օ','է','ը'];const kv=V.filter(v=>known.has(v)),kc=[...known].filter(c=>!V.includes(c)&&c!=='և');
+  const out=[];if(V.includes(l.k)){kc.slice(0,3).forEach(c=>out.push(c+l.k))}else{kv.slice(0,2).forEach(v=>{out.push(l.k+v);out.push(v+l.k)})}
+  return out.slice(0,4)}
 function genLetters(group){
-  return ()=>{const pool=lettersUpTo(group[0].L);const items=[];
-    group.forEach(l=>{items.push({type:'letter',l});items.push(qL2S(l,pool))});
-    shuffle(group).forEach(l=>items.push(Math.random()<.5?qS2L(l,pool):qL2S(l,pool)));
-    const ws=wordsUpTo(group[0].L).filter(w=>w.u.some(u=>group.some(g=>g.k===u)));
-    sample(ws,2).forEach(w=>items.push(qRead(w,wordsUpTo(group[0].L))));
-    sample(ws.filter(w=>hasAudio(w.a)),1).forEach(w=>items.push(qListen(w,wordsUpTo(group[0].L))));
+  return ()=>{const before=LETTERS.slice(0,LETTERS.indexOf(group[0])),known=new Set(before.map(l=>l.k));const pool=[...before,...group];const items=[];
+    group.forEach(l=>{known.add(l.k);const ex=pickExample(l,known);items.push({type:'letter',l,ex,syl:ex?null:syllables(l,known)});items.push(qL2S(l,pool,true))});
+    shuffle(group).forEach(l=>items.push(Math.random()<.5?qS2L(l,pool,true):qL2S(l,pool,true)));
+    const okW=WORDS.filter(w=>readable(w,known)),ws=okW.filter(w=>w.u.some(u=>group.some(g=>g.k===u)));
+    if(okW.length>=4){sample(ws,2).forEach(w=>items.push(qRead(w,okW)));
+      sample(ws.filter(w=>hasAudio(w.a)),1).forEach(w=>items.push(qListen(w,okW)))}
     return items}
 }
 function qListen(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>x.a!==w.a&&!clash(x.m,w.m)).sort((a,b)=>Math.abs(a.u.length-w.u.length)-Math.abs(b.u.length-w.u.length)).slice(0,6).map(x=>x.a)).slice(0,3);
@@ -1647,7 +1660,7 @@ function ciroStatus(){const st=streakNow(),tx=todayXP(),left=Math.max(0,S.goal-t
 function renderLearn(){
   const curIdx=LESSONS.findIndex((l,i)=>unlocked(i)&&!S.done[l.id]);
   const g=ciroGreet(),stt=ciroStatus(),tx=todayXP(),pct=Math.min(100,Math.round(tx/S.goal*100));
-  const wpool=WORDS.filter(w=>hasAudio(w.a)),wod=wpool[Math.floor(Date.now()/864e5)%wpool.length];
+  const kn=new Set(LETTERS.filter(letterLearned).map(l=>l.k)),wpool=WORDS.filter(w=>hasAudio(w.a)&&readable(w,kn)),wod=wpool.length?wpool[Math.floor(Date.now()/864e5)%wpool.length]:null;
   if(S.factI==null)S.factI=Math.floor(Math.random()*FACTS.length);
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
   let html=`<div class="home"><section class="hero">
@@ -1656,7 +1669,7 @@ function renderLearn(){
     <div class="goal"><div class="goal-top"><span>Цель дня</span><b>${tx} / ${S.goal} XP</b></div><div class="bar ${pct>=100?'good':''}"><i style="width:${pct}%"></i></div></div>
     <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>
    <div class="duo">
-    <div class="tile2 wod"><div class="tx"><span class="lbl">Слово дня</span><span class="w">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></div>${spk(wod.a)}</div>
+    ${wod?`<div class="tile2 wod"><div class="tx"><span class="lbl">Слово дня</span><span class="w">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></div>${spk(wod.a)}</div>`:`<div class="tile2 wod"><div class="tx"><span class="lbl">Слово дня</span><span class="m">Появится, когда вы выучите первые буквы: здесь будут только слова, которые вы уже можете прочитать.</span></div></div>`}
     <button class="tile2 phr" id="phr-tile">${mascot('happy','','taxi')}<span class="tx"><span class="lbl">Фразы для поездки</span><span class="pt">Такси, рынок, кафе, аэропорт…</span><span class="m">${PHR.filter(p=>phDone(p.id)).length} из ${PHR.length} ситуаций · костюмы для Циро</span></span></button>
     <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button>
     ${Object.keys(S.done).length?`<button class="tile2 prac" id="prac"><span class="pic">${IC.bolt}</span><span class="tx"><span class="lbl">Тренировка</span><span class="pt">10 заданий из пройденного</span><span class="m">+5 XP и +1 сердце</span></span></button>`:''}
@@ -1749,7 +1762,7 @@ function next(){
   const box=$('#ex');box.innerHTML='';$('#lfoot').className='l-foot';
   box.innerHTML=`<div class="combo">${LS.combo>=3?`<span class="chipf">${IC.flame}${LS.combo} подряд</span>`:''}</div>`;
   if(ex.type==='teach')renderTeach(ex,box);
-  else if(ex.type==='letter')renderLetterCard(ex.l,box);
+  else if(ex.type==='letter')renderLetterCard(ex.l,box,ex);
   else if(ex.type==='choice')renderChoice(ex,box);
   else if(ex.type==='build')renderBuild(ex,box);
   else if(ex.type==='match')renderMatch(ex,box);
@@ -1760,9 +1773,12 @@ function footCheck(enabled){foot(`<span></span><button class="btn" id="chk" ${en
 function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);$('#nxt').onclick=()=>next();$('#nxt').focus();LS.state='info'}
 
 function renderTeach(ex,box){box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.title)}</h2><div class="ciro-say stack">${mascot('happy','m-idle',ex.outfit)}<div class="bubble teach">${ex.html}</div></div>`);footNext('Понятно')}
-function exWord(l){const w=WORDS.find(x=>x.a===l.w);
-  return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(l.w,l.k)}</span>${spk(l.w,'sm')}</div><div class="ew-mean"><b>${esc(l.m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(l.w,l.k)}</div>`}
-function renderLetterCard(l,box){box.insertAdjacentHTML('beforeend',`<h2>Новая буква</h2><div class="letter-card"><div class="lc-hero"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="chip lg">${esc(l.s)}</span><span style="color:var(--muted)">Название: «${esc(l.nm)}»</span></div></div><p style="margin:0">${esc(tipOf(l))}</p>${exWord(l)}</div>`);footNext();autoSay(l.w)}
+function exWord(l,ex){const a=ex?ex.a:l.w,m=ex?ex.m:l.m,w=ex||WORDS.find(x=>x.a===l.w);
+  return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(a,l.k)}</span>${spk(a,'sm')}</div><div class="ew-mean"><b>${esc(m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(a,l.k)}</div>`}
+function exSyl(l,syl){const rd=t=>units(t).map(u=>(BY[u]||{}).s||u).join('').replace(/ \/ .*/,'');
+  if(!syl.length)return `<div class="ex-word"><span class="lbl">Первая буква</span><div class="ew-mean"><span>С неё начинается армянский алфавит. По названиям первых двух букв, «айб» и «бен», он и называется «Айбубен». Слоги и слова начнутся со следующей буквы.</span></div></div>`;
+  return `<div class="ex-word"><span class="lbl">Читаем слоги</span><div class="syls">${syl.map(t=>`<span class="syl"><b class="arm">${t}</b><small>${esc(units(t).map(u=>((BY[u]||{}).s||u).split(' / ')[0]).join(''))}</small></span>`).join('')}</div><div class="ew-mean"><span>Первые слова откроются, когда выучите ещё пару букв.</span></div></div>`}
+function renderLetterCard(l,box,ex={}){box.insertAdjacentHTML('beforeend',`<h2>Новая буква</h2><div class="letter-card"><div class="lc-hero"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="chip lg">${esc(l.s)}</span><span style="color:var(--muted)">Название: «${esc(l.nm)}»</span></div></div><p style="margin:0">${esc(tipOf(l))}</p>${ex.syl?exSyl(l,ex.syl):exWord(l,ex.ex)}</div>`);footNext();if(!ex.syl)autoSay(ex.ex?ex.ex.a:l.w)}
 function renderChoice(ex,box){
   const opts=shuffle(ex.options);LS.opts=opts;
   const pre=preSay(ex);
