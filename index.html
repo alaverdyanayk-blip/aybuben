@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="e870b103a8"</script>
+<script>window.BUILD_ID="685eb46513"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -913,7 +913,7 @@ const THEMES=[
 /* Порядок изучения букв (v2): сначала самые «урожайные» — из них складывается больше всего слов,
    поэтому настоящие слова появляются уже в первом уроке. Прежний порядок нужен для пересчёта прогресса. */
 const OLD_GROUPS=[1,2,3,4,5,6].map(n=>LETTERS.filter(l=>l.L===n).map(l=>l.k));
-const ABC_STEPS=['ա մ տ ի ս ր ու','կ ե լ ն գ բ և','ո հ դ յ ք վ օ','շ պ չ ց թ ծ փ','ղ խ ռ ջ ձ զ ճ','ժ է ը ֆ'].map(s=>s.split(' '));
+const ABC_STEPS=['ա տ մ ի ս ր ու','կ ե լ ն գ բ և','ո հ դ յ ք վ օ','շ պ չ ց թ ծ փ','ղ խ ռ ջ ձ զ ճ','ժ է ը ֆ'].map(s=>s.split(' '));
 {const ord=ABC_STEPS.flat();LETTERS.sort((a,b)=>ord.indexOf(a.k)-ord.indexOf(b.k));ABC_STEPS.forEach((st,i)=>st.forEach(k=>{LETTERS.find(l=>l.k===k).L=i+1}))}
 const BY={};LETTERS.forEach(l=>BY[l.k]=l);
 function units(w){const s=w.toLowerCase(),o=[];for(let i=0;i<s.length;i++){if(s[i]==='ո'&&s[i+1]==='ւ'){o.push('ու');i++}else o.push(s[i])}return o}
@@ -957,10 +957,10 @@ function qBuildWord(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2)
 function qDict(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2).map(l=>l.k);return {type:'build',prompt:'Напишите, что услышали',listen:w.a,tiles:[...w.u,...extra],answers:[w.u],joiner:'',letters:true,show:w.a,tag:'read',item:w.a,explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`}}
 /* Принцип: в уроке встречаются только слова из уже пройденных букв.
    known — буквы прошлых уроков + буквы этого урока (по мере появления карточек). */
-const EXTRA_EX=[['նա','на','он, она'],['մամա','мама','мама (по-домашнему)'],['Արամ','арам','Арам (имя)']].map(([a,r,m])=>({a,r,m,u:units(a)}));
+const EXTRA_EX=[['նա','на','он, она'],['մամա','мама','мама'],['Արամ','арам','Арам (имя)']].map(([a,r,m])=>({a,r,m,u:units(a)}));
 const readable=(w,known)=>w.u.every(u=>known.has(u));
 function pickExample(l,known){const c=[...WORDS,...EXTRA_EX].filter(w=>w.u.includes(l.k)&&readable(w,known));
-  if(!c.length)return null;const st=w=>w.u[0]===l.k?1:0,amb=w=>w.a==='մարտ'?1:0;c.sort((a,b)=>(amb(a)-amb(b))||(st(b)-st(a))||(hasAudio(b.a)-hasAudio(a.a))||(Math.abs(a.u.length-4)-Math.abs(b.u.length-4)));return c[0]}
+  if(!c.length)return null;const st=w=>w.u[0]===l.k?1:0,amb=w=>w.a==='մարտ'?1:0;c.sort((a,b)=>(amb(a)-amb(b))||(hasAudio(b.a)-hasAudio(a.a))||(st(b)-st(a))||(Math.abs(a.u.length-4)-Math.abs(b.u.length-4)));return c[0]}
 function syllables(l,known){const V=['ա','ե','ի','ո','ու','օ','է','ը'];const kv=V.filter(v=>known.has(v)),kc=[...known].filter(c=>!V.includes(c)&&c!=='և');
   const out=[];if(V.includes(l.k)){kc.slice(0,3).forEach(c=>out.push(c+l.k))}else{kv.slice(0,2).forEach(v=>{out.push(l.k+v);out.push(v+l.k)})}
   return out.slice(0,4)}
@@ -1700,7 +1700,7 @@ function ciroStatus(){const st=streakNow(),tx=todayXP(),left=Math.max(0,S.goal-t
 function renderLearn(){
   const curIdx=LESSONS.findIndex((l,i)=>unlocked(i)&&!S.done[l.id]);
   const g=ciroGreet(),stt=ciroStatus(),tx=todayXP(),pct=Math.min(100,Math.round(tx/S.goal*100));
-  const kn=new Set(LETTERS.filter(letterLearned).map(l=>l.k)),wpool=WORDS.filter(w=>hasAudio(w.a)&&readable(w,kn)),wod=wpool.length?wpool[Math.floor(Date.now()/864e5)%wpool.length]:null;
+  const kn=new Set(LETTERS.filter(letterLearned).map(l=>l.k)),wr=WORDS.filter(w=>hasAudio(w.a)&&readable(w,kn)),wpool=wr.length>=5?wr:WORDS.filter(w=>hasAudio(w.a)),wod=wpool.length?wpool[Math.floor(Date.now()/864e5)%wpool.length]:null;
   if(S.factI==null)S.factI=Math.floor(Math.random()*FACTS.length);
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
   let html=`<div class="home"><section class="hero">
