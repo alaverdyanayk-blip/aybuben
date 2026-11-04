@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="685eb46513"</script>
+<script>window.BUILD_ID="f032a2fb0c"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1402,7 +1402,9 @@ function unlockAudio(){if(audioReady)return;audioReady=true;
   try{PLAYER.src='data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAABAAAAlgAenp6enp6enp6enp6enp6enp6enp6enp6pqampqampqampqampqampqampqampqamptPT09PT09PT09PT09PT09PT09PT09PT09P/////////////////////////////////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQCcQAAAAAAAAJY+/rsqgAAAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NCxKMAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';PLAYER.play().then(()=>PLAYER.pause()).catch(()=>{})}catch(e){}
   try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
 document.addEventListener('pointerdown',unlockAudio,{capture:true,once:false});
-function say(t,rate=1){if(!hasAudio(t))return false;try{if(curAud){curAud.pause();curAud.dispatchEvent(new Event('ended'))}const a=PLAYER;a.pause();a.src='audio/'+fnv(akey(t))+'.mp3';a.playbackRate=rate;a.defaultPlaybackRate=rate;curAud=a;
+/* на сайте бота записи лежат рядом; в превью (claude.ai) берём их с сайта, при ошибке — из файлов превью */
+let AUD_BASE=/github\.io|localhost|127\.0\.0\.1/.test(location.hostname)?'audio/':'https://alaverdyanayk-blip.github.io/aybuben/audio/';
+function say(t,rate=1){if(!hasAudio(t))return false;try{if(curAud){curAud.pause();curAud.dispatchEvent(new Event('ended'))}const a=PLAYER;a.pause();const f=fnv(akey(t))+'.mp3';a.src=AUD_BASE+f;a.onerror=()=>{if(AUD_BASE!=='audio/'){AUD_BASE='audio/';a.src=AUD_BASE+f;a.play().catch(()=>{})}};a.playbackRate=rate;a.defaultPlaybackRate=rate;curAud=a;
   const btns=[...document.querySelectorAll('.spk')].filter(b=>b.dataset.say===t);btns.forEach(b=>b.classList.add('playing'));
   const off=()=>btns.forEach(b=>b.classList.remove('playing'));a.onended=off;a.onpause=off;
   a.play().catch(()=>btns.forEach(b=>b.classList.remove('playing')));return true}catch(e){return false}}
