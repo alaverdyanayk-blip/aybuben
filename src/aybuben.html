@@ -574,6 +574,10 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .opt .or{display:block;margin-top:3px;font-family:var(--f-body);font-size:12.5px;font-weight:500;color:var(--muted);line-height:1.3}
 .opts.one{grid-template-columns:1fr;gap:8px}.opts.one .opt{font-size:20px;text-align:left;padding:12px 14px 11px 34px;min-height:0}.opts.one .opt .k{top:50%;left:12px;margin-top:-8px;font-size:12px}
 .wr-sub{margin:10px 0 6px;font-size:14px}
+.path-sub{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;max-width:330px;background:var(--bg);padding:10px 14px;border-radius:18px;border:1.5px dashed color-mix(in srgb,var(--band) 55%,var(--line))}
+.path-sub .ps-k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--band)}
+.path-sub b{font-size:17px}.path-sub .ps-l{font-size:15px;color:var(--muted);letter-spacing:.06em}
+.path-sub .ps-d{font-size:12.5px;color:var(--muted);line-height:1.4}.path-sub .ps-d b{font-size:inherit;color:var(--ink)}
 </style>
 
 <header class="top"><div class="top-in">
@@ -1012,14 +1016,17 @@ lit2:`<p>Русские слова в армянской речи (<b>ուժե, 
 /* ================= КУРС ================= */
 function half(arr){const h=Math.ceil(arr.length/2);return [arr.slice(0,h),arr.slice(h)]}
 const UNITS=[];
-GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n);const lessons=[];
+const READW=['Читаем первые слова','Читаем «привет»','Читаем «мама» и «папа»','Читаем «хлеб» и «сыр»','Читаем «вода» и «рыба»','Читаем всё'];
+{const lessons=[];
+GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n);const first=lessons.length;
   if(grp.length>3){const [a,b]=half(grp);
     lessons.push({id:`a${n}a`,t:`Буквы ${a.map(l=>l.U).join(' ')}`,g:a[0].U,gen:genLetters(a)});
     lessons.push({id:`a${n}b`,t:`Буквы ${b.map(l=>l.U).join(' ')}`,g:b[0].U,gen:genLetters(b)});
   }else lessons.push({id:`a${n}a`,t:`Буквы ${grp.map(l=>l.U).join(' ')}`,g:grp[0].U,gen:genLetters(grp)});
-  lessons.push({id:`a${n}w`,t:'Читаем слова',g:'Բառ',gen:genWords(n)});
-  UNITS.push({k:`Алфавит · ${n} из 6`,t:g,d:`<span class="arm">${grp.map(l=>l.U).join(' ')}</span> · ${GDESC[i]}`,lessons,alpha:n});
+  lessons.push({id:`a${n}w`,t:READW[i],g:'Բառ',gen:genWords(n)});
+  lessons[first].sub={n,t:g,d:GDESC[i],letters:grp.map(l=>l.U).join(' ')};
 });
+UNITS.push({k:'Алфавит',t:'Армянский алфавит',d:'Все буквы за 6 шагов — от первых слов до свободного чтения.',lessons,alpha:true});}
 const L=(id,t,g,teach,items,n=10)=>({id,t,g,teach,gen:()=>{const fixed=items.filter(x=>x.first),rest=items.filter(x=>!x.first);const base=[{type:'teach',title:t,html:teach},...fixed,...sample(rest,n-fixed.length)];
   const lb=sample(items.filter(x=>x.type==='build'&&!x.letters&&hasAudio(x.show)),2).map(x=>({...x,listen:x.show,prompt:'Соберите то, что услышали',sub:''}));return [...base,...lb]}});
 UNITS.push({k:'Раздел 7',t:'Правила чтения',d:'Как читать то, что написано, и как слышать то, что не написано.',lessons:[
@@ -1250,7 +1257,7 @@ UNITS.push({k:'Раздел 16',t:'Литературный язык',d:'Как 
   const order=[...alpha,gram[0]];let ti=0;
   gram.slice(1).forEach(g=>{order.push(g);if(ti<tu.length)order.push(tu[ti++])});
   while(ti<tu.length)order.push(tu[ti++]);
-  let n=alpha.length;order.forEach(u=>{if(u.alpha)return;n++;u.k=u.theme?`Раздел ${n} · Слова`:`Раздел ${n}`});
+  let n=0;order.forEach(u=>{if(u.alpha)return;n++;u.k=u.theme?`Раздел ${n} · Слова`:`Раздел ${n}`});
   UNITS.length=0;order.forEach(u=>UNITS.push(u));
 })();
 const LESSONS=[];UNITS.forEach((u,ui)=>u.lessons.forEach(l=>{l.unit=ui;LESSONS.push(l)}));
@@ -1275,7 +1282,7 @@ const unlocked=i=>S.unlockAll||i===0||!!S.done[LESSONS[i].id]||LESSONS.slice(0,i
 
 const ACH=[
  {id:'first',t:'Первый шаг',d:'Пройти первый урок',ic:'star',ok:()=>Object.keys(S.done).length>0},
- {id:'abc',t:'Весь алфавит',d:'Пройти все 6 разделов алфавита',ic:'book',ok:()=>LESSONS.filter(l=>UNITS[l.unit].alpha).every(l=>S.done[l.id])},
+ {id:'abc',t:'Весь алфавит',d:'Пройти весь алфавит',ic:'book',ok:()=>LESSONS.filter(l=>UNITS[l.unit].alpha).every(l=>S.done[l.id])},
  {id:'reader',t:'Читатель',d:'Прочитать 50 слов',ic:'eye',ok:()=>S.read>=50},
  {id:'perfect',t:'Без ошибок',d:'Пройти урок без единой ошибки',ic:'target',ok:()=>S.perfect>0},
  {id:'s3',t:'Три дня подряд',d:'Серия из 3 дней',ic:'flame',ok:()=>S.best>=3},
@@ -1604,6 +1611,7 @@ function renderLearn(){
     if(compact){html+=`<section class="unit" style="--band:var(--b${ui%4})"><button class="band mini ${all?'fin':'lock'}" data-exp="${ui}" aria-expanded="false"><span class="mi-ic">${all?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</span><span class="mi-tx"><span class="k">${u.k}</span><b>${esc(u.t)}</b></span><span class="mi-r">${all?'Пройден':`${u.lessons.length} ${plural(u.lessons.length,'урок','урока','уроков')}`}<svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></section>`;return}
     html+=`<section class="unit" style="--band:var(--b${ui%4})"><div class="band"><div><div class="k">${u.k}<span class="uprog">${dn}/${u.lessons.length}</span></div><h2>${u.t}</h2><p>${u.d}</p><div class="uline"><i style="width:${Math.round(dn/u.lessons.length*100)}%"></i></div></div><div class="band-side">${EXPANDED.has(ui)?`<button class="guide" data-col="${ui}" aria-label="Свернуть раздел">Свернуть</button>`:''}${u.lessons.some(l=>l.teach)?`<button class="guide" data-guide="${ui}">${IC.book.replace('class="i"','class="i" style="width:18px;height:18px;vertical-align:-4px"')} Правило</button>`:''}</div></div><div class="nodes">`;
     u.lessons.forEach((l,li)=>{const gi=LESSONS.indexOf(l),open=unlocked(gi),done=S.done[l.id]||0,cur=gi===curIdx;
+      if(l.sub)html+=`<div class="path-sub ${li?'':'first'}"><span class="ps-k">Шаг ${l.sub.n} из 6</span><b>${esc(l.sub.t)}</b><span class="ps-l arm">${l.sub.letters}</span><span class="ps-d">${l.sub.d}</span></div>`;
       const off=OFF[(gi)%OFF.length];
       html+=`<div class="node ${done?'done':open?'open':''} ${cur?'cur':''}" style="transform:translateX(${off}px)">${cur?`<span class="start-tag">${done?'Повтор':'Начать'}</span><span class="buddy ${off>0?'l':'r'}">${mascot('happy','m-idle')}</span>`:''}
         <button class="stone" data-l="${gi}" aria-label="${esc(l.t)}${open?'':' (закрыто)'}" ${l.g.length>2?'style="font-size:19px"':''}>${open||done?esc(l.g):'<svg class="i" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</button>
@@ -1651,7 +1659,7 @@ function lessonSheet(i){const l=LESSONS[i],u=UNITS[l.unit],open=unlocked(i),done
   const pr=s.el.querySelector('#prac');if(pr)pr.onclick=()=>{s.close();startPractice()};
 }
 function guideSheet(ui){const u=UNITS[ui];
-  const content=u.alpha?`<div class="teach">${LETTERS.filter(l=>l.L===u.alpha).map(l=>`<p><b style="font-family:var(--f-display);font-size:22px">${l.U}${l.U!==l.k?' '+l.k:''}</b> — «${esc(l.s)}». ${esc(tipOf(l))}</p>`).join('')}</div>`
+  const content=u.alpha?`<div class="teach">${LETTERS.filter(l=>u.alpha===true||l.L===u.alpha).map(l=>`<p><b style="font-family:var(--f-display);font-size:22px">${l.U}${l.U!==l.k?' '+l.k:''}</b> — «${esc(l.s)}». ${esc(tipOf(l))}</p>`).join('')}</div>`
     :u.lessons.map(l=>`<h4 style="margin:6px 0 0">${esc(l.t)}</h4><div class="teach">${l.teach}</div>`).join('');
   sheet(`<div class="sheet-top"><h3>${esc(u.t)}</h3><button class="x" data-close aria-label="Закрыть">✕</button></div>${content}<button class="btn plain" data-close>Закрыть</button>`)}
 
