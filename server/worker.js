@@ -9,7 +9,7 @@
  *   SALT            — необязательно: соль для обезличивания id (по умолчанию выводится из BOT_TOKEN)
  * Имена и ники пользователей не сохраняются: только обезличенный хэш id.
  */
-const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game']);
+const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game', 'phrase']);
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, ev TEXT NOT NULL, p TEXT, src TEXT);
 CREATE INDEX IF NOT EXISTS ev_day ON events(day, ev);
@@ -81,7 +81,7 @@ async function authed(req, env) { const c = cookie(req, 'ays'); return !!(c && e
 async function gather(env) {
   await ensureSchema(env.DB);
   const t = today(), d7 = dayShift(t, -6), d30 = dayShift(t, -29), q = (s, ...b) => env.DB.prepare(s).bind(...b);
-  const [k1, k2, k3, k4, k5, k6, daily, newDaily, lessonsDaily, funnel, fails, games, src, ret] = await env.DB.batch([
+  const [k1, k2, k3, k4, k5, k6, daily, newDaily, lessonsDaily, funnel, fails, games, src, ret, phr] = await env.DB.batch([
     q('SELECT COUNT(DISTINCT uid) n FROM events WHERE day=?', t),
     q('SELECT COUNT(DISTINCT uid) n FROM events WHERE day>=?', d7),
     q('SELECT COUNT(DISTINCT uid) n FROM events WHERE day>=?', d30),
@@ -96,7 +96,8 @@ async function gather(env) {
     q("SELECT p, COUNT(*) n, COUNT(DISTINCT uid) u FROM events WHERE ev='game' AND day>=? GROUP BY p ORDER BY n DESC", d30),
     q('SELECT src, COUNT(*) n FROM users GROUP BY src'),
     q(`SELECT COUNT(*) total, SUM(CASE WHEN EXISTS(SELECT 1 FROM events e WHERE e.uid=u.uid AND e.day=date(u.first_day,'+1 day')) THEN 1 ELSE 0 END) back
-       FROM users u WHERE u.first_day>=? AND u.first_day<?`, dayShift(t, -30), dayShift(t, -1))
+       FROM users u WHERE u.first_day>=? AND u.first_day<?`, dayShift(t, -30), dayShift(t, -1)),
+    q("SELECT p, COUNT(*) n, COUNT(DISTINCT uid) u FROM events WHERE ev='phrase' AND day>=? GROUP BY p ORDER BY n DESC", d30)
   ]);
   const one = r => (r.results[0] || {}).n || 0;
   const series = (rows) => { const m = Object.fromEntries(rows.results.map(r => [r.day, r.n])); return Array.from({ length: 30 }, (_, i) => { const d = dayShift(t, i - 29); return [d, m[d] || 0]; }); };
@@ -104,7 +105,7 @@ async function gather(env) {
     today: t, dau: one(k1), wau: one(k2), mau: one(k3), total: one(k4), newToday: one(k5), lessonsToday: one(k6),
     daily: series(daily), newDaily: series(newDaily), lessonsDaily: series(lessonsDaily),
     funnel: funnel.results, fails: fails.results, games: games.results, src: src.results,
-    retention: ret.results[0] || { total: 0, back: 0 }
+    retention: ret.results[0] || { total: 0, back: 0 }, phr: phr.results
   };
 }
 
@@ -139,6 +140,7 @@ function statsPage(D) {
 <div class="card"><h2>Активные пользователи за 30 дней</h2><div id="ch1"></div><div class="lg"><span><i style="background:var(--b3)"></i>активные за день</span><span><i style="background:var(--good)"></i>новые</span></div></div>
 <div class="grid2"><div class="card"><h2>Пройдено уроков и тренировок</h2><div id="ch2"></div></div><div class="card"><h2>Игры за 30 дней</h2><div id="games"></div></div></div>
 <div class="grid2"><div class="card"><h2>Докуда доходят: уроки, пройденные впервые</h2><div class="tw" id="funnel"></div></div><div class="card"><h2>Самые трудные уроки (кончились сердца)</h2><div id="fails"></div></div></div>
+<div class="card"><h2>Фразы: пройденные уроки за 30 дней</h2><div id="phr"></div></div>
 </div>
 <script>const D=${JSON.stringify(D).replace(/</g, '\\u003c')};
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -159,6 +161,8 @@ const parseL=p=>{const [n,id,...t]=String(p||'').split('|');return {n:+n||0,id,t
 const fun=D.funnel.map(r=>({p:parseL(r.p),n:r.n})).sort((a,b)=>a.p.n-b.p.n);table($('#funnel'),fun.map(r=>({n:r.n,t:(r.p.n+1)+'. '+r.p.t})),['Урок','Людей'],r=>r.t);
 table($('#fails'),D.fails.map(r=>({n:r.n,t:parseL(r.p).t})),['Урок','Раз'],r=>r.t);
 const GN={fall:'Буквопад',sprint:'Спринт',echo:'Эхо',memo:'Найди пары',odd:'Лишнее слово',spell:'Слово по буквам'},MN={letters:'буквы',words:'слова',w6:'6 пар',w8:'8 пар'};
+const PN={meet:'Знакомство',airport:'Аэропорт',taxi:'Такси',hotel:'Гостиница',street:'На улице',cafe:'Кафе',market:'Рынок',pharmacy:'Аптека и врач',help:'Экстренное'};
+table($('#phr'),(D.phr||[]).map(r=>{const [id,n]=String(r.p).split('-');return {n:r.n,u:r.u,t:(PN[id]||id)+(n?' · '+(n==='2'?'диалог':'фразы'):'')}}),['Ситуация','Пройдено','Людей'],r=>r.t);
 table($('#games'),D.games.map(r=>({n:r.n,u:r.u,t:(GN[String(r.p).split('-')[0]]||r.p)+(String(r.p).includes('-')?' · '+(MN[String(r.p).split('-').slice(1).join('-')]||String(r.p).split('-').slice(1).join('-')):'')})),['Игра','Партий','Игроков'],r=>r.t);
 </script></body></html>`;
 }

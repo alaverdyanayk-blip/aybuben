@@ -517,6 +517,63 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 }
 .gamefoot{display:flex;gap:10px;width:100%}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* фразы */
+.phx{display:flex;flex-direction:column;gap:16px}
+.ph-intro{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
+.ph-prog{display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:10px 16px;text-align:center}
+.ph-prog b{font-size:22px}.ph-prog span{font-size:12px;color:var(--muted)}
+.phc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.phc{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-left:6px solid var(--pc);border-radius:20px;padding:10px 14px 10px 8px;box-shadow:0 3px 0 var(--line);font:inherit;color:inherit;cursor:pointer;min-width:0}
+.phc:hover{border-color:var(--pc)}
+.phc:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.phc-art{flex:none;width:84px;height:84px;border-radius:16px;background:color-mix(in srgb,var(--pc) 16%,transparent);display:flex;align-items:center;justify-content:center}
+.phc-art .mascot{width:80px;height:80px}
+.phc-tx{display:flex;flex-direction:column;gap:1px;min-width:0}
+.phc-tx b{font-size:17px}.phc-tx .hy{font-size:15px;color:var(--pc);font-weight:600}
+.phc-tx .d{font-size:12.5px;color:var(--muted)}
+.phc-st{display:flex;align-items:center;gap:5px;margin-top:4px}
+.phc-st i{width:22px;height:6px;border-radius:99px;background:var(--line)}.phc-st i.on{background:var(--good)}
+.phc-st em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--good);margin-left:4px}
+.ph-back{align-self:flex-start;color:var(--muted);font-weight:700;text-decoration:none;font-size:14px}
+.ph-back:hover{color:var(--accent)}
+.ph-head{display:flex;align-items:center;gap:16px;border-radius:24px;padding:16px;background:color-mix(in srgb,var(--pc) 15%,var(--surface));border:1.5px solid color-mix(in srgb,var(--pc) 40%,var(--line))}
+.ph-art{flex:none;width:130px;height:130px;cursor:pointer}.ph-art .mascot{width:130px;height:130px}
+.ph-ht{min-width:0}.ph-ht .k{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--pc)}
+.ph-ht h2{margin:2px 0 0;font-size:26px}.ph-ht .hy{font-size:18px;color:var(--pc);font-weight:600}.ph-ht p{margin:6px 0 0;color:var(--muted)}
+.ph-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.ph-step{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:0 3px 0 var(--line);font:inherit;color:inherit;cursor:pointer}
+.ph-step .num{flex:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--pc);color:#fff;font-weight:800;font-size:18px;box-shadow:0 3px 0 color-mix(in srgb,var(--pc) 65%,#000)}
+.ph-step .num svg{width:22px;height:22px}
+.ph-step.done .num{background:var(--good);box-shadow:0 3px 0 color-mix(in srgb,var(--good) 65%,#000)}
+.ph-step .tx{display:flex;flex-direction:column;flex:1;min-width:0}.ph-step .tx span{font-size:13px;color:var(--muted)}
+.ph-step .go{font-weight:800;font-size:13px;color:var(--pc);text-transform:uppercase;letter-spacing:.04em}
+.ph-step:disabled{cursor:default;opacity:.6}.ph-step:disabled .num{background:var(--line);color:var(--muted);box-shadow:none}
+.ph-step:not(:disabled):active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.ph-cos{flex-direction:row;align-items:center;gap:12px}
+.ph-cos .cos-art{flex:none;width:64px;height:64px}.ph-cos .cos-art .mascot{width:64px;height:64px}
+.ph-cos>div{flex:1;min-width:0}
+.ph-list h3{margin:0}
+.ph-row{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:2px 14px;padding:10px 0;border-top:1px solid var(--line)}
+.ph-a{display:flex;align-items:center;gap:8px;font-size:19px;font-weight:500;min-width:0}.ph-a .arm{overflow-wrap:anywhere}
+.ph-r{grid-column:1;color:var(--muted);font-size:13.5px}
+.ph-m{grid-column:2;grid-row:1/span 2;align-self:center;font-weight:600}
+.ph-n{grid-column:1/-1;font-size:12.5px;color:var(--pc);font-weight:600}
+@media (max-width:520px){.ph-intro{grid-template-columns:1fr}.ph-prog{flex-direction:row;gap:8px;justify-content:center}.ph-head{gap:10px;padding:12px}.ph-art,.ph-art .mascot{width:96px;height:96px}.ph-ht h2{font-size:22px}
+ .ph-row{grid-template-columns:1fr}.ph-m{grid-column:1;grid-row:auto}}
+.tile2.phr{cursor:pointer;font:inherit;color:inherit}
+.tile2.phr .mascot{width:62px;height:62px;flex:none}
+.tile2.phr .pt{font-size:16px;font-weight:700}.tile2.phr .m{color:var(--muted);font-size:13.5px}
+.tile2.phr:hover{border-color:var(--accent)}
+/* диалог в уроке */
+.dlg{display:flex;align-items:flex-start;gap:12px}
+.dlg .mascot{flex:none;width:92px;height:92px}
+.dlg .bubble{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dlg .who{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--accent)}
+.dlg .dq{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--f-arm);font-size:22px;font-weight:500;line-height:1.35}
+.dlg .dr{color:var(--muted);font-size:13.5px}.dlg .dm{font-weight:600;font-size:14.5px}
+.opt .or{display:block;margin-top:3px;font-family:var(--f-body);font-size:12.5px;font-weight:500;color:var(--muted);line-height:1.3}
+.opts.one{grid-template-columns:1fr;gap:8px}.opts.one .opt{font-size:20px;text-align:left;padding:12px 14px 11px 34px;min-height:0}.opts.one .opt .k{top:50%;left:12px;margin-top:-8px;font-size:12px}
+.wr-sub{margin:10px 0 6px;font-size:14px}
 </style>
 
 <header class="top"><div class="top-in">
@@ -560,12 +617,39 @@ const OUTFITS=[
  {id:'crown',t:'Корона',lv:10,d:'Король литературной нормы'}
 ];
 function outfitSvg(o){const K='#2B1E22';
+ if(COSTUMES.some(c=>c.id===o))return costumeSvg(o);
  if(o==='glasses')return `<g fill="#fff" fill-opacity=".18" stroke="${K}" stroke-width="3"><circle cx="47" cy="61" r="12.5"/><circle cx="73" cy="61" r="12.5"/></g><path d="M59 59.5Q60 56.5 61 59.5M34.6 58 22 54M85.4 58 98 54" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
  if(o==='cap')return `<path d="M21 51C21 17 99 17 99 51Q60 41 21 51Z" fill="#4D6596"/><path d="M60 21C53 30 51 40 51 46" stroke="#3B4F78" stroke-width="2.2" fill="none"/><circle cx="60" cy="20.5" r="3.6" fill="#3B4F78"/><path d="M70 47Q96 38 114 50Q93 55 70 51Z" fill="#3B4F78"/>`;
  if(o==='scarf')return `<g stroke="#5A1A12" stroke-width=".8"><path d="M24 85Q60 99 96 85L95.5 89.5Q60 103.5 24.5 89.5Z" fill="#D0283A"/><path d="M24.5 89.5Q60 103.5 95.5 89.5L95 94Q60 108 25 94Z" fill="#2A4FA8"/><path d="M25 94Q60 108 95 94L94 98Q60 112 26 98Z" fill="#F2A800"/><path d="M80 99 88 116 95 113 87 97Z" fill="#D0283A"/></g>`;
  if(o==='phones')return `<path d="M16 63C13 11 107 11 104 63" stroke="#2B2B35" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="7" y="52" width="17" height="25" rx="7.5" fill="#8E3B5A"/><rect x="96" y="52" width="17" height="25" rx="7.5" fill="#8E3B5A"/><rect x="10" y="56" width="5" height="17" rx="2.5" fill="#fff" opacity=".25"/>`;
  if(o==='duduk')return `<g transform="rotate(33 64 86)"><rect x="66" y="82" width="48" height="8" rx="3.5" fill="#9A5B2E"/><rect x="57" y="83" width="10" height="6" rx="2" fill="#E2C27A"/>${[80,88,96,104].map(x=>`<circle cx="${x}" cy="86" r="1.7" fill="#4A2A12"/>`).join('')}</g><text x="96" y="40" font-size="15" font-weight="700" fill="#8E3B5A" font-family="sans-serif">♪</text>`;
  if(o==='crown')return `<path d="M38 35 42 12 52 25 60 6 68 25 78 12 82 35Z" fill="#F2C14E" stroke="#A87812" stroke-width="2" stroke-linejoin="round"/><circle cx="60" cy="27" r="3.2" fill="#D0283A"/><circle cx="48" cy="30" r="2.3" fill="#2A4FA8"/><circle cx="72" cy="30" r="2.3" fill="#2A4FA8"/>`;
+ return ''}
+/* Костюмы из раздела «Фразы»: открываются только за диалоги ситуаций */
+const COSTUMES=[
+ {id:'bowtie',t:'Бабочка',ph:'meet',d:'Для первого знакомства'},
+ {id:'pilot',t:'Пилот',ph:'airport',d:'Фуражка и чемодан'},
+ {id:'taxi',t:'Таксист',ph:'taxi',d:'Кепка в шашечку и руль'},
+ {id:'bellhop',t:'Портье',ph:'hotel',d:'Шапочка и ключ от номера'},
+ {id:'tourist',t:'Турист',ph:'street',d:'Панама и карта Еревана'},
+ {id:'chef',t:'Повар',ph:'cafe',d:'Колпак и джезве с кофе'},
+ {id:'seller',t:'Продавец',ph:'market',d:'Фартук и корзина фруктов'},
+ {id:'doctor',t:'Доктор',ph:'pharmacy',d:'Шапочка и стетоскоп'},
+ {id:'police',t:'Полицейский',ph:'help',d:'Фуражка и свисток'}
+];
+const HATS=new Set(['cap','crown','taxi','pilot','chef','bellhop','tourist','doctor','police']);
+function costumeSvg(o){const K='#2B1E22';
+ if(o==='taxi'){let ch='';for(let i=0;i<12;i++){const x=24+i*6;ch+=`<rect x="${x}" y="39" width="6" height="3.5" fill="${i%2?'#fff':K}"/><rect x="${x}" y="42.5" width="6" height="3.5" fill="${i%2?K:'#fff'}"/>`}
+  return `<path d="M24 46C24 15 96 15 96 46Z" fill="#F2C230"/><path d="M60 17C55 26 53 34 53 39" stroke="#D9A21B" stroke-width="2" fill="none"/>${ch}<circle cx="60" cy="17" r="3.2" fill="#D9A21B"/><path d="M62 46Q92 42 110 50Q90 57 62 50Z" fill="${K}"/><g transform="translate(60 107)"><circle r="12.5" fill="none" stroke="#3A3A44" stroke-width="4.5"/><circle r="3.6" fill="#3A3A44"/><path d="M-12 0H12M0 0V12" stroke="#3A3A44" stroke-width="3"/></g>`}
+ if(o==='pilot')return `<path d="M27 41Q22 18 60 17Q98 18 93 41Z" fill="#22304D"/><rect x="27" y="37" width="66" height="9" rx="3" fill="#151E33"/><path d="M30 40H90" stroke="#F2C14E" stroke-width="2"/><path d="M56 28Q47 23 40 25Q47 31 56 31ZM64 28Q73 23 80 25Q73 31 64 31Z" fill="#F2C14E"/><circle cx="60" cy="28.5" r="4.2" fill="#F2C14E" stroke="#A87812" stroke-width="1"/><path d="M30 46Q60 55 90 46L91 49Q60 60 29 49Z" fill="#0E0E14"/><rect x="92" y="86" width="22" height="21" rx="3" fill="#3E7CB1" stroke="#22304D" stroke-width="1.5"/><path d="M98 86v-4h10v4" stroke="#22304D" stroke-width="2" fill="none"/><path d="M92 95h22" stroke="#2B5E8C" stroke-width="1.5"/>`;
+ if(o==='seller')return `<path d="M22 84Q38 96 44 94M98 84Q82 96 76 94" stroke="#EDE5D8" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M43 92H77V100Q77 107 70 108H50Q43 107 43 100Z" fill="#F4EEE4" stroke="#CDBFAE" stroke-width="1.2"/><rect x="53" y="97" width="14" height="6" rx="2" fill="none" stroke="#CDBFAE" stroke-width="1.2"/><path d="M8 92Q18 72 28 92" stroke="#7A4E22" stroke-width="2.5" fill="none"/><circle cx="12" cy="90" r="4.6" fill="#D0283A"/><circle cx="20" cy="88.5" r="4.6" fill="#F5A640"/><circle cx="27.5" cy="90.5" r="4.1" fill="#63A34F"/><path d="M3 92H33L29 110H7Z" fill="#B07A3C" stroke="#7A4E22" stroke-width="1.5"/><path d="M5.5 98H30.5M7 104H29" stroke="#7A4E22" stroke-width="1"/>`;
+ if(o==='chef'){const c=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#D9D2CC" stroke-width="1.5"/>`;
+  return `${c(43,23,11)}${c(77,23,11)}${c(60,15,13.5)}<path d="M37 24H83V33H37Z" fill="#fff"/><rect x="36" y="29" width="48" height="14" rx="3" fill="#fff" stroke="#D9D2CC" stroke-width="1.5"/><path d="M90 92h14l-2.5 14h-9Z" fill="#C8743A" stroke="#7A3F1A" stroke-width="1.2"/><path d="M104 94l13-9" stroke="#5A3418" stroke-width="3" stroke-linecap="round"/><path d="M94 88q-2.5-4 1-7.5M99.5 88q-2.5-4 1-7.5" stroke="#B9A89A" stroke-width="1.6" fill="none" stroke-linecap="round"/>`}
+ if(o==='bellhop')return `<g transform="rotate(-10 62 30)"><rect x="43" y="19" width="36" height="19" rx="5" fill="#C8283A"/><rect x="43" y="19" width="36" height="5" rx="3" fill="#A51F30"/><rect x="43" y="32" width="36" height="5" fill="#F2C14E"/><circle cx="61" cy="17.5" r="2.8" fill="#F2C14E"/></g><g transform="rotate(-35 18 96)"><circle cx="18" cy="86" r="6.2" fill="none" stroke="#E0B23A" stroke-width="3.2"/><rect x="16.4" y="91.5" width="3.2" height="17" fill="#E0B23A"/><rect x="19" y="101" width="5.5" height="2.8" fill="#E0B23A"/><rect x="19" y="105.5" width="4" height="2.8" fill="#E0B23A"/></g>`;
+ if(o==='tourist')return `<path d="M30 42Q28 18 60 17Q92 18 90 42Z" fill="#D8C59A"/><path d="M30 37Q60 32 90 37L90 42Q60 37 30 42Z" fill="#8B6F3C"/><path d="M16 46Q60 33 104 46Q97 54 60 47Q23 54 16 46Z" fill="#C9B07A"/><g transform="rotate(12 100 96)"><path d="M88 84l8 3 8-3 8 3v20l-8-3-8 3-8-3Z" fill="#F4EEE4" stroke="#8B6F3C" stroke-width="1.2"/><path d="M96 87v20M104 84v20" stroke="#CDBFAE" stroke-width="1"/><path d="M90 99q5-6 9 0t11-3" stroke="#D0283A" stroke-width="1.6" fill="none" stroke-dasharray="2 2"/><circle cx="110" cy="95.5" r="1.8" fill="#D0283A"/></g>`;
+ if(o==='doctor')return `<path d="M33 41Q32 20 60 19Q88 20 87 41Z" fill="#FFFFFF" stroke="#D9D2CC" stroke-width="1.5"/><path d="M57 24h6v5h5v6h-5v5h-6v-5h-5v-6h5Z" fill="#D0283A"/><path d="M37 91Q41 106 56 106M83 91Q79 106 64 106" stroke="#4A5A6A" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M60 106v3" stroke="#4A5A6A" stroke-width="3"/><circle cx="60" cy="112" r="4.6" fill="#B8C4CE" stroke="#4A5A6A" stroke-width="2"/>`;
+ if(o==='police')return `<path d="M24 42Q20 16 60 15Q100 16 96 42Z" fill="#2E4E8F"/><rect x="26" y="37" width="68" height="9" rx="3" fill="#1B2A4E"/><path d="m60 21 2.4 5 5.4.6-4 3.7 1.1 5.3L60 32.9l-4.9 2.7 1.1-5.3-4-3.7 5.4-.6Z" fill="#F2C14E" stroke="#A87812" stroke-width=".8"/><path d="M28 46Q60 56 92 46L93 49Q60 61 27 49Z" fill="#0E0E14"/><path d="M62 98Q84 99 92 88" stroke="#D0283A" stroke-width="1.6" fill="none"/><rect x="88" y="80" width="15" height="8.5" rx="4.2" fill="#C9CED6" stroke="#6B7380" stroke-width="1.2"/><circle cx="99" cy="84.2" r="1.6" fill="#6B7380"/>`;
+ if(o==='bowtie')return `<path d="M60 103 45 96v15Z" fill="#D0283A"/><path d="M60 103 75 96v15Z" fill="#D0283A"/><circle cx="50" cy="101" r="1.3" fill="#fff"/><circle cx="49" cy="106" r="1.3" fill="#fff"/><circle cx="70" cy="101" r="1.3" fill="#fff"/><circle cx="71" cy="106" r="1.3" fill="#fff"/><circle cx="60" cy="103" r="3.6" fill="#A51F30"/>`;
  return ''}
 function mascot(mood='happy',cls='',outfit){
  if(outfit===undefined){try{outfit=S.outfit||null}catch(e){outfit=null}}
@@ -590,7 +674,7 @@ function mascot(mood='happy',cls='',outfit){
  if(mood==='sad')extra+=`<path d="M40 71Q36.5 77.5 40 80Q43.5 77.5 40 71Z" fill="#7FC4F0"/>`;
  if(mood==='think')extra+=`<ellipse cx="80" cy="91" rx="7" ry="9" transform="rotate(-30 80 91)" fill="#E8892E"/>`;
  if(mood==='sleep')extra+=`<text x="88" y="36" font-size="15" font-weight="800" fill="#B08A70" font-family="sans-serif">z</text><text x="99" y="24" font-size="11" font-weight="800" fill="#B08A70" font-family="sans-serif">z</text>`;
- const top=(outfit==='cap'||outfit==='crown')?'':`<path d="M60 31C60 25 61 20 63.5 15" stroke="#7A4E2A" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M63 19C70 7 85 5 93 10C87 20 74 25 63 19Z" fill="#63A34F"/><path d="M64.5 18C72 14 81 11.5 89 10.5" stroke="#3F7A35" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+ const top=HATS.has(outfit)?'':`<path d="M60 31C60 25 61 20 63.5 15" stroke="#7A4E2A" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M63 19C70 7 85 5 93 10C87 20 74 25 63 19Z" fill="#63A34F"/><path d="M64.5 18C72 14 81 11.5 89 10.5" stroke="#3F7A35" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
  return `<svg class="mascot ${cls}" viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="113" rx="30" ry="4.5" fill="#000" opacity=".13"/>${arms}<ellipse cx="46" cy="104" rx="9" ry="5.5" fill="#D9792A"/><ellipse cx="74" cy="104" rx="9" ry="5.5" fill="#D9792A"/>${top}<ellipse cx="60" cy="66" rx="42" ry="39" fill="#E8892E"/><ellipse cx="56.5" cy="62" rx="38" ry="35" fill="#F5A640"/><path d="M60 28.5C57 35 57 41 60 46" stroke="#DE7F2A" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="42" rx="8" ry="4.5" transform="rotate(-30 40 42)" fill="#FFDCA6" opacity=".9"/><ellipse cx="35" cy="77" rx="7" ry="4.5" fill="#EF6F4A" opacity=".5"/><ellipse cx="85" cy="77" rx="7" ry="4.5" fill="#EF6F4A" opacity=".5"/>${brows}${eyes}${mouth}${extra}${outfitSvg(outfit)}</svg>`;
 }
 function ciroSay(mood,html,cls=''){return `<div class="ciro-say ${cls}">${mascot(mood,'m-idle')}<div class="bubble">${html}</div></div>`}
@@ -1168,7 +1252,7 @@ const LESSONS=[];UNITS.forEach((u,ui)=>u.lessons.forEach(l=>{l.unit=ui;LESSONS.p
 const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
 let S={xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:Date.now(),done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{}};
 try{const r=localStorage.getItem(KEY);if(r)Object.assign(S,JSON.parse(r))}catch(e){}
-S.games=S.games||{};
+S.games=S.games||{};S.phr=S.phr||{};
 const save=()=>{S.ts=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.__onSave)window.__onSave(S)};
 const dstr=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const today=()=>dstr(new Date());
@@ -1198,6 +1282,8 @@ const ACH=[
  {id:'memo3',t:'Отличная память',d:'Собрать «Найди пары» на три звезды',ic:'star',ok:()=>!!S.memo3},
  {id:'lit',t:'Литературная норма',d:'Пройти раздел «Литературный язык»',ic:'quill',ok:()=>LESSONS.filter(l=>UNITS[l.unit].t==='Литературный язык').every(l=>S.done[l.id])},
  {id:'vocab5',t:'Словарный запас',d:'Пройти 5 тематических разделов',ic:'book',ok:()=>THEMES.filter(th=>LESSONS.filter(l=>UNITS[l.unit].theme===th.id).every(l=>S.done[l.id])).length>=5},
+ {id:'trip1',t:'В дорогу!',d:'Пройти диалог любой ситуации во «Фразах»',ic:'star',ok:()=>PHR.some(p=>phDone(p.id))},
+ {id:'tripAll',t:'Свой в Ереване',d:'Пройти все ситуации во «Фразах»',ic:'crown',ok:()=>PHR.every(p=>phDone(p.id))},
  {id:'vocabAll',t:'Ходячий словарь',d:'Пройти все тематические разделы',ic:'crown',ok:()=>LESSONS.filter(l=>UNITS[l.unit].theme).every(l=>S.done[l.id])}
 ];
 function checkAch(){const n=[];ACH.forEach(a=>{if(!S.ach[a.id]&&a.ok()){S.ach[a.id]=today();n.push(a)}});save();return n}
@@ -1229,12 +1315,252 @@ const autoSay=(t,ms=120)=>{if(S.voice!==false)setTimeout(()=>say(t),ms)};
 const haptic=t=>{if(window.__haptic)window.__haptic(t)};
 const sGood=()=>{tone([[660,.12],[990,.2]]);haptic('ok')},sBad=()=>{tone([[220,.18],[180,.25]]);haptic('bad')},sWin=()=>tone([[523,.14],[659,.14],[784,.14],[1046,.35]]);
 
+/* ================= ФРАЗЫ: разговорник по ситуациям =================
+   ph: [армянский, как звучит, перевод, примечание?]
+   dl: мини-диалоги — реплика собеседника q и правильный ответ a (тройки), w — неподходящие ответы (армянский текст фраз этой ситуации) */
+const PHR=[
+ {id:'meet',t:'Знакомство',hy:'Ծանոթություն',o:'bowtie',mood:'wink',c:'#D9792A',who:'Новый знакомый',d:'Поздороваться, представиться и сказать, откуда вы.',
+  scene:'Вы в гостях у армянских родственников. К вам подходит незнакомый человек.',
+  ph:[
+   ['Բարև։','барев','Привет.'],
+   ['Բարև ձեզ։','барев дзез','Здравствуйте.'],
+   ['Ինչպե՞ս եք։','инчʰпес екʰ','Как вы? Как дела?','В разговоре чаще: Ո՞նց եք։ — вонцʰ екʰ'],
+   ['Լավ եմ, շնորհակալություն։','лав ем, шнорһакалутʰюн','Хорошо, спасибо.'],
+   ['Ի՞նչ է ձեր անունը։','инчʰ э дзер ануны','Как вас зовут?'],
+   ['Իմ անունն Արամ է։','им анунн арам э','Меня зовут Арам.','Перед гласной артикль ը меняется на ն: անունն Արամ'],
+   ['Շատ հաճելի է։','шат һачели э','Очень приятно.'],
+   ['Որտեղի՞ց եք։','вортегъицʰ екʰ','Откуда вы?'],
+   ['Ես Ռուսաստանից եմ։','йес ррусастаницʰ ем','Я из России.'],
+   ['Ես հայերեն եմ սովորում։','йес һайерен ем соворум','Я учу армянский.'],
+   ['Խնդրեմ։','хындрем','Пожалуйста (в ответ на «спасибо»).'],
+   ['Ցտեսություն։','цʰтесутʰюн','До свидания.']],
+  dl:[
+   {q:['Բարև ձեզ, ինչպե՞ս եք։','барев дзез, инчʰпес екʰ','Здравствуйте, как вы?'],a:['Լավ եմ, շնորհակալություն։','лав ем, шнорһакалутʰюн','Хорошо, спасибо.'],w:['Ես Ռուսաստանից եմ։','Ցտեսություն։']},
+   {q:['Ի՞նչ է ձեր անունը։','инчʰ э дзер ануны','Как вас зовут?'],a:['Իմ անունն Արամ է։','им анунн арам э','Меня зовут Арам.'],w:['Շատ հաճելի է։','Խնդրեմ։']},
+   {q:['Որտեղի՞ց եք։','вортегъицʰ екʰ','Откуда вы?'],a:['Ես Ռուսաստանից եմ։','йес ррусастаницʰ ем','Я из России.'],w:['Լավ եմ, շնորհակալություն։','Բարև։']},
+   {q:['Դուք լավ եք խոսում հայերեն։','дукʰ лав екʰ хосум һайерен','Вы хорошо говорите по-армянски.'],a:['Շնորհակալություն, ես հայերեն եմ սովորում։','шнорһакалутʰюн, йес һайерен ем соворум','Спасибо, я учу армянский.'],w:['Ի՞նչ է ձեր անունը։','Ցտեսություն։']}]},
+
+ {id:'airport',t:'Аэропорт',hy:'Օդանավակայան',o:'pilot',mood:'happy',c:'#3E7CB1',who:'Сотрудник аэропорта',d:'Регистрация, паспортный контроль, багаж и выход на посадку.',
+  scene:'Вы прилетели в Ереван, в аэропорт «Звартноц». Впереди паспортный контроль.',
+  ph:[
+   ['Որտե՞ղ է գրանցումը։','вортегъ э гранцʰумы','Где регистрация?'],
+   ['Ահա իմ անձնագիրը։','аһа им андзнагиры','Вот мой паспорт.'],
+   ['Զբոսաշրջիկ եմ։','зыбошырджик ем','Я турист.'],
+   ['Ես թռչում եմ Մոսկվա։','йес тʰырчʰум ем москва','Я лечу в Москву.'],
+   ['Սա ձեռքի ուղեբեռ է։','са дзерркʰи угъеберр э','Это ручная кладь.'],
+   ['Միայն հագուստ է։','миайн һагуст э','Там только одежда.'],
+   ['Որտե՞ղ է ելքը։','вортегъ э йелкʰы','Где выход?'],
+   ['Չվերթն ուշանում է։','чʰвертʰн ушанум э','Рейс задерживается.','В разговоре «рейс» часто называют ռեյս — ррейс'],
+   ['Իմ ճամպրուկը կորել է։','им чампрукы корел э','Мой чемодан потерялся.'],
+   ['Որտե՞ղ կարող եմ փող փոխել։','вортегъ карогъ ем пʰогъ пʰохел','Где можно поменять деньги?'],
+   ['Որտե՞ղ է զուգարանը։','вортегъ э зугараны','Где туалет?'],
+   ['Ինձ տաքսի է պետք։','индз такʰси э петкʰ','Мне нужно такси.']],
+  dl:[
+   {q:['Ձեր անձնագիրը, խնդրում եմ։','дзер андзнагиры, хындрум ем','Ваш паспорт, пожалуйста.'],a:['Ահա իմ անձնագիրը։','аһа им андзнагиры','Вот мой паспорт.'],w:['Չվերթն ուշանում է։','Որտե՞ղ է զուգարանը։']},
+   {q:['Ո՞րն է ձեր այցի նպատակը։','ворн э дзер айцʰи нпатакы','Какова цель вашего визита?'],a:['Զբոսաշրջիկ եմ։','зыбошырджик ем','Я турист.'],w:['Ինձ տաքսի է պետք։','Որտե՞ղ է ելքը։']},
+   {q:['Ի՞նչ կա ճամպրուկում։','инчʰ ка чампрукум','Что в чемодане?'],a:['Միայն հագուստ է։','миайн һагуст э','Там только одежда.'],w:['Ահա իմ անձնագիրը։','Ես թռչում եմ Մոսկվա։']},
+   {q:['Ուղեբեռ ունե՞ք։','угъеберр унекʰ','У вас есть багаж?'],a:['Սա ձեռքի ուղեբեռ է։','са дзерркʰи угъеберр э','Это ручная кладь.'],w:['Որտե՞ղ է գրանցումը։','Զբոսաշրջիկ եմ։']}]},
+
+ {id:'taxi',t:'Такси',hy:'Տաքսի',o:'taxi',mood:'happy',c:'#E0A100',who:'Таксист',d:'Объяснить, куда ехать, где повернуть и где остановиться.',
+  scene:'Вы садитесь в такси у аэропорта. Водитель оборачивается к вам.',
+  ph:[
+   ['Ազատ ե՞ք։','азат екʰ','Вы свободны?'],
+   ['Ինձ տարեք կենտրոն։','индз тарекʰ кентрон','Отвезите меня в центр.'],
+   ['Ինձ տարեք օդանավակայան։','индз тарекʰ оданавакайан','Отвезите меня в аэропорт.'],
+   ['Այս հասցեով, խնդրում եմ։','айс һасцʰеов, хындрум ем','Вот по этому адресу, пожалуйста.'],
+   ['Ինչքա՞ն կարժենա։','инчкʰан каржена','Сколько это будет стоить?','Литературно: Որքա՞ն կարժենա։ — воркʰан каржена'],
+   ['Ճանապարհն ինչքա՞ն կտևի։','чанапарһн инчкʰан кытеви','Сколько ехать?'],
+   ['Ուղիղ գնացեք։','угъигъ гынацʰекʰ','Езжайте прямо.'],
+   ['Աջ թեքվեք։','адж тʰекʰвекʰ','Поверните направо.'],
+   ['Ձախ թեքվեք։','дзах тʰекʰвекʰ','Поверните налево.'],
+   ['Ավելի դանդաղ, խնդրում եմ։','авели дандагъ, хындрум ем','Помедленнее, пожалуйста.'],
+   ['Կանգնեք այստեղ։','кангнекʰ айстегъ','Остановитесь здесь.'],
+   ['Մանրը պետք չէ։','манры петкʰ чʰэ','Сдачи не надо.']],
+  dl:[
+   {q:['Ո՞ւր գնանք։','ур гынанкʰ','Куда едем?'],a:['Ինձ տարեք կենտրոն։','индз тарекʰ кентрон','Отвезите меня в центр.'],w:['Մանրը պետք չէ։','Ազատ ե՞ք։']},
+   {q:['Հասցեն ասեք, խնդրում եմ։','һасцʰен асекʰ, хындрум ем','Скажите адрес, пожалуйста.'],a:['Այս հասցեով, խնդրում եմ։','айс һасцʰеов, хындрум ем','Вот по этому адресу, пожалуйста.'],w:['Կանգնեք այստեղ։','Ձախ թեքվեք։']},
+   {q:['Հետո ո՞ր կողմ թեքվեմ։','һето вор когъм тʰекʰвем','А потом куда поворачивать?'],a:['Աջ թեքվեք։','адж тʰекʰвекʰ','Поверните направо.'],w:['Ինչքա՞ն կարժենա։','Ազատ ե՞ք։']},
+   {q:['Հասանք։ Երկու հազար դրամ։','һасанкʰ. йерку һазар драм','Приехали. Две тысячи драмов.'],a:['Մանրը պետք չէ։','манры петкʰ чʰэ','Сдачи не надо.'],w:['Ինձ տարեք օդանավակայան։','Ուղիղ գնացեք։']}]},
+
+ {id:'hotel',t:'Гостиница',hy:'Հյուրանոց',o:'bellhop',mood:'happy',c:'#B03A48',who:'Администратор',d:'Заселиться, спросить про завтрак, пароль и выезд.',
+  scene:'Вы подходите к стойке администратора в гостинице.',
+  ph:[
+   ['Ես համար եմ ամրագրել։','йес һамар ем амрагрел','Я забронировал номер.'],
+   ['Ազատ համար ունե՞ք։','азат һамар унекʰ','У вас есть свободный номер?'],
+   ['Մեկ գիշերն ինչքա՞ն արժե։','мек гишерн инчкʰан арже','Сколько стоит одна ночь?'],
+   ['Ես կմնամ երեք գիշեր։','йес кымнам йерекʰ гишер','Я останусь на три ночи.'],
+   ['Նախաճաշը ներառվա՞ծ է։','нахачашы нерарвац э','Завтрак включён?'],
+   ['Ո՞րն է ինտերնետի գաղտնաբառը։','ворн э интернети гагътнабарры','Какой пароль от интернета?'],
+   ['Բանալին, խնդրում եմ։','баналин, хындрум ем','Ключ, пожалуйста.'],
+   ['Սենյակում տաք ջուր չկա։','сенйакум такʰ джур чʰыка','В номере нет горячей воды.'],
+   ['Կարո՞ղ եք տաքսի կանչել։','карогъ екʰ такʰси канчʰел','Можете вызвать такси?'],
+   ['Ժամը քանիսի՞ն պետք է ազատել սենյակը։','жамы кʰанисин петкʰ э азател сенйакы','Во сколько нужно освободить номер?'],
+   ['Խնդրում եմ, մաքրեք սենյակը։','хындрум ем, макʰрекʰ сенйакы','Уберите номер, пожалуйста.'],
+   ['Շնորհակալություն, ամեն ինչ լավ էր։','шнорһакалутʰюн, амен инчʰ лав эр','Спасибо, всё было хорошо.']],
+  dl:[
+   {q:['Բարի գալուստ։ Ամրագրում ունե՞ք։','бари галуст. амрагрум унекʰ','Добро пожаловать! У вас есть бронь?'],a:['Ես համար եմ ամրագրել։','йес һамар ем амрагрел','Я забронировал номер.'],w:['Սենյակում տաք ջուր չկա։','Բանալին, խնդրում եմ։']},
+   {q:['Քանի՞ գիշեր կմնաք։','кʰани гишер кымнакʰ','Сколько ночей пробудете?'],a:['Ես կմնամ երեք գիշեր։','йес кымнам йерекʰ гишер','Я останусь на три ночи.'],w:['Նախաճաշը ներառվա՞ծ է։','Կարո՞ղ եք տաքսի կանչել։']},
+   {q:['Ինչո՞վ կարող եմ օգնել։','инчʰов карогъ ем огнел','Чем могу помочь?'],a:['Սենյակում տաք ջուր չկա։','сенйакум такʰ джур чʰыка','В номере нет горячей воды.'],w:['Ցտեսություն։','Շնորհակալություն, ամեն ինչ լավ էր։']},
+   {q:['Ինչպե՞ս էր ձեր հանգիստը։','инчʰпес эр дзер һангисты','Как вам отдыхалось?'],a:['Շնորհակալություն, ամեն ինչ լավ էր։','шнорһакалутʰюн, амен инчʰ лав эр','Спасибо, всё было хорошо.'],w:['Ազատ համար ունե՞ք։','Ես համար եմ ամրագրել։']}]},
+
+ {id:'street',t:'На улице',hy:'Փողոցում',o:'tourist',mood:'think',c:'#4E8F5A',who:'Прохожий',d:'Спросить дорогу, понять ответ и не потеряться.',
+  scene:'Вы гуляете по Еревану и, кажется, свернули не туда.',
+  ph:[
+   ['Ներեցեք, կարո՞ղ եք օգնել։','нерецʰекʰ, карогъ екʰ огнел','Извините, можете помочь?'],
+   ['Ես մոլորվել եմ։','йес молорвел ем','Я заблудился.'],
+   ['Որտե՞ղ է մետրոն։','вортегъ э метрон','Где метро?'],
+   ['Որտե՞ղ է մոտակա կանգառը։','вортегъ э мотака кангарры','Где ближайшая остановка?'],
+   ['Ինչպե՞ս հասնել Հանրապետության հրապարակ։','инчʰпес һаснел һанрапетутʰян һырапарак','Как добраться до площади Республики?'],
+   ['Հեռո՞ւ է։','һерру э','Это далеко?'],
+   ['Մոտ է։','мот э','Это близко.'],
+   ['Ոտքով կարելի՞ է գնալ։','воткʰов карели э гынал','Можно дойти пешком?'],
+   ['Ցույց տվեք քարտեզի վրա։','цʰуйцʰ твекʰ кʰартези вра','Покажите на карте.'],
+   ['Ես հայերեն լավ չեմ հասկանում։','йес һайерен лав чʰем һасканум','Я плохо понимаю по-армянски.'],
+   ['Ավելի դանդաղ խոսեք, խնդրում եմ։','авели дандагъ хосекʰ, хындрум ем','Говорите медленнее, пожалуйста.'],
+   ['Կրկնեք, խնդրում եմ։','кыркнекʰ, хындрум ем','Повторите, пожалуйста.']],
+  dl:[
+   {q:['Ինչո՞վ կարող եմ օգնել։','инчʰов карогъ ем огнел','Чем могу помочь?'],a:['Ես մոլորվել եմ։','йес молорвел ем','Я заблудился.'],w:['Մոտ է։','Հեռո՞ւ է։']},
+   {q:['Ո՞ւր եք ուզում հասնել։','ур екʰ узум һаснел','Куда вы хотите добраться?'],a:['Որտե՞ղ է մետրոն։','вортегъ э метрон','Где метро?'],w:['Մոտ է։','Շատ համեղ էր։']},
+   {q:['Գնացեք ուղիղ, երկրորդ փողոցից թեքվեք ձախ, հետո…','гынацʰекʰ угъигъ, йеркрорд пʰогъоцʰицʰ тʰекʰвекʰ дзах, һето…','Идите прямо, на второй улице налево, потом…'],a:['Ավելի դանդաղ խոսեք, խնդրում եմ։','авели дандагъ хосекʰ, хындрум ем','Говорите медленнее, пожалуйста.'],w:['Որտե՞ղ է մոտակա կանգառը։','Ներեցեք, կարո՞ղ եք օգնել։']},
+   {q:['Հինգ րոպե ոտքով։','һинг ропе воткʰов','Пять минут пешком.'],a:['Մոտ է։ Շնորհակալություն։','мот э. шнорһакалутʰюн','Близко. Спасибо!'],w:['Ես մոլորվել եմ։','Ցույց տվեք քարտեզի վրա։']}]},
+
+ {id:'cafe',t:'Кафе',hy:'Սրճարան',o:'chef',mood:'happy',c:'#8B5A3C',who:'Официант',d:'Заказать кофе и еду, попросить счёт.',
+  scene:'Вы зашли в кафе на Северном проспекте. Подходит официант.',
+  ph:[
+   ['Սեղան կա՞ երկու հոգու համար։','сегъан ка йерку һогу һамар','Есть столик на двоих?'],
+   ['Մենյուն, խնդրում եմ։','менюн, хындрум ем','Меню, пожалуйста.','Литературно меню — ճաշացանկ (чашацʰанк)'],
+   ['Ի՞նչ խորհուրդ կտաք։','инчʰ хорһурт кытакʰ','Что посоветуете?'],
+   ['Մեկ սուրճ, խնդրում եմ։','мек сурч, хындрум ем','Один кофе, пожалуйста.'],
+   ['Առանց շաքարի։','арранцʰ шакʰари','Без сахара.'],
+   ['Ջուր, խնդրում եմ։','джур, хындрум ем','Воды, пожалуйста.'],
+   ['Կծո՞ւ է։','кыцу э','Это острое?'],
+   ['Ես միս չեմ ուտում։','йес мис чʰем утум','Я не ем мясо.'],
+   ['Ինձ էլ նույնը։','индз эл нуйны','Мне то же самое.'],
+   ['Շատ համեղ էր։','шат һамегъ эр','Было очень вкусно.'],
+   ['Հաշիվը, խնդրում եմ։','һашивы, хындрум ем','Счёт, пожалуйста.'],
+   ['Կարելի՞ է քարտով վճարել։','карели э кʰартов вычарел','Можно оплатить картой?']],
+  dl:[
+   {q:['Քանի՞ հոգի եք։','кʰани һоги екʰ','Сколько вас человек?'],a:['Սեղան կա՞ երկու հոգու համար։','сегъан ка йерку һогу һамар','Есть столик на двоих?'],w:['Հաշիվը, խնդրում եմ։','Կծո՞ւ է։']},
+   {q:['Ի՞նչ կպատվիրեք։','инчʰ кыпатвирекʰ','Что закажете?'],a:['Մեկ սուրճ, խնդրում եմ։','мек сурч, хындрум ем','Один кофе, пожалуйста.'],w:['Շատ համեղ էր։','Կարելի՞ է քարտով վճարել։']},
+   {q:['Սուրճը շաքարո՞վ։','сурчы шакʰаров','Кофе с сахаром?'],a:['Առանց շաքարի։','арранцʰ шакʰари','Без сахара.'],w:['Մենյուն, խնդրում եմ։','Ես միս չեմ ուտում։']},
+   {q:['Ամեն ինչ լա՞վ էր։','амен инчʰ лав эр','Всё было хорошо?'],a:['Շատ համեղ էր։','шат һамегъ эр','Было очень вкусно.'],w:['Ջուր, խնդրում եմ։','Ի՞նչ խորհուրդ կտաք։']}]},
+
+ {id:'market',t:'Рынок',hy:'Շուկա',o:'seller',mood:'happy',c:'#4E9A3C',who:'Продавец',d:'Спросить цену, поторговаться и купить фрукты.',
+  scene:'Вы на рынке ГУМ. Прилавки ломятся от абрикосов, гранатов и сухофруктов.',
+  ph:[
+   ['Սա ի՞նչ է։','са инчʰ э','Что это?'],
+   ['Ինչքա՞ն արժե։','инчкʰан арже','Сколько стоит?','Литературно: Որքա՞ն արժե։ — воркʰан арже'],
+   ['Կիլոն ինչքա՞ն է։','килон инчкʰан э','Почём килограмм?'],
+   ['Թանկ է։','тʰанк э','Дорого.'],
+   ['Մի քիչ զիջեք։','ми кʰичʰ зиджекʰ','Уступите немного.'],
+   ['Կարելի՞ է փորձել։','карели э пʰордзел','Можно попробовать?'],
+   ['Մեկ կիլո տվեք։','мек кило твекʰ','Дайте один килограмм.'],
+   ['Կես կիլո, խնդրում եմ։','кес кило, хындрум ем','Полкило, пожалуйста.'],
+   ['Տոպրակ ունե՞ք։','топрак унекʰ','У вас есть пакет?'],
+   ['Քարտով կարելի՞ է։','кʰартов карели э','Можно картой?'],
+   ['Մանր չունեմ։','манр чʰунем','У меня нет мелочи.'],
+   ['Ոչ, շնորհակալություն։','вочʰ, шнорһакалутʰюн','Нет, спасибо.']],
+  dl:[
+   {q:['Ի՞նչ եք ուզում։','инчʰ екʰ узум','Что желаете?'],a:['Կես կիլո, խնդրում եմ։','кес кило, хындрум ем','Полкило, пожалуйста.'],w:['Թանկ է։','Մանր չունեմ։']},
+   {q:['Կիլոն հազար դրամ է։','килон һазар драм э','Килограмм — тысяча драмов.'],a:['Թանկ է։ Մի քիչ զիջեք։','тʰанк э. ми кʰичʰ зиджекʰ','Дорого. Уступите немного.'],w:['Սա ի՞նչ է։','Ոչ, շնորհակալություն։']},
+   {q:['Ուրիշ բա՞ն։','уриш бан','Что-нибудь ещё?'],a:['Ոչ, շնորհակալություն։','вочʰ, шнорһакалутʰюн','Нет, спасибо.'],w:['Կարելի՞ է փորձել։','Մեկ կիլո տվեք։']},
+   {q:['Քարտո՞վ, թե՞ կանխիկ։','кʰартов, тʰе канхик','Картой или наличными?'],a:['Քարտով։','кʰартов','Картой.'],w:['Թանկ է։','Կես կիլո, խնդրում եմ։']}]},
+
+ {id:'pharmacy',t:'Аптека и врач',hy:'Դեղատուն',o:'doctor',mood:'sad',c:'#2E9C8F',who:'Фармацевт',d:'Объяснить, что болит, и купить лекарство.',
+  scene:'Вам нездоровится. Вы заходите в аптеку.',
+  ph:[
+   ['Ես ինձ վատ եմ զգում։','йес индз ват ем зыгум','Я плохо себя чувствую.'],
+   ['Գլուխս ցավում է։','гылухс цʰавум э','У меня болит голова.'],
+   ['Փորս ցավում է։','пʰорс цʰавум э','У меня болит живот.'],
+   ['Ատամս ցավում է։','атамс цʰавум э','У меня болит зуб.'],
+   ['Ջերմություն ունեմ։','джермутʰюн унем','У меня температура.'],
+   ['Ինչ-որ բան ունե՞ք գլխացավի դեմ։','инчʰ-вор бан унекʰ гылхацʰави дем','У вас есть что-нибудь от головной боли?'],
+   ['Ալերգիա ունեմ։','алергия унем','У меня аллергия.'],
+   ['Ինչպե՞ս խմել այս դեղը։','инчʰпес хымел айс дегъы','Как принимать это лекарство?'],
+   ['Օրը քանի՞ անգամ։','оры кʰани ангам','Сколько раз в день?'],
+   ['Դեղատոմս պե՞տք է։','дегъатомс петкʰ э','Нужен рецепт?'],
+   ['Ինձ բժիշկ է պետք։','индз бжишк э петкʰ','Мне нужен врач.'],
+   ['Լավ, հասկացա։','лав, һаскацʰа','Хорошо, понял(а).']],
+  dl:[
+   {q:['Ի՞նչ է պատահել։','инчʰ э патаһел','Что случилось?'],a:['Գլուխս ցավում է։','гылухс цʰавум э','У меня болит голова.'],w:['Օրը քանի՞ անգամ։','Լավ, հասկացա։']},
+   {q:['Ալերգիա ունե՞ք։','алергия унекʰ','У вас есть аллергия?'],a:['Ալերգիա ունեմ։','алергия унем','У меня аллергия.'],w:['Դեղատոմս պե՞տք է։','Ինձ բժիշկ է պետք։']},
+   {q:['Ահա այս դեղը։','аһа айс дегъы','Вот это лекарство.'],a:['Ինչպե՞ս խմել այս դեղը։','инчʰпес хымел айс дегъы','Как принимать это лекарство?'],w:['Ջերմություն ունեմ։','Ատամս ցավում է։']},
+   {q:['Օրը երեք անգամ, ուտելուց հետո։','оры йерекʰ ангам, утелуцʰ һето','Три раза в день, после еды.'],a:['Լավ, հասկացա։','лав, һаскацʰа','Хорошо, понял(а).'],w:['Փորս ցավում է։','Ինչ-որ բան ունե՞ք գլխացավի դեմ։']}]},
+
+ {id:'help',t:'Экстренное',hy:'Օգնություն',o:'police',mood:'wow',c:'#2E4E8F',who:'Полицейский',d:'Позвать на помощь, вызвать полицию или скорую.',
+  scene:'Что-то случилось. Рядом полицейский.',
+  ph:[
+   ['Օգնեցե՛ք։','огнецʰекʰ','Помогите!'],
+   ['Ոստիկանություն կանչեք։','востиканутʰюн канчʰекʰ','Вызовите полицию.'],
+   ['Շտապօգնություն կանչեք։','штапогнутʰюн канчʰекʰ','Вызовите скорую.'],
+   ['Ինձ թալանել են։','индз тʰаланел ен','Меня ограбили.'],
+   ['Հեռախոսս գողացել են։','һеррахосс гогъацʰел ен','У меня украли телефон.'],
+   ['Ես կորցրել եմ անձնագիրս։','йес корцʰрел ем андзнагирс','Я потерял(а) паспорт.'],
+   ['Այստեղ ռուսերեն խոսող կա՞։','айстегъ ррусерен хосогъ ка','Здесь кто-нибудь говорит по-русски?'],
+   ['Որտե՞ղ է մոտակա հիվանդանոցը։','вортегъ э мотака һиванданоцʰы','Где ближайшая больница?'],
+   ['Ես հայերեն վատ եմ խոսում։','йес һайерен ват ем хосум','Я плохо говорю по-армянски.'],
+   ['Զգո՛ւյշ։','зыгуйш','Осторожно!'],
+   ['Ամեն ինչ կարգին է։','амен инчʰ каргин э','Всё в порядке.'],
+   ['Ահա, խնդրեմ։','аһа, хындрем','Вот, пожалуйста.']],
+  dl:[
+   {q:['Ի՞նչ է պատահել։','инчʰ э патаһел','Что случилось?'],a:['Հեռախոսս գողացել են։','һеррахосс гогъацʰел ен','У меня украли телефон.'],w:['Զգո՛ւյշ։','Ահա, խնդրեմ։']},
+   {q:['Ձեր փաստաթղթերը, խնդրում եմ։','дзер пʰастатʰгътʰеры, хындрум ем','Ваши документы, пожалуйста.'],a:['Ահա, խնդրեմ։','аһа, хындрем','Вот, пожалуйста.'],w:['Շտապօգնություն կանչեք։','Ամեն ինչ կարգին է։']},
+   {q:['Ձեզ շտապօգնությո՞ւն է պետք։','дзез штапогнутʰюн э петкʰ','Вам нужна скорая?'],a:['Ոչ, ամեն ինչ կարգին է։','вочʰ, амен инчʰ каргин э','Нет, всё в порядке.'],w:['Ինձ թալանել են։','Կես կիլո, խնդրում եմ։']},
+   {q:['Ո՞ւմ զանգեմ։','ум зангем','Кому позвонить?'],a:['Ոստիկանություն կանչեք։','востиканутʰюн канчʰекʰ','Вызовите полицию.'],w:['Մեկ սուրճ, խնդրում եմ։','Ահա, խնդրեմ։']}]}
+];
+const PHMAP=new Map();PHR.forEach(P=>{P.ph.forEach(x=>PHMAP.set(x[0],x));P.dl.forEach(d=>{PHMAP.set(d.a[0],d.a);PHMAP.set(d.q[0],d.q)})});
+const phSt=id=>(S.phr&&S.phr[id])||{};
+const phDone=id=>!!phSt(id).l2;
+const phStars=id=>{const r=phSt(id);return (r.l1?1:0)+(r.l2?1:0)};
+const phToks=a=>a.replace(/[։,]/g,' ').split(/\s+/).filter(Boolean);
+function phGen1(P){
+  const ph=shuffle(P.ph),others=PHR.filter(x=>x!==P).flatMap(x=>x.ph),out=[];
+  const mW=x=>sample(P.ph.filter(y=>y!==x&&!clash(y[2],x[2])).map(y=>y[2]),3);
+  const aW=x=>sample(P.ph.filter(y=>y!==x).map(y=>y[0]),3);
+  const note=x=>x[3]?'<br>'+esc(x[3]):'';
+  ph.slice(0,4).forEach(x=>out.push(CH('Что значит эта фраза?',x[0],x[2],mW(x),{bigCls:'sent',sub:'звучит «'+x[1]+'»',explain:note(x).slice(4)})));
+  ph.slice(4,7).forEach(x=>out.push(CH('Как сказать по-армянски?',x[2],x[0],aW(x),{bigCls:'ru',optArm:true,optR:true,explain:'«'+esc(x[1])+'»'+note(x)})));
+  const short=P.ph.slice().sort((a,b)=>a[0].length-b[0].length).slice(0,6);
+  out.splice(4,0,MT(sample(short,4).map(x=>[x[0].replace(/։$/,''),x[2]])));
+  ph.slice(7).filter(x=>{const n=phToks(x[0]).length;return n>=2&&n<=5}).slice(0,2).forEach(x=>{const w=phToks(x[0]);
+    const extra=sample(uniq(others.flatMap(y=>phToks(y[0]))).filter(t=>!w.includes(t)),2);
+    out.push({type:'build',prompt:'Соберите фразу',sub:x[2],tiles:[...w,...extra],answers:[w],joiner:' ',show:x[0],explain:'«'+esc(x[1])+'»'})});
+  return out}
+function phGen2(P){
+  const out=[{type:'teach',title:'Сцена: '+P.t.toLowerCase(),outfit:P.o,html:`<p>${esc(P.scene)}</p><p style="margin-top:8px">${esc(P.who)} обращается к вам. Выберите подходящий ответ.</p>`}];
+  P.dl.forEach(d=>out.push({type:'choice',prompt:'Что ответите?',dlg:d,who:P.who,outfit:P.o,correct:d.a[0],options:[d.a[0],...d.w],optArm:true,optR:true,explain:'«'+esc(d.a[1])+'» — '+esc(d.a[2])}));
+  sample(P.ph.filter(x=>!P.dl.some(d=>d.a[0]===x[0])),2).forEach(x=>out.push(CH('Как сказать по-армянски?',x[2],x[0],sample(P.ph.filter(y=>y!==x).map(y=>y[0]),3),{bigCls:'ru',optArm:true,optR:true,explain:'«'+esc(x[1])+'»'})));
+  return out}
+function phLesson(P,n){return {id:`ph-${P.id}-${n}`,t:`${P.t} · ${n===1?'фразы':'диалог'}`,ph:{id:P.id,n},gen:()=>n===1?phGen1(P):phGen2(P)}}
+function phStart(P,n){if(hearts()<=0){const s=sheet(`<div class="row">${mascot('sleep')}<h3 style="flex:1">Сердца закончились. Сердечко восстанавливается за 30 минут — или потренируйтесь на пройденном.</h3></div><div class="row"><button class="btn" id="phpr">Тренировка</button><button class="btn plain" data-close>Позже</button></div>`);s.el.querySelector('#phpr').onclick=()=>{s.close();startPractice()};return}
+  startLesson(phLesson(P,n),false)}
+function phCard(P){const st=phStars(P),c=COSTUMES.find(x=>x.ph===P.id);
+  return `<button class="phc" data-ph="${P.id}" style="--pc:${P.c}"><span class="phc-art">${mascot(P.mood,'',P.o)}</span><span class="phc-tx"><b>${esc(P.t)}</b><span class="arm hy">${esc(P.hy)}</span><span class="d">${P.ph.length} фраз · ${P.dl.length} диалога</span><span class="phc-st">${[0,1].map(i=>`<i class="${i<st?'on':''}"></i>`).join('')}${phDone(P.id)?`<em>костюм: ${esc(c.t.toLowerCase())}</em>`:''}</span></span></button>`}
+function renderPhrases(sub){const P=PHR.find(p=>p.id===sub);
+  if(!P){const n=PHR.filter(p=>phDone(p.id)).length;
+    $('#view').innerHTML=`<div class="phx"><section class="ph-intro">${ciroSay('happy',`<p><b>Фразы для поездки.</b> Самые нужные слова для рынка, такси, аэропорта и других мест — с подсказкой, как это звучит.</p><p>Пройдите диалог ситуации — и Циро получит новый костюм.</p>`)}<div class="ph-prog"><b>${n} из ${PHR.length}</b><span>ситуаций пройдено</span></div></section>
+      <div class="phc-grid">${PHR.map(phCard).join('')}</div>
+      <p class="note" style="text-align:center">Фразы — живой разговорный язык. Где литературная норма говорит иначе, это указано рядом.</p></div>`;
+    document.querySelectorAll('.phc').forEach(b=>b.onclick=()=>{location.hash='phrases/'+b.dataset.ph});return}
+  const r=phSt(P.id),c=COSTUMES.find(x=>x.ph===P.id),open2=!!r.l1||S.unlockAll,worn=S.outfit===c.id;
+  const step=(n,t,d,open,done)=>`<button class="ph-step ${done?'done':''}" data-n="${n}" ${open?'':'disabled'}><span class="num">${done?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>':open?n:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</span><span class="tx"><b>${t}</b><span>${open?d:'Откроется после урока 1'}</span></span><span class="go">${done?'Повторить':open?'Начать':''}</span></button>`;
+  $('#view').innerHTML=`<div class="phx" style="--pc:${P.c}">
+    <a class="ph-back" href="#phrases">← Все ситуации</a>
+    <section class="ph-head"><div class="ph-art" id="ph-art">${mascot(P.mood,'m-idle',P.o)}</div><div class="ph-ht"><span class="k">Фразы · ситуация</span><h2>${esc(P.t)}</h2><span class="arm hy">${esc(P.hy)}</span><p>${esc(P.d)}</p></div></section>
+    <div class="ph-steps">${step(1,'Урок 1 · Фразы','Перевод, пары и сборка фраз',true,r.l1)}${step(2,'Урок 2 · Диалог',esc(P.who)+' говорит — вы отвечаете',open2,r.l2)}</div>
+    <div class="box ph-cos"><span class="cos-art">${mascot('cheer','',c.id)}</span><div><b>Костюм «${esc(c.t)}»</b><p class="note" style="margin:2px 0 0">${phDone(P.id)?esc(c.d):'Откроется, когда пройдёте диалог.'}</p></div>${phDone(P.id)?`<button class="btn ${worn?'plain':''} sm" id="ph-wear" ${worn?'disabled':''}>${worn?'Надето':'Надеть'}</button>`:''}</div>
+    <section class="box ph-list"><h3>Разговорник</h3>${P.ph.map(x=>`<div class="ph-row"><div class="ph-a"><span class="arm">${esc(x[0])}</span>${spk(x[0],'sm')}</div><div class="ph-r">«${esc(x[1])}»</div><div class="ph-m">${esc(x[2])}</div>${x[3]?`<div class="ph-n">${esc(x[3])}</div>`:''}</div>`).join('')}</section>
+  </div>`;
+  document.querySelectorAll('.ph-step').forEach(b=>b.onclick=()=>phStart(P,+b.dataset.n));
+  const w=$('#ph-wear');if(w)w.onclick=()=>{S.outfit=c.id;save();renderPhrases(P.id)};
+  $('#ph-art').onclick=()=>bounce($('#ph-art .mascot'))}
+
 /* ================= HUD и роутинг ================= */
 function ring(v,max){const p=Math.min(1,v/max),c=2*Math.PI*9;return `<svg class="ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle cx="12" cy="12" r="9" fill="none" stroke="var(--good)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 12 12)"/></svg>`}
 function drawHud(){const st=streakNow();
   $('#hud').innerHTML=`<span class="pill flame ${S.lastDay===today()?'':'off'}" title="Серия дней">${IC.flame}${st}</span><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`}
-const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile};
-function route(){const v=VIEWS[location.hash.slice(1)]?location.hash.slice(1):'learn';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));$('#logo').innerHTML=mascot('happy');drawHud();VIEWS[v]()}
+const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases};
+function route(){const [hb,hs]=location.hash.slice(1).split('/'),v=VIEWS[hb]?hb:'learn';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));$('#logo').innerHTML=mascot('happy');drawHud();VIEWS[v](hs)}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{location.hash=b.dataset.view});
 window.addEventListener('hashchange',()=>{route();window.scrollTo(0,0)});
 setInterval(drawHud,60000);
@@ -1260,6 +1586,7 @@ function renderLearn(){
     <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>
    <div class="duo">
     <div class="tile2 wod"><div class="tx"><span class="lbl">Слово дня</span><span class="w">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></div>${spk(wod.a)}</div>
+    <button class="tile2 phr" id="phr-tile">${mascot('happy','','taxi')}<span class="tx"><span class="lbl">Фразы для поездки</span><span class="pt">Такси, рынок, кафе, аэропорт…</span><span class="m">${PHR.filter(p=>phDone(p.id)).length} из ${PHR.length} ситуаций · костюмы для Циро</span></span></button>
     <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button>
     ${Object.keys(S.done).length?`<button class="tile2 prac" id="prac"><span class="pic">${IC.bolt}</span><span class="tx"><span class="lbl">Тренировка</span><span class="pt">10 заданий из пройденного</span><span class="m">+5 XP и +1 сердце</span></span></button>`:''}
    </div></div>
@@ -1283,6 +1610,7 @@ function renderLearn(){
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   const pr=$('#prac');if(pr)pr.onclick=startPractice;
+  $('#phr-tile').onclick=()=>{location.hash='phrases'};
   document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{EXPANDED.add(+b.dataset.exp);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
   document.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{EXPANDED.delete(+b.dataset.col);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
   setupJump();
@@ -1359,7 +1687,7 @@ function foot(html){$('#lfoot').innerHTML=`<div class="foot-in">${html}</div>`}
 function footCheck(enabled){foot(`<span></span><button class="btn" id="chk" ${enabled?'':'disabled'}>Проверить</button>`);$('#chk').onclick=check}
 function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);$('#nxt').onclick=()=>next();$('#nxt').focus();LS.state='info'}
 
-function renderTeach(ex,box){box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.title)}</h2><div class="ciro-say stack">${mascot('happy','m-idle')}<div class="bubble teach">${ex.html}</div></div>`);footNext('Понятно')}
+function renderTeach(ex,box){box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.title)}</h2><div class="ciro-say stack">${mascot('happy','m-idle',ex.outfit)}<div class="bubble teach">${ex.html}</div></div>`);footNext('Понятно')}
 function exWord(l){const w=WORDS.find(x=>x.a===l.w);
   return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(l.w,l.k)}</span>${spk(l.w,'sm')}</div><div class="ew-mean"><b>${esc(l.m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(l.w,l.k)}</div>`}
 function renderLetterCard(l,box){box.insertAdjacentHTML('beforeend',`<h2>Новая буква</h2><div class="letter-card"><div class="lc-hero"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="chip lg">${esc(l.s)}</span><span style="color:var(--muted)">Название: «${esc(l.nm)}»</span></div></div><p style="margin:0">${esc(tipOf(l))}</p>${exWord(l)}</div>`);footNext();autoSay(l.w)}
@@ -1368,10 +1696,11 @@ function renderChoice(ex,box){
   const pre=preSay(ex);
   let bigHtml=ex.bigCls==='sent'?esc(ex.big).replace('___','<span class="gap">?</span>'):esc(ex.big);
   if(ex.listen)bigHtml=`<div class="listen-row">${spk(ex.listen,'huge')}${spkSlow(ex.listen)}</div>`;else if(pre)bigHtml+=spk(pre);
-  box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.prompt)}</h2><div class="big ${ex.listen?'':ex.bigCls||'word'}">${bigHtml}</div>${ex.sub?`<div class="sub">${esc(ex.sub)}</div>`:''}
-   <div class="opts">${opts.map((o,i)=>`<button class="opt ${ex.optArm?'arm':''}" data-i="${i}" aria-pressed="false"><span class="k">${i+1}</span>${esc(o)}</button>`).join('')}</div>`);
+  const d=ex.dlg,bigBox=d?`<div class="dlg">${mascot('happy','m-idle',ex.outfit)}<div class="bubble"><span class="who">${esc(ex.who)}</span><span class="dq">${esc(d.q[0])}${spk(d.q[0],'sm')}</span><span class="dr">«${esc(d.q[1])}»</span><span class="dm">${esc(d.q[2])}</span></div></div>`:`<div class="big ${ex.listen?'':ex.bigCls||'word'}">${bigHtml}</div>`;
+  box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.prompt)}</h2>${bigBox}${ex.sub?`<div class="sub">${esc(ex.sub)}</div>`:''}
+   <div class="opts ${ex.optR?'one':''}">${opts.map((o,i)=>`<button class="opt ${ex.optArm?'arm':''}" data-i="${i}" aria-pressed="false"><span class="k">${i+1}</span>${esc(o)}${ex.optR&&PHMAP.has(o)?`<small class="or">${esc(PHMAP.get(o)[1])}</small>`:''}</button>`).join('')}</div>`);
   box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>selectOpt(+b.dataset.i));
-  footCheck(false);if(ex.listen)autoSay(ex.listen);else if(pre)autoSay(pre);
+  footCheck(false);if(ex.listen)autoSay(ex.listen);else if(pre)autoSay(pre);else if(d&&hasAudio(d.q[0]))autoSay(d.q[0]);
 }
 const ARMRE=/[\u0531-\u0587]/;
 function preSay(ex){if(ex.listen)return null;if(!ARMRE.test(ex.big)||ex.big.includes('___'))return null;
@@ -1435,8 +1764,9 @@ function feedback(ok,detail){
 function finishLesson(){
   LS.state='end';const prac=LS.practice,perfect=LS.mistakes===0;
   const xp=prac?5:10+(perfect?5:0);
-  if(prac)track('practice');else{track('lesson',lref(LS.lesson));if(!S.done[LS.lesson.id])track('lesson_first',lref(LS.lesson))}
-  if(prac){S.hearts=Math.min(MAXH,hearts()+1)}else{S.done[LS.lesson.id]=(S.done[LS.lesson.id]||0)+1;if(perfect)S.perfect++}
+  const PL=LS.lesson.ph;let phFirst=false;
+  if(prac)track('practice');else if(PL)track('phrase',PL.id+'-'+PL.n);else{track('lesson',lref(LS.lesson));if(!S.done[LS.lesson.id])track('lesson_first',lref(LS.lesson))}
+  if(prac){S.hearts=Math.min(MAXH,hearts()+1)}else if(PL){const r=S.phr[PL.id]=S.phr[PL.id]||{},k='l'+PL.n;phFirst=!r[k];r[k]=(r[k]||0)+1;if(perfect)S.perfect++}else{S.done[LS.lesson.id]=(S.done[LS.lesson.id]||0)+1;if(perfect)S.perfect++}
   const goalBefore=todayXP()>=S.goal,lvBefore=level();addXP(xp);const goalNow=!goalBefore&&todayXP()>=S.goal;
   const newA=checkAch();save();
   const secs=Math.round((Date.now()-LS.start)/1000),acc=Math.round(LS.total/(LS.total+LS.mistakes)*100);
@@ -1444,7 +1774,7 @@ function finishLesson(){
   const line=prac?'Хорошая тренировка! Держи сердечко.':perfect?'Ни одной ошибки! <b class="arm">Կեցցե՛ս!</b>':LS.mistakes<=2?'Отличный урок. Все ошибки уже исправлены!':'Было непросто, но урок пройден. <b class="arm">Ապրե՛ս!</b>';
   $('#ex').innerHTML=`<div class="end"><span id="end-ciro">${mascot('cheer','m-jump')}</span><h2>${prac?'Тренировка окончена':perfect?'Урок без ошибок!':'Урок пройден!'}</h2>
    <div class="bubble">${line}${goalNow?`<p style="margin-top:6px;font-weight:700">Цель дня выполнена! Огонёк: ${streakNow()} ${plural(streakNow(),'день','дня','дней')}.</p>`:''}</div>
-   ${levelUps(lvBefore)}
+   ${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}
    <div class="tiles3"><div class="stat" style="--c:var(--gold-deep)"><div class="h">XP</div><div class="v">+${xp}</div></div><div class="stat" style="--c:var(--good)"><div class="h">Точность</div><div class="v">${acc}%</div></div><div class="stat" style="--c:var(--b3)"><div class="h">Время</div><div class="v">${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</div></div></div>
    ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<span class="chip">${IC[a.ic]} ${esc(a.t)}</span>`).join('')}</div></div>`:''}</div>`;
   $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);$('#nxt').onclick=closeLesson;$('#nxt').focus();
@@ -1454,6 +1784,7 @@ function failLesson(){LS.state='end';if(LS.lesson.id!=='practice')track('fail',l
   $('#ex').innerHTML=`<div class="end">${mascot('sleep','m-idle')}<h2 style="color:var(--bad)">Сердца закончились</h2><div class="bubble">Сердечко восстанавливается за 30 минут. Или давай потренируемся на пройденном — сразу получишь одно.</div></div>`;
   $('#lfoot').className='l-foot';foot(`<button class="btn plain" id="out">Выйти</button><button class="btn" id="pr">Тренировка</button>`);
   $('#out').onclick=closeLesson;$('#pr').onclick=()=>{const el=$('#lesson');el&&el.remove();LS=null;startPractice()}}
+function costumeUnlock(id){const c=COSTUMES.find(x=>x.ph===id);return `<div class="unlock"><b>Новый костюм для Циро!</b><div class="unlock-item">${mascot('cheer','',c.id)}<div>Циро теперь <b>${esc(c.t.toLowerCase())}</b><br><button class="btn plain sm" data-wear="${c.id}">Надеть</button></div></div></div>`}
 function levelUps(lvBefore){const lv=level();if(lv<=lvBefore)return '';const items=OUTFITS.filter(o=>o.id&&o.lv>lvBefore&&o.lv<=lv);
   return `<div class="unlock"><b>Новый уровень: ${lv}</b>${items.map(o=>`<div class="unlock-item">${mascot('cheer','',o.id)}<div>Новая вещь для Циро: <b>${o.t}</b><br><button class="btn plain sm" data-wear="${o.id}">Надеть</button></div></div>`).join('')}</div>`}
 function wireWear(sel){document.querySelectorAll('[data-wear]').forEach(b=>b.onclick=()=>{S.outfit=b.dataset.wear;save();b.textContent='Надето';b.disabled=true;const host=$(sel);if(host)host.innerHTML=mascot('cheer','m-jump')})}
@@ -1752,7 +2083,8 @@ function renderProfile(){
   $('#view').innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
    <div class="box"><h3>Гардероб Циро</h3><div class="wr">
     <div class="wr-prev"><span id="wr-ciro">${mascot('happy','m-idle')}</span><div class="lv"><b>Уровень ${lv}</b><div class="bar"><i style="width:${into}%"></i></div><span class="note">до уровня ${lv+1}: ${100-into} XP</span></div></div>
-    <div class="wr-grid">${OUTFITS.map(o=>{const op=lv>=o.lv,on=(S.outfit||null)===o.id;return `<button class="wr-item ${on?'on':''}" data-o="${o.id||''}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',o.id)}<b>${o.t}</b><span>${op?o.d:`Откроется на уровне ${o.lv}`}</span></button>`}).join('')}</div>
+    <div class="wr-col"><div class="wr-grid">${OUTFITS.map(o=>{const op=lv>=o.lv,on=(S.outfit||null)===o.id;return `<button class="wr-item ${on?'on':''}" data-o="${o.id||''}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',o.id)}<b>${o.t}</b><span>${op?o.d:`Откроется на уровне ${o.lv}`}</span></button>`}).join('')}</div>
+    <h4 class="wr-sub">Костюмы за «Фразы»</h4><div class="wr-grid">${COSTUMES.map(c=>{const op=phDone(c.ph),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:`Диалог «${esc(PHR.find(p=>p.id===c.ph).t)}»`}</span></button>`}).join('')}</div></div>
    </div></div>
    <div class="cards">
     <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div></div></div>

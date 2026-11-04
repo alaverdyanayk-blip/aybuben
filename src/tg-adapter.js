@@ -32,13 +32,16 @@
 
   // Кнопка «Назад» в шапке Телеграма закрывает урок, игру или окно
   var layer=document.getElementById('layer'),BB=tg.BackButton;
-  function syncBack(){layer&&layer.children.length?BB.show():BB.hide()}
+  var subPage=function(){return /^#phrases\/./.test(location.hash)};
+  function syncBack(){(layer&&layer.children.length)||subPage()?BB.show():BB.hide()}
   if(layer){new MutationObserver(syncBack).observe(layer,{childList:true});syncBack()}
+  window.addEventListener('hashchange',syncBack);
   BB.onClick(function(){
     var sc=document.querySelectorAll('.scrim');sc=sc[sc.length-1];
     if(sc){var c=sc.querySelector('[data-close]');if(c)c.click();else sc.click();return}
     if(document.getElementById('lesson')&&window.quitLesson)return quitLesson();
     if(document.getElementById('game')&&window.closeGame)return closeGame();
+    if(subPage())location.hash='phrases';
   });
 
   // Прогресс в облаке Телеграма: виден на телефоне и компьютере, не теряется при очистке кэша
