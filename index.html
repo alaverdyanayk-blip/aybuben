@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="02892bfc1a"</script>
+<script>window.BUILD_ID="ddaa3ec715"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1789,7 +1789,7 @@ function renderProfile(){
   $('#sw-voice').onclick=()=>{S.voice=S.voice===false;save();renderProfile()};
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
-  $('#reset').onclick=()=>{$('#rs-confirm').innerHTML='<button class="btn bad" id="rs-yes">Да, стереть всё</button>';$('#rs-yes').onclick=()=>{try{localStorage.removeItem(KEY)}catch(e){}location.reload()}};
+  $('#reset').onclick=()=>{$('#rs-confirm').innerHTML='<button class="btn bad" id="rs-yes">Да, стереть всё</button>';$('#rs-yes').onclick=()=>{const b=$('#rs-yes');b.disabled=true;b.textContent='Стираю…';let gone=false;const go=()=>{if(gone)return;gone=true;try{localStorage.removeItem(KEY)}catch(e){}location.reload()};if(window.__resetCloud){window.__resetCloud(go);setTimeout(go,3000)}else go()}};
 }
 
 route();
@@ -1846,7 +1846,16 @@ route();
     for(var i=0;i<n;i++)CS.setItem(P+i,j.slice(i*CH,(i+1)*CH));
     CS.setItem(P+'n',String(n));
   }
-  var timer;window.__onSave=function(st){clearTimeout(timer);timer=setTimeout(function(){put(st)},700)};
+  var timer;window.__onSave=function(st){if(wiped)return;clearTimeout(timer);timer=setTimeout(function(){put(st)},700)};
+  // Сброс прогресса: стереть и облачную копию, иначе после перезагрузки прогресс вернётся из облака
+  var wiped=false;
+  window.__resetCloud=function(done){
+    wiped=true;clearTimeout(timer);
+    CS.getItem(P+'n',function(err,n){
+      n=+n||0;var keys=[P+'n'];for(var i=0;i<n;i++)keys.push(P+i);
+      try{CS.removeItems(keys,function(){done()})}catch(x){done()}
+    });
+  };
   CS.getItem(P+'n',function(err,n){
     n=+n;if(err)return;if(!n){put(S);return}
     var keys=[];for(var i=0;i<n;i++)keys.push(P+i);

@@ -49,7 +49,16 @@
     for(var i=0;i<n;i++)CS.setItem(P+i,j.slice(i*CH,(i+1)*CH));
     CS.setItem(P+'n',String(n));
   }
-  var timer;window.__onSave=function(st){clearTimeout(timer);timer=setTimeout(function(){put(st)},700)};
+  var timer;window.__onSave=function(st){if(wiped)return;clearTimeout(timer);timer=setTimeout(function(){put(st)},700)};
+  // Сброс прогресса: стереть и облачную копию, иначе после перезагрузки прогресс вернётся из облака
+  var wiped=false;
+  window.__resetCloud=function(done){
+    wiped=true;clearTimeout(timer);
+    CS.getItem(P+'n',function(err,n){
+      n=+n||0;var keys=[P+'n'];for(var i=0;i<n;i++)keys.push(P+i);
+      try{CS.removeItems(keys,function(){done()})}catch(x){done()}
+    });
+  };
   CS.getItem(P+'n',function(err,n){
     n=+n;if(err)return;if(!n){put(S);return}
     var keys=[];for(var i=0;i<n;i++)keys.push(P+i);
