@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="c5810d578c"</script>
+<script>window.BUILD_ID="b69a1e3c6f"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -125,6 +125,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .buddy{position:absolute;top:-2px;width:66px;height:66px;pointer-events:none}
 .buddy.l{right:calc(100% + 4px)}.buddy.r{left:calc(100% + 4px)}
 .buddy .mascot{width:66px;height:66px}
+.ciro-say.upd{width:100%;max-width:440px;align-items:center;margin-bottom:6px}.ciro-say.upd .mascot{width:66px;height:66px}.ciro-say.upd .bubble p{font-size:14.5px}
 .node .cap{font-size:12.5px;color:var(--muted);font-weight:600;max-width:130px;text-align:center;line-height:1.25}
 .node .lv{display:flex;gap:3px}
 .node .lv b{width:7px;height:7px;border-radius:50%;background:var(--line)}
@@ -1349,6 +1350,8 @@ function fixState(){try{for(const k in S0){const v=S[k],d=S0[k];if(d!==null&&(v=
   if(S.outfit!=null&&typeof S.outfit!=='string')S.outfit=null;migrateAbc();try{seedMem()}catch(e){}}catch(e){}}
 /* Пересчёт прогресса алфавита из прежнего порядка букв: по старым отметкам (a1a…a6w) узнаём,
    какие буквы человек уже прошёл, и отмечаем новые уроки, где все буквы ему знакомы. Отметки только добавляются. */
+/* старый пользователь, которому после смены порядка букв надо допройти урок: дальше по пути уже есть пройденные уроки алфавита */
+const updGap=gi=>!!LESSONS[gi].abc&&Object.keys(S.done).some(k=>/^a[1-6][abw]$/.test(k))&&LESSONS.slice(gi+1).some(l=>l.abc&&S.done[l.id]);
 function migrateAbc(){const d=S.done;const old=Object.keys(d).filter(k=>/^a[1-6][abw]$/.test(k));if(!old.length)return;
   const known=new Set();old.forEach(id=>{const g=OLD_GROUPS[+id[1]-1];let ks=g;if(g.length>3&&id[2]!=='w'){const [a,b]=half(g);ks=id[2]==='a'?a:b}ks.forEach(k=>known.add(k))});
   LESSONS.forEach(l=>{if(l.abc&&!d[l.id]&&l.abc.every(k=>known.has(k)))d[l.id]=1})}
@@ -1725,8 +1728,9 @@ function renderLearn(){
     html+=`<section class="unit" style="--band:var(--b${ui%4})"><div class="band"><div><div class="k">${u.k}<span class="uprog">${dn}/${u.lessons.length}</span></div><h2>${u.t}</h2><p>${u.d}</p><div class="uline"><i style="width:${Math.round(dn/u.lessons.length*100)}%"></i></div></div><div class="band-side">${EXPANDED.has(ui)?`<button class="guide" data-col="${ui}" aria-label="Свернуть раздел">Свернуть</button>`:''}${u.lessons.some(l=>l.teach)?`<button class="guide" data-guide="${ui}">${IC.book.replace('class="i"','class="i" style="width:18px;height:18px;vertical-align:-4px"')} Правило</button>`:''}</div></div><div class="nodes">`;
     u.lessons.forEach((l,li)=>{const gi=LESSONS.indexOf(l),open=unlocked(gi),done=S.done[l.id]||0,cur=gi===curIdx;
       if(l.sub)html+=`<div class="path-sub ${li?'':'first'}"><span class="ps-k">Шаг ${l.sub.n} из 6</span><b>${esc(l.sub.t)}</b><span class="ps-l arm">${l.sub.letters}</span></div>`;
-      const off=OFF[(gi)%OFF.length];
-      html+=`<div class="node ${done?'done':open?'open':''} ${cur?'cur':''}" style="transform:translateX(${off}px)">${cur?`<span class="start-tag">${done?'Повтор':'Начать'}</span><span class="buddy ${off>0?'l':'r'}">${mascot('happy','m-idle')}</span>`:''}
+      const off=OFF[(gi)%OFF.length],upd=cur&&!done&&updGap(gi);
+      if(upd)html+=`<div class="ciro-say upd">${mascot('happy','m-idle')}<div class="bubble"><p><b>Я обновился!</b> Буквы теперь идут в новом порядке, поэтому здесь есть новенькое. Пройдите этот урок — всё, что вы уже знаете, я засчитал.</p></div></div>`;
+      html+=`<div class="node ${done?'done':open?'open':''} ${cur?'cur':''}" style="transform:translateX(${off}px)">${cur?`<span class="start-tag">${done?'Повтор':'Начать'}</span>${upd?'':`<span class="buddy ${off>0?'l':'r'}">${mascot('happy','m-idle')}</span>`}`:''}
         <button class="stone" data-l="${gi}" aria-label="${esc(l.t)}${open?'':' (закрыто)'}" ${l.g.length>2?'style="font-size:19px"':''}>${open||done?esc(l.g):'<svg class="i" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</button>
         <span class="lv">${[0,1,2].map(i=>`<b class="${i<Math.min(3,done)?'on':''}"></b>`).join('')}</span><span class="cap">${esc(l.t)}</span></div>`});
     html+='</div></section>'});
