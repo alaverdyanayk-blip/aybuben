@@ -597,6 +597,7 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .sg strong{font-size:14.5px}.sg .d{font-size:12.5px;color:var(--muted);line-height:1.35}
 .sg .e{font-family:var(--f-arm);font-size:16px;margin-top:2px}
 .teach td .a{font-size:16px}
+@media (max-width:389px){.top-in{gap:8px 10px}.brand{font-size:22px}.brand .mascot{width:30px;height:30px}.hud{gap:4px}.hud .pill{padding:4px 7px}.hud .gtxt{display:none}}
 </style>
 
 <header class="top"><div class="top-in">
@@ -1302,9 +1303,14 @@ const LESSONS=[];UNITS.forEach((u,ui)=>u.lessons.forEach(l=>{l.unit=ui;LESSONS.p
 
 /* ================= СОСТОЯНИЕ ================= */
 const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
-let S={xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:Date.now(),done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{}};
+let S={xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:Date.now(),done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{}};
+const S0=JSON.parse(JSON.stringify(S));
 try{const r=localStorage.getItem(KEY);if(r)Object.assign(S,JSON.parse(r))}catch(e){}
-S.games=S.games||{};S.phr=S.phr||{};
+// Защита от повреждённого сохранения: неверные типы возвращаем к значениям по умолчанию
+function fixState(){try{for(const k in S0){const v=S[k],d=S0[k];if(d!==null&&(v==null||typeof v!==typeof d||Array.isArray(v)!==Array.isArray(d)||(typeof d==='number'&&!isFinite(v))))S[k]=JSON.parse(JSON.stringify(d))}
+  S.hearts=Math.max(0,Math.min(MAXH,S.hearts|0));S.xp=Math.max(0,S.xp|0);
+  if(S.outfit!=null&&typeof S.outfit!=='string')S.outfit=null}catch(e){}}
+window.fixState=fixState;fixState();
 const save=()=>{S.ts=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.__onSave)window.__onSave(S)};
 const dstr=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const today=()=>dstr(new Date());

@@ -69,7 +69,7 @@
       if(e2||!v)return;
       try{
         var cloud=JSON.parse(keys.map(function(k){return v[k]||''}).join(''));
-        if((cloud.ts||0)>(S.ts||0)){Object.assign(S,cloud);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}route()}
+        if((cloud.ts||0)>(S.ts||0)){Object.assign(S,cloud);if(window.fixState)fixState();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}route()}
         else if((S.ts||0)>(cloud.ts||0))put(S);
       }catch(x){}
     });
