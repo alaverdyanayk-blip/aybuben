@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="9407be73d2"</script>
+<script>window.BUILD_ID="d6c49dc379"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1624,7 +1624,7 @@ function renderLearn(){
     if(compact){html+=`<section class="unit" style="--band:var(--b${ui%4})"><button class="band mini ${all?'fin':'lock'}" data-exp="${ui}" aria-expanded="false"><span class="mi-ic">${all?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</span><span class="mi-tx"><span class="k">${u.k}</span><b>${esc(u.t)}</b></span><span class="mi-r">${all?'Пройден':`${u.lessons.length} ${plural(u.lessons.length,'урок','урока','уроков')}`}<svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></section>`;return}
     html+=`<section class="unit" style="--band:var(--b${ui%4})"><div class="band"><div><div class="k">${u.k}<span class="uprog">${dn}/${u.lessons.length}</span></div><h2>${u.t}</h2><p>${u.d}</p><div class="uline"><i style="width:${Math.round(dn/u.lessons.length*100)}%"></i></div></div><div class="band-side">${EXPANDED.has(ui)?`<button class="guide" data-col="${ui}" aria-label="Свернуть раздел">Свернуть</button>`:''}${u.lessons.some(l=>l.teach)?`<button class="guide" data-guide="${ui}">${IC.book.replace('class="i"','class="i" style="width:18px;height:18px;vertical-align:-4px"')} Правило</button>`:''}</div></div><div class="nodes">`;
     u.lessons.forEach((l,li)=>{const gi=LESSONS.indexOf(l),open=unlocked(gi),done=S.done[l.id]||0,cur=gi===curIdx;
-      if(l.sub)html+=`<div class="path-sub ${li?'':'first'}"><span class="ps-k">Шаг ${l.sub.n} из 6</span><b>${esc(l.sub.t)}</b><span class="ps-l arm">${l.sub.letters}</span><span class="ps-d">${l.sub.d}</span></div>`;
+      if(l.sub)html+=`<div class="path-sub ${li?'':'first'}"><span class="ps-k">Шаг ${l.sub.n} из 6</span><b>${esc(l.sub.t)}</b><span class="ps-l arm">${l.sub.letters}</span></div>`;
       const off=OFF[(gi)%OFF.length];
       html+=`<div class="node ${done?'done':open?'open':''} ${cur?'cur':''}" style="transform:translateX(${off}px)">${cur?`<span class="start-tag">${done?'Повтор':'Начать'}</span><span class="buddy ${off>0?'l':'r'}">${mascot('happy','m-idle')}</span>`:''}
         <button class="stone" data-l="${gi}" aria-label="${esc(l.t)}${open?'':' (закрыто)'}" ${l.g.length>2?'style="font-size:19px"':''}>${open||done?esc(l.g):'<svg class="i" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</button>
