@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="eb7629089c"</script>
+<script>window.BUILD_ID="6f5f866f98"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -683,12 +683,12 @@ const COSTUMES=[
 /* Костюмы за приглашённых друзей: n — сколько друзей должно пройти первый урок (0 — подарок тому, кого пригласили) */
 const REFC=[
  {id:'guest',t:'Гость',n:0,d:'Пришёл по приглашению — с цветами'},
- {id:'family',t:'Семейный',n:1,d:'Бабушка связала шапку'},
+ {id:'family',t:'Семейный',n:1,d:'Шарф с узором ковра и гранат — символ большой семьи'},
  {id:'tamada',t:'Тамада',n:3,d:'Усы и бокал для тоста'},
- {id:'golden',t:'Золотой Циро',n:5,d:'Медаль за большую семью'}
+ {id:'uncle',t:'Ереванский дядя',n:5,d:'Кепка-аэродром и нарды. Партию?'}
 ];
 const refOwned=c=>c.n===0?!!S.refBy:(S.friends||0)>=c.n;
-const HATS=new Set(['cap','crown','taxi','pilot','chef','bellhop','tourist','doctor','police','family']);
+const HATS=new Set(['cap','crown','taxi','pilot','chef','bellhop','tourist','doctor','police','uncle']);
 function costumeSvg(o){const K='#2B1E22';
  if(o==='taxi'){let ch='';for(let i=0;i<12;i++){const x=24+i*6;ch+=`<rect x="${x}" y="39" width="6" height="3.5" fill="${i%2?'#fff':K}"/><rect x="${x}" y="42.5" width="6" height="3.5" fill="${i%2?K:'#fff'}"/>`}
   return `<path d="M24 46C24 15 96 15 96 46Z" fill="#F2C230"/><path d="M60 17C55 26 53 34 53 39" stroke="#D9A21B" stroke-width="2" fill="none"/>${ch}<circle cx="60" cy="17" r="3.2" fill="#D9A21B"/><path d="M62 46Q92 42 110 50Q90 57 62 50Z" fill="${K}"/><g transform="translate(60 107)"><circle r="12.5" fill="none" stroke="#3A3A44" stroke-width="4.5"/><circle r="3.6" fill="#3A3A44"/><path d="M-12 0H12M0 0V12" stroke="#3A3A44" stroke-width="3"/></g>`}
@@ -701,10 +701,13 @@ function costumeSvg(o){const K='#2B1E22';
  if(o==='doctor')return `<path d="M33 41Q32 20 60 19Q88 20 87 41Z" fill="#FFFFFF" stroke="#D9D2CC" stroke-width="1.5"/><path d="M57 24h6v5h5v6h-5v5h-6v-5h-5v-6h5Z" fill="#D0283A"/><path d="M37 91Q41 106 56 106M83 91Q79 106 64 106" stroke="#4A5A6A" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M60 106v3" stroke="#4A5A6A" stroke-width="3"/><circle cx="60" cy="112" r="4.6" fill="#B8C4CE" stroke="#4A5A6A" stroke-width="2"/>`;
  if(o==='police')return `<path d="M24 42Q20 16 60 15Q100 16 96 42Z" fill="#2E4E8F"/><rect x="26" y="37" width="68" height="9" rx="3" fill="#1B2A4E"/><path d="m60 21 2.4 5 5.4.6-4 3.7 1.1 5.3L60 32.9l-4.9 2.7 1.1-5.3-4-3.7 5.4-.6Z" fill="#F2C14E" stroke="#A87812" stroke-width=".8"/><path d="M28 46Q60 56 92 46L93 49Q60 61 27 49Z" fill="#0E0E14"/><path d="M62 98Q84 99 92 88" stroke="#D0283A" stroke-width="1.6" fill="none"/><rect x="88" y="80" width="15" height="8.5" rx="4.2" fill="#C9CED6" stroke="#6B7380" stroke-width="1.2"/><circle cx="99" cy="84.2" r="1.6" fill="#6B7380"/>`;
  if(o==='guest')return `<path d="M12 112 22 82 34 112Z" fill="#F4EEE4" stroke="#CDBFAE" stroke-width="1.3"/><path d="M23 84 18 66M23 84 23 62M23 84 29 67" stroke="#4E8A3E" stroke-width="2" fill="none"/>${[[18,64,'#D0283A'],[23,59,'#F2A800'],[29,64,'#C2408A']].map(([x,y,c])=>`<circle cx="${x}" cy="${y}" r="5.2" fill="${c}"/><circle cx="${x}" cy="${y}" r="1.8" fill="#fff" opacity=".7"/>`).join('')}<path d="M15 100Q23 95 31 100" stroke="#D0283A" stroke-width="2.4" fill="none"/>`;
- if(o==='family'){let z='';for(let i=0;i<8;i++)z+=(i?'L':'M')+(28+i*8)+' '+(i%2?36:31);
-  return `<path d="M25 44C24 12 96 12 95 44Z" fill="#C8283A"/><path d="${z}" stroke="#fff" stroke-width="2.4" fill="none" stroke-linejoin="round"/><rect x="23" y="39" width="74" height="10" rx="5" fill="#A51F30"/>${[31,39,47,55,63,71,79,87].map(x=>`<path d="M${x} 40v8" stroke="#8C1A28" stroke-width="1.6"/>`).join('')}<circle cx="60" cy="12" r="7.5" fill="#fff" stroke="#D9D2CC" stroke-width="1.2"/><circle cx="57.5" cy="10" r="2.2" fill="#E8E1DA"/>`}
+ if(o==='family'){const rh=x=>`<path d="M${x} 91.5l3.2 3.6-3.2 3.6-3.2-3.6Z" fill="#F2C14E"/><circle cx="${x}" cy="95.1" r="1" fill="#1F3A7A"/>`;
+  return `<path d="M24 85Q60 99 96 85L94.5 98Q60 112 25.5 98Z" fill="#B3122E" stroke="#6E0A1C" stroke-width="1"/><path d="M24.6 89Q60 103 95.4 89M25.2 94.5Q60 108.5 94.8 94.5" stroke="#1F3A7A" stroke-width="1.6" fill="none"/>${[34,44,54,66,76,86].map(rh).join('')}<path d="M80 100 85 117H94L90 98Z" fill="#B3122E" stroke="#6E0A1C" stroke-width="1"/><path d="M84 110H92.5" stroke="#F2C14E" stroke-width="1.6"/><path d="M85.5 117v4M88.5 117v4M91.5 117v4" stroke="#6E0A1C" stroke-width="1.2"/>
+  <g transform="translate(106 74)"><circle r="10" fill="#B3122E"/><path d="M-4-8.5l1.5-4.5 2.5 3 2.5-3 1.5 4.5Z" fill="#8C0E24"/><ellipse cx="-3.5" cy="-3.5" rx="3" ry="2" fill="#fff" opacity=".3"/></g>`}
+ if(o==='uncle'){let tri='';for(let i=0;i<6;i++){const x=3+i*4.4;tri+=`<path d="M${x} 87l2.2 8 2.2-8Z" fill="${i%2?'#7A3F1A':'#E9D9B8'}"/><path d="M${x} 105l2.2-8 2.2 8Z" fill="${i%2?'#E9D9B8':'#7A3F1A'}"/>`}
+  return `<path d="M27 42Q60 33 93 42L93 34Q60 26 27 34Z" fill="#35323A"/><ellipse cx="62" cy="29" rx="45" ry="12" fill="#4A4650"/><ellipse cx="60" cy="27" rx="35" ry="7.5" fill="#57525E"/><circle cx="60" cy="25.5" r="2.6" fill="#35323A"/><path d="M50 40Q68 37 84 41Q80 46 66 46Q55 45.5 50 40Z" fill="#2A272E"/>
+  <g transform="rotate(-8 16 96)"><rect x="0" y="84" width="32" height="24" rx="2.5" fill="#9A5B2E" stroke="#5A3418" stroke-width="1.4"/><rect x="2.2" y="86.2" width="27.6" height="19.6" fill="#F4EEE4"/>${tri}<path d="M16 84v24" stroke="#5A3418" stroke-width="1.8"/><circle cx="9" cy="96" r="2" fill="#fff" stroke="#333" stroke-width=".8"/><circle cx="23" cy="96" r="2" fill="#2B1E22"/></g>`}
  if(o==='tamada')return `<path d="M60 73.5Q52 69 44 72Q41 77 46 76.5Q53 74 60 76.5Q67 74 74 76.5Q79 77 76 72Q68 69 60 73.5Z" fill="#3B2116"/><g transform="rotate(14 103 82)"><path d="M95 64H111Q111 78 103 79Q95 78 95 64Z" fill="#fff" fill-opacity=".35" stroke="#B9A89A" stroke-width="1.4"/><path d="M96 69H110Q109.5 77.5 103 78Q96.5 77.5 96 69Z" fill="#8E1B2E"/><path d="M103 79V95M97 95H109" stroke="#B9A89A" stroke-width="2" stroke-linecap="round"/></g>`;
- if(o==='golden')return `<path d="M50 84 56 100H64L70 84" fill="none" stroke="#2A4FA8" stroke-width="5"/><path d="M51 84 57 98" stroke="#D0283A" stroke-width="2"/><path d="M69 84 63 98" stroke="#D0283A" stroke-width="2"/><circle cx="60" cy="105" r="9" fill="#F2C14E" stroke="#A87812" stroke-width="2"/><path d="m60 99.5 1.6 3.4 3.7.4-2.8 2.5.8 3.6-3.3-1.9-3.3 1.9.8-3.6-2.8-2.5 3.7-.4Z" fill="#A87812"/>${[[18,30,5],[102,26,4],[108,60,3.4],[12,66,3]].map(([x,y,r])=>`<path d="M${x} ${y-r*2}Q${x} ${y} ${x+r*2} ${y}Q${x} ${y} ${x} ${y+r*2}Q${x} ${y} ${x-r*2} ${y}Q${x} ${y} ${x} ${y-r*2}Z" fill="#F2C14E"/>`).join('')}`;
  if(o==='bowtie')return `<path d="M60 103 45 96v15Z" fill="#D0283A"/><path d="M60 103 75 96v15Z" fill="#D0283A"/><circle cx="50" cy="101" r="1.3" fill="#fff"/><circle cx="49" cy="106" r="1.3" fill="#fff"/><circle cx="70" cy="101" r="1.3" fill="#fff"/><circle cx="71" cy="106" r="1.3" fill="#fff"/><circle cx="60" cy="103" r="3.6" fill="#A51F30"/>`;
  return ''}
 function mascot(mood='happy',cls='',outfit){

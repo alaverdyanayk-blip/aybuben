@@ -122,7 +122,7 @@ async function refClaim(req, env, ctx) {
   if (ctx && ctx.waitUntil) ctx.waitUntil(task); else await task;
   return json({ ok: true });
 }
-const REF_TIERS = [[1, 'Семейный'], [3, 'Тамада'], [5, 'Золотой Циро']];
+const REF_TIERS = [[1, 'Семейный'], [3, 'Тамада'], [5, 'Ереванский дядя']];
 async function notifyInviter(env, inviter, n) {
   if (!env.BOT_TOKEN) return;
   const row = await env.DB.prepare('SELECT chat_id FROM notify WHERE uid=? AND chat_id IS NOT NULL').bind(inviter).first();
