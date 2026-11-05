@@ -114,6 +114,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .buddy{position:absolute;top:-2px;width:66px;height:66px;pointer-events:none}
 .buddy.l{right:calc(100% + 4px)}.buddy.r{left:calc(100% + 4px)}
 .buddy .mascot{width:66px;height:66px}
+.news-card{position:relative;background:var(--accent-soft);border:1.5px solid color-mix(in srgb,var(--accent) 40%,var(--line));border-radius:22px;padding:14px 14px 14px 12px}
+.news-card .x{position:absolute;top:6px;right:6px;width:34px;height:34px;font-size:16px}.news-card .ciro-say .mascot{width:70px;height:70px}.news-card .bubble{margin-right:22px}
 .invite .ciro-say .mascot{width:72px;height:72px}.unlock.mile{background:color-mix(in srgb,var(--accent) 18%,var(--surface))}.unlock.mile p{max-width:36ch}
 .ciro-say.upd{width:100%;max-width:440px;align-items:center;margin-bottom:6px}.ciro-say.upd .mascot{width:66px;height:66px}.ciro-say.upd .bubble p{font-size:14.5px}
 .node .cap{font-size:12.5px;color:var(--muted);font-weight:600;max-width:130px;text-align:center;line-height:1.25}
@@ -1729,7 +1731,7 @@ function renderLearn(){
   const kn=new Set(LETTERS.filter(letterLearned).map(l=>l.k)),wr=WORDS.filter(w=>hasAudio(w.a)&&readable(w,kn)),wpool=wr.length>=5?wr:WORDS.filter(w=>hasAudio(w.a)),wod=wpool.length?wpool[Math.floor(Date.now()/864e5)%wpool.length]:null;
   if(S.factI==null)S.factI=Math.floor(Math.random()*FACTS.length);
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
-  let html=`<div class="home"><section class="hero">
+  let html=`<div class="home">${whatsNew()}<section class="hero">
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
     <div class="bubble"><div class="hy"><b>${g.hy}!</b>${spk(g.hy,'sm')}<span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <div class="goal"><div class="goal-top"><span>Цель дня</span><b>${tx} / ${S.goal} XP</b></div><div class="bar ${pct>=100?'good':''}"><i style="width:${pct}%"></i></div></div>
@@ -1763,6 +1765,7 @@ function renderLearn(){
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   const pr=$('#prac');if(pr)pr.onclick=startPractice;
   $('#phr-tile').onclick=()=>{location.hash='phrases'};
+  wireNews();
   document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{EXPANDED.add(+b.dataset.exp);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
   document.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{EXPANDED.delete(+b.dataset.col);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
   setupJump();
@@ -2319,6 +2322,16 @@ function inviteBox(){const f=S.friends||0,nt=nextTier();
    <p class="note">${f?`Пришло друзей: <b>${f}</b>. `:''}${nt?`До костюма «${esc(nt.t)}»: ${nt.n-f} ${plural(nt.n-f,'друг','друга','друзей')}.`:'Все костюмы за друзей собраны!'}</p>
    <button class="btn" data-invite>Пригласить</button></div>`}
 function inviteNudge(){const nt=nextTier();if(!nt)return '';return `<button class="link" data-invite style="font-size:14px">Пригласить друга — костюм «${esc(nt.t)}» для Циро</button>`}
+/* «Что нового» — один раз для тех, кто занимался до обновления */
+const NEWS_ID='growth1';
+function whatsNew(){if(S.newsSeen===NEWS_ID)return '';if(!Object.keys(S.done).length&&!(S.xp>0)){S.newsSeen=NEWS_ID;return ''}
+  const can=!!(TGW&&TGW.requestWriteAccess&&!(S.notif&&S.notif.on));
+  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say">${mascot('cheer','m-idle','family')}<div class="bubble"><p><b>Я обновился!</b> Пригласите родственника или друга — получите костюмы для меня. И я теперь могу напоминать о себе в Телеграме${can?'':' — включается в профиле'}.</p>
+   <div class="row" style="margin-top:10px">${can?'<button class="btn sm" data-news-nt>Включить напоминания</button>':''}<button class="btn plain sm" data-invite>Пригласить друга</button></div></div></div></section>`}
+function wireNews(){const done=()=>{S.newsSeen=NEWS_ID;save();const c=$('.news-card');c&&c.remove()};
+  const x=$('[data-news-x]');if(x)x.onclick=done;
+  const nt=$('[data-news-nt]');if(nt)nt.onclick=()=>enableNotif(ok=>{const b=$('.news-card .bubble');if(b)b.innerHTML=ok?'<p>Договорились! 🍑 Не чаще раза в день. Выключить можно в профиле.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>';S.newsSeen=NEWS_ID;save();setTimeout(done,2500)});
+  document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()})}
 /* напоминания */
 function askNotif(){if(!TGW||!TGW.requestWriteAccess||S.notif)return '';
   return `<div class="bubble" id="ask-nt" style="text-align:left"><p>Можно я буду иногда напоминать о себе в Телеграме? Обещаю без спама — не чаще раза в день.</p><div class="row" style="margin-top:10px"><button class="btn sm" data-nt="1">Да, напоминай</button><button class="btn plain sm" data-nt="0">Не надо</button></div></div>`}

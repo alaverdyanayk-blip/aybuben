@@ -21,13 +21,14 @@ CREATE INDEX IF NOT EXISTS users_first ON users(first_day);
 CREATE TABLE IF NOT EXISTS refcodes(code TEXT PRIMARY KEY, uid TEXT UNIQUE NOT NULL, created TEXT);
 CREATE TABLE IF NOT EXISTS refs(friend TEXT PRIMARY KEY, inviter TEXT NOT NULL, day TEXT);
 CREATE INDEX IF NOT EXISTS refs_inv ON refs(inviter);
-CREATE TABLE IF NOT EXISTS notify(uid TEXT PRIMARY KEY, chat_id INTEGER, enabled INTEGER DEFAULT 0, tz INTEGER DEFAULT 180, hour INTEGER, auto_hour INTEGER, freq INTEGER DEFAULT 1, streak INTEGER DEFAULT 0, last_day TEXT, last_sent TEXT, ignored INTEGER DEFAULT 0, used TEXT, upd INTEGER);
+CREATE TABLE IF NOT EXISTS notify(uid TEXT PRIMARY KEY, chat_id INTEGER, enabled INTEGER DEFAULT 0, tz INTEGER DEFAULT 180, hour INTEGER, auto_hour INTEGER, freq INTEGER DEFAULT 1, streak INTEGER DEFAULT 0, last_day TEXT, last_sent TEXT, ignored INTEGER DEFAULT 0, used TEXT, news TEXT, upd INTEGER);
 CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT);
 `;
 let schemaReady = false;
 async function ensureSchema(db) {
   if (schemaReady) return;
   for (const q of SCHEMA.split(';').map(s => s.trim()).filter(Boolean)) await db.prepare(q).run();
+  try { await db.prepare('ALTER TABLE notify ADD COLUMN news TEXT').run(); } catch (e) { } // для баз, созданных до новостей
   schemaReady = true;
 }
 
@@ -233,9 +234,13 @@ const MSG = {
 const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return n + ' ' + (m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c); };
 const ddiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 864e5);
 /** Решает, писать ли человеку сейчас. now — время UTC в мс. Возвращает {type, text, mood, id} или null. */
-function plan(row, now) {
+function plan(row, now, news = []) {
   if (!row.enabled || !row.chat_id) return null;
   const loc = new Date(now + (row.tz ?? 180) * 6e4), day = loc.toISOString().slice(0, 10), h = loc.getUTCHours();
+  // новость: один раз каждому, в его обычный час, вместо напоминания этого дня (лимит «одно сообщение в день» сохраняется)
+  const seen = (row.news || '').split(',').filter(Boolean), nw = news.find(n => n && n.id && n.text && !seen.includes(n.id) && (!n.until || day <= n.until));
+  if (nw && row.last_sent !== day && h === Math.min(22, Math.max(9, row.hour ?? row.auto_hour ?? 19)))
+    return { type: 'news', id: nw.id, mood: nw.mood || 'cheer', text: nw.text, day, ignoredNow: row.ignored || 0, used: row.used || '', news: [nw.id, ...seen].slice(0, 30).join(',') };
   if (row.last_day === day || row.last_sent === day) return null;          // уже занимался сегодня или уже писали
   const gap = row.last_day ? ddiff(row.last_day, day) : 99, since = row.last_sent ? ddiff(row.last_sent, day) : 99;
   const ign = row.ignored || 0;
@@ -256,11 +261,13 @@ async function runReminders(env, now = Date.now()) {
   if (!env.BOT_TOKEN) return { sent: 0 };
   await ensureSchema(env.DB);
   const rows = (await env.DB.prepare('SELECT * FROM notify WHERE enabled=1 AND chat_id IS NOT NULL').all()).results;
+  let news = []; // новости лежат в news.json на сайте: добавили запись и выкатили — бот разошлёт её сам
+  try { const r = await fetch(appUrl(env) + 'news.json?t=' + Math.floor(now / 6e5), { cf: { cacheTtl: 300 } }); if (r.ok) { const j = await r.json(); if (Array.isArray(j)) news = j; } } catch (e) { }
   let sent = 0;
   for (const row of rows) {
-    const p = plan(row, now); if (!p) continue;
-    const r = await tg(env, 'sendPhoto', { chat_id: row.chat_id, photo: art(env, p.mood), caption: p.text, reply_markup: KB(env) });
-    if (r.ok) { sent++; await env.DB.prepare('UPDATE notify SET last_sent=?, ignored=?, used=? WHERE uid=?').bind(p.day, p.ignoredNow, p.used, row.uid).run(); }
+    const p = plan(row, now, news); if (!p) continue;
+    const r = await tg(env, 'sendPhoto', { chat_id: row.chat_id, photo: art(env, p.mood), caption: p.text, reply_markup: p.type === 'news' ? { inline_keyboard: [[{ text: 'Открыть Айбубен', web_app: { url: appUrl(env) } }], [{ text: 'Не напоминать', callback_data: 'off' }]] } : KB(env) });
+    if (r.ok) { sent++; await env.DB.prepare('UPDATE notify SET last_sent=?, ignored=?, used=?, news=COALESCE(?,news) WHERE uid=?').bind(p.day, p.ignoredNow, p.used, p.news || null, row.uid).run(); }
     else if (r.error_code === 403 || r.error_code === 400) await env.DB.prepare('UPDATE notify SET enabled=0, chat_id=NULL WHERE uid=?').bind(row.uid).run(); // заблокировал бота
   }
   return { sent };
