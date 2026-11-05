@@ -8,5 +8,10 @@
     try{if(navigator.sendBeacon&&navigator.sendBeacon(U,new Blob([body],{type:'text/plain'})))return}catch(e){}
     try{fetch(U,{method:'POST',body:body,headers:{'Content-Type':'text/plain'},keepalive:true})}catch(e){}
   };
+  /* запросы с ответом: приглашения друзей и настройки напоминаний */
+  window.__api=function(path,data){
+    var b={init:init,anon:anon};for(var k in data)b[k]=data[k];
+    return fetch('__SERVER__'+path,{method:'POST',body:JSON.stringify(b),headers:{'Content-Type':'text/plain'}}).then(function(r){return r.json()});
+  };
   window.__stats('open');
 })();

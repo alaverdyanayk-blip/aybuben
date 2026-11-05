@@ -114,6 +114,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .buddy{position:absolute;top:-2px;width:66px;height:66px;pointer-events:none}
 .buddy.l{right:calc(100% + 4px)}.buddy.r{left:calc(100% + 4px)}
 .buddy .mascot{width:66px;height:66px}
+.invite .ciro-say .mascot{width:72px;height:72px}.unlock.mile{background:color-mix(in srgb,var(--accent) 18%,var(--surface))}.unlock.mile p{max-width:36ch}
 .ciro-say.upd{width:100%;max-width:440px;align-items:center;margin-bottom:6px}.ciro-say.upd .mascot{width:66px;height:66px}.ciro-say.upd .bubble p{font-size:14.5px}
 .node .cap{font-size:12.5px;color:var(--muted);font-weight:600;max-width:130px;text-align:center;line-height:1.25}
 .node .lv{display:flex;gap:3px}
@@ -646,7 +647,7 @@ const OUTFITS=[
  {id:'crown',t:'Корона',lv:10,d:'Король литературной нормы'}
 ];
 function outfitSvg(o){const K='#2B1E22';
- if(COSTUMES.some(c=>c.id===o))return costumeSvg(o);
+ if(COSTUMES.some(c=>c.id===o)||REFC.some(c=>c.id===o))return costumeSvg(o);
  if(o==='glasses')return `<g fill="#fff" fill-opacity=".18" stroke="${K}" stroke-width="3"><circle cx="47" cy="61" r="12.5"/><circle cx="73" cy="61" r="12.5"/></g><path d="M59 59.5Q60 56.5 61 59.5M34.6 58 22 54M85.4 58 98 54" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
  if(o==='cap')return `<path d="M21 51C21 17 99 17 99 51Q60 41 21 51Z" fill="#4D6596"/><path d="M60 21C53 30 51 40 51 46" stroke="#3B4F78" stroke-width="2.2" fill="none"/><circle cx="60" cy="20.5" r="3.6" fill="#3B4F78"/><path d="M70 47Q96 38 114 50Q93 55 70 51Z" fill="#3B4F78"/>`;
  if(o==='scarf')return `<g stroke="#5A1A12" stroke-width=".8"><path d="M24 85Q60 99 96 85L95.5 89.5Q60 103.5 24.5 89.5Z" fill="#D0283A"/><path d="M24.5 89.5Q60 103.5 95.5 89.5L95 94Q60 108 25 94Z" fill="#2A4FA8"/><path d="M25 94Q60 108 95 94L94 98Q60 112 26 98Z" fill="#F2A800"/><path d="M80 99 88 116 95 113 87 97Z" fill="#D0283A"/></g>`;
@@ -666,7 +667,15 @@ const COSTUMES=[
  {id:'doctor',t:'Доктор',ph:'pharmacy',d:'Шапочка и стетоскоп'},
  {id:'police',t:'Полицейский',ph:'help',d:'Фуражка и свисток'}
 ];
-const HATS=new Set(['cap','crown','taxi','pilot','chef','bellhop','tourist','doctor','police']);
+/* Костюмы за приглашённых друзей: n — сколько друзей должно пройти первый урок (0 — подарок тому, кого пригласили) */
+const REFC=[
+ {id:'guest',t:'Гость',n:0,d:'Пришёл по приглашению — с цветами'},
+ {id:'family',t:'Семейный',n:1,d:'Бабушка связала шапку'},
+ {id:'tamada',t:'Тамада',n:3,d:'Усы и бокал для тоста'},
+ {id:'golden',t:'Золотой Циро',n:5,d:'Медаль за большую семью'}
+];
+const refOwned=c=>c.n===0?!!S.refBy:(S.friends||0)>=c.n;
+const HATS=new Set(['cap','crown','taxi','pilot','chef','bellhop','tourist','doctor','police','family']);
 function costumeSvg(o){const K='#2B1E22';
  if(o==='taxi'){let ch='';for(let i=0;i<12;i++){const x=24+i*6;ch+=`<rect x="${x}" y="39" width="6" height="3.5" fill="${i%2?'#fff':K}"/><rect x="${x}" y="42.5" width="6" height="3.5" fill="${i%2?K:'#fff'}"/>`}
   return `<path d="M24 46C24 15 96 15 96 46Z" fill="#F2C230"/><path d="M60 17C55 26 53 34 53 39" stroke="#D9A21B" stroke-width="2" fill="none"/>${ch}<circle cx="60" cy="17" r="3.2" fill="#D9A21B"/><path d="M62 46Q92 42 110 50Q90 57 62 50Z" fill="${K}"/><g transform="translate(60 107)"><circle r="12.5" fill="none" stroke="#3A3A44" stroke-width="4.5"/><circle r="3.6" fill="#3A3A44"/><path d="M-12 0H12M0 0V12" stroke="#3A3A44" stroke-width="3"/></g>`}
@@ -678,6 +687,11 @@ function costumeSvg(o){const K='#2B1E22';
  if(o==='tourist')return `<path d="M30 42Q28 18 60 17Q92 18 90 42Z" fill="#D8C59A"/><path d="M30 37Q60 32 90 37L90 42Q60 37 30 42Z" fill="#8B6F3C"/><path d="M16 46Q60 33 104 46Q97 54 60 47Q23 54 16 46Z" fill="#C9B07A"/><g transform="rotate(12 100 96)"><path d="M88 84l8 3 8-3 8 3v20l-8-3-8 3-8-3Z" fill="#F4EEE4" stroke="#8B6F3C" stroke-width="1.2"/><path d="M96 87v20M104 84v20" stroke="#CDBFAE" stroke-width="1"/><path d="M90 99q5-6 9 0t11-3" stroke="#D0283A" stroke-width="1.6" fill="none" stroke-dasharray="2 2"/><circle cx="110" cy="95.5" r="1.8" fill="#D0283A"/></g>`;
  if(o==='doctor')return `<path d="M33 41Q32 20 60 19Q88 20 87 41Z" fill="#FFFFFF" stroke="#D9D2CC" stroke-width="1.5"/><path d="M57 24h6v5h5v6h-5v5h-6v-5h-5v-6h5Z" fill="#D0283A"/><path d="M37 91Q41 106 56 106M83 91Q79 106 64 106" stroke="#4A5A6A" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M60 106v3" stroke="#4A5A6A" stroke-width="3"/><circle cx="60" cy="112" r="4.6" fill="#B8C4CE" stroke="#4A5A6A" stroke-width="2"/>`;
  if(o==='police')return `<path d="M24 42Q20 16 60 15Q100 16 96 42Z" fill="#2E4E8F"/><rect x="26" y="37" width="68" height="9" rx="3" fill="#1B2A4E"/><path d="m60 21 2.4 5 5.4.6-4 3.7 1.1 5.3L60 32.9l-4.9 2.7 1.1-5.3-4-3.7 5.4-.6Z" fill="#F2C14E" stroke="#A87812" stroke-width=".8"/><path d="M28 46Q60 56 92 46L93 49Q60 61 27 49Z" fill="#0E0E14"/><path d="M62 98Q84 99 92 88" stroke="#D0283A" stroke-width="1.6" fill="none"/><rect x="88" y="80" width="15" height="8.5" rx="4.2" fill="#C9CED6" stroke="#6B7380" stroke-width="1.2"/><circle cx="99" cy="84.2" r="1.6" fill="#6B7380"/>`;
+ if(o==='guest')return `<path d="M12 112 22 82 34 112Z" fill="#F4EEE4" stroke="#CDBFAE" stroke-width="1.3"/><path d="M23 84 18 66M23 84 23 62M23 84 29 67" stroke="#4E8A3E" stroke-width="2" fill="none"/>${[[18,64,'#D0283A'],[23,59,'#F2A800'],[29,64,'#C2408A']].map(([x,y,c])=>`<circle cx="${x}" cy="${y}" r="5.2" fill="${c}"/><circle cx="${x}" cy="${y}" r="1.8" fill="#fff" opacity=".7"/>`).join('')}<path d="M15 100Q23 95 31 100" stroke="#D0283A" stroke-width="2.4" fill="none"/>`;
+ if(o==='family'){let z='';for(let i=0;i<8;i++)z+=(i?'L':'M')+(28+i*8)+' '+(i%2?36:31);
+  return `<path d="M25 44C24 12 96 12 95 44Z" fill="#C8283A"/><path d="${z}" stroke="#fff" stroke-width="2.4" fill="none" stroke-linejoin="round"/><rect x="23" y="39" width="74" height="10" rx="5" fill="#A51F30"/>${[31,39,47,55,63,71,79,87].map(x=>`<path d="M${x} 40v8" stroke="#8C1A28" stroke-width="1.6"/>`).join('')}<circle cx="60" cy="12" r="7.5" fill="#fff" stroke="#D9D2CC" stroke-width="1.2"/><circle cx="57.5" cy="10" r="2.2" fill="#E8E1DA"/>`}
+ if(o==='tamada')return `<path d="M60 73.5Q52 69 44 72Q41 77 46 76.5Q53 74 60 76.5Q67 74 74 76.5Q79 77 76 72Q68 69 60 73.5Z" fill="#3B2116"/><g transform="rotate(14 103 82)"><path d="M95 64H111Q111 78 103 79Q95 78 95 64Z" fill="#fff" fill-opacity=".35" stroke="#B9A89A" stroke-width="1.4"/><path d="M96 69H110Q109.5 77.5 103 78Q96.5 77.5 96 69Z" fill="#8E1B2E"/><path d="M103 79V95M97 95H109" stroke="#B9A89A" stroke-width="2" stroke-linecap="round"/></g>`;
+ if(o==='golden')return `<path d="M50 84 56 100H64L70 84" fill="none" stroke="#2A4FA8" stroke-width="5"/><path d="M51 84 57 98" stroke="#D0283A" stroke-width="2"/><path d="M69 84 63 98" stroke="#D0283A" stroke-width="2"/><circle cx="60" cy="105" r="9" fill="#F2C14E" stroke="#A87812" stroke-width="2"/><path d="m60 99.5 1.6 3.4 3.7.4-2.8 2.5.8 3.6-3.3-1.9-3.3 1.9.8-3.6-2.8-2.5 3.7-.4Z" fill="#A87812"/>${[[18,30,5],[102,26,4],[108,60,3.4],[12,66,3]].map(([x,y,r])=>`<path d="M${x} ${y-r*2}Q${x} ${y} ${x+r*2} ${y}Q${x} ${y} ${x} ${y+r*2}Q${x} ${y} ${x-r*2} ${y}Q${x} ${y} ${x} ${y-r*2}Z" fill="#F2C14E"/>`).join('')}`;
  if(o==='bowtie')return `<path d="M60 103 45 96v15Z" fill="#D0283A"/><path d="M60 103 75 96v15Z" fill="#D0283A"/><circle cx="50" cy="101" r="1.3" fill="#fff"/><circle cx="49" cy="106" r="1.3" fill="#fff"/><circle cx="70" cy="101" r="1.3" fill="#fff"/><circle cx="71" cy="106" r="1.3" fill="#fff"/><circle cx="60" cy="103" r="3.6" fill="#A51F30"/>`;
  return ''}
 function mascot(mood='happy',cls='',outfit){
@@ -1686,8 +1700,9 @@ setInterval(drawHud,60000);
 const OFF=[0,48,72,48,0,-48,-72,-48];
 function ciroStatus(){const st=streakNow(),tx=todayXP(),left=Math.max(0,S.goal-tx),fresh=!S.xp&&!Object.keys(S.done).length;
   if(fresh)return {mood:'happy',t:'Я — Циро, армянский абрикос. Научу тебя читать и писать на литературном армянском. Начнём с первых букв?'};
-  if(tx>=S.goal)return {mood:'cheer',t:`Цель дня выполнена!${st>1?` Огонёк горит ${st} ${plural(st,'день','дня','дней')}.`:''} Можно отдохнуть… или ещё урок?`};
+  if(tx>=S.goal)return {mood:'cheer',t:st>=3?`Цель дня выполнена! ${st} ${plural(st,'день','дня','дней')} подряд — бабушка уже рассказала соседям. Ещё урок?`:`Цель дня выполнена!${st>1?` Огонёк горит ${st} ${plural(st,'день','дня','дней')}.`:''} Можно отдохнуть… или ещё урок?`};
   if(st>0&&S.lastDay!==today())return {mood:'wow',t:`Огонёк горит ${st} ${plural(st,'день','дня','дней')}. Один урок сегодня — и он не погаснет!`};
+  if(S.lastDay&&daysBetween(S.lastDay,today())>=3)return {mood:'sad',t:'Наконец-то! Мне пришлось одному доедать всю долму. Начнём с повторения?'};
   if(st===0&&(S.best||0)>0)return {mood:'sad',t:'Огонёк погас, но это не беда. Зажжём новый?'};
   const n=Math.ceil(left/10);return {mood:'happy',t:`До цели дня ${left} XP — примерно ${n} ${plural(n,'урок','урока','уроков')}.`}}
 function renderLearn(){
@@ -1899,14 +1914,16 @@ function finishLesson(){
   const newA=checkAch();save();
   const secs=Math.round((Date.now()-LS.start)/1000),acc=Math.round(LS.total/(LS.total+LS.mistakes)*100);
   $('#lprog').style.width='100%';
-  const line=prac?'Хорошая тренировка! Держи сердечко.':perfect?'Ни одной ошибки! <b class="arm">Կեցցե՛ս!</b>':LS.mistakes<=2?'Отличный урок. Все ошибки уже исправлены!':'Было непросто, но урок пройден. <b class="arm">Ապրե՛ս!</b>';
+  const line=pick(prac?ENDLINE.prac:perfect?ENDLINE.perfect:LS.mistakes<=2?ENDLINE.good:ENDLINE.hard);
+  if(!prac){S.hrs=S.hrs||{};const hh=new Date().getHours();S.hrs[hh]=(S.hrs[hh]||0)+1}
+  const mile=streakMile();if(!prac&&S.refBy&&!S.refClaimed)refClaim();save();syncU();
   $('#ex').innerHTML=`<div class="end"><span id="end-ciro">${mascot('cheer','m-jump')}</span><h2>${prac?'Тренировка окончена':perfect?'Урок без ошибок!':'Урок пройден!'}</h2>
    <div class="bubble">${line}${goalNow?`<p style="margin-top:6px;font-weight:700">Цель дня выполнена! Огонёк: ${streakNow()} ${plural(streakNow(),'день','дня','дней')}.</p>`:''}</div>
-   ${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}
+   ${mile}${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}
    <div class="tiles3"><div class="stat" style="--c:var(--gold-deep)"><div class="h">XP</div><div class="v">+${xp}</div></div><div class="stat" style="--c:var(--good)"><div class="h">Точность</div><div class="v">${acc}%</div></div><div class="stat" style="--c:var(--b3)"><div class="h">Время</div><div class="v">${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</div></div></div>
-   ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<span class="chip">${IC[a.ic]} ${esc(a.t)}</span>`).join('')}</div></div>`:''}</div>`;
+   ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<span class="chip">${IC[a.ic]} ${esc(a.t)}</span>`).join('')}</div></div>`:''}${!prac?askNotif():''}${!prac&&!PL?inviteNudge():''}</div>`;
   $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);$('#nxt').onclick=closeLesson;$('#nxt').focus();
-  wireWear('#end-ciro');sWin();confetti();
+  wireWear('#end-ciro');wireGrowth();sWin();confetti();
 }
 function failLesson(){LS.state='end';if(LS.lesson.id!=='practice')track('fail',lref(LS.lesson));
   $('#ex').innerHTML=`<div class="end">${mascot('sleep','m-idle')}<h2 style="color:var(--bad)">Сердца закончились</h2><div class="bubble">Сердечко восстанавливается за 30 минут. Или давай потренируемся на пройденном — сразу получишь одно.</div></div>`;
@@ -2215,7 +2232,8 @@ function renderProfile(){
    <div class="box"><h3>Гардероб Циро</h3><div class="wr">
     <div class="wr-prev"><span id="wr-ciro">${mascot('happy','m-idle')}</span><div class="lv"><b>Уровень ${lv}</b><div class="bar"><i style="width:${into}%"></i></div><span class="note">до уровня ${lv+1}: ${100-into} XP</span></div></div>
     <div class="wr-col"><div class="wr-grid">${OUTFITS.map(o=>{const op=lv>=o.lv,on=(S.outfit||null)===o.id;return `<button class="wr-item ${on?'on':''}" data-o="${o.id||''}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',o.id)}<b>${o.t}</b><span>${op?o.d:`Откроется на уровне ${o.lv}`}</span></button>`}).join('')}</div>
-    <h4 class="wr-sub">Костюмы за «Фразы»</h4><div class="wr-grid">${COSTUMES.map(c=>{const op=phDone(c.ph),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:`Диалог «${esc(PHR.find(p=>p.id===c.ph).t)}»`}</span></button>`}).join('')}</div></div>
+    <h4 class="wr-sub">Костюмы за «Фразы»</h4><div class="wr-grid">${COSTUMES.map(c=>{const op=phDone(c.ph),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:`Диалог «${esc(PHR.find(p=>p.id===c.ph).t)}»`}</span></button>`}).join('')}</div>
+    <h4 class="wr-sub">Костюмы за друзей</h4><div class="wr-grid">${REFC.map(c=>{const op=refOwned(c),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:c.n?`${c.n} ${plural(c.n,'друг','друга','друзей')} пройдут первый урок`:'Если пришёл по приглашению'}</span></button>`}).join('')}</div></div>
    </div></div>
    <div class="cards">
     <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div></div></div>
@@ -2226,6 +2244,8 @@ function renderProfile(){
    <div class="box week"><h3>Неделя</h3>${chart}</div>
    <div class="box"><h3>Цель дня</h3><div class="goals">${[[10,'Лёгкая','1 урок'],[20,'Обычная','2 урока'],[30,'Серьёзная','3 урока'],[50,'Интенсив','5 уроков']].map(([v,t,d])=>`<button data-g="${v}" aria-pressed="${S.goal===v}"><b>${t} · ${v} XP</b><span>около ${d} в день</span></button>`).join('')}</div></div>
    <div class="box"><h3>Достижения · ${Object.keys(S.ach).length} из ${ACH.length}</h3><div class="agrid2">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?'on':''}"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></div>
+   ${inviteBox()}
+   ${notifBox()}
    ${contactBox()}
    <div class="box"><h3>Настройки</h3>
     <div class="toggle"><span>Произносить слова автоматически<br><span class="note">Кнопка с динамиком работает всегда</span></span><button class="switch" role="switch" id="sw-voice" aria-checked="${S.voice!==false}" aria-label="Автоозвучка"></button></div>
@@ -2239,8 +2259,77 @@ function renderProfile(){
   $('#sw-voice').onclick=()=>{S.voice=S.voice===false;save();renderProfile()};
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
+  wireGrowth();
   $('#reset').onclick=()=>{$('#rs-confirm').innerHTML='<button class="btn bad" id="rs-yes">Да, стереть всё</button>';$('#rs-yes').onclick=()=>{const b=$('#rs-yes');b.disabled=true;b.textContent='Стираю…';let gone=false;const go=()=>{if(gone)return;gone=true;try{localStorage.removeItem(KEY)}catch(e){}location.reload()};if(window.__resetCloud){window.__resetCloud(go);setTimeout(go,3000)}else go()}};
 }
+
+/* ================= ДРУЗЬЯ, ПОХВАЛА, НАПОМИНАНИЯ ================= */
+const TGW=(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.initData)?Telegram.WebApp:null;
+const BOT='aybubenHAY_bot';
+const ENDLINE={
+ perfect:['Ни одной ошибки! <b class="arm">Կեցցե՛ս!</b>','Без единой ошибки. Дядя впервые улыбнулся.','Идеально! Бабушка плачет. От гордости.'],
+ good:['Отличный урок. Все ошибки уже исправлены!','<b class="arm">Ապրե՛ս!</b> Дядя кивнул. Это максимум одобрения.','Хорошо идёшь! Тётя Ануш уже рассказывает соседям.'],
+ hard:['Было непросто, но урок пройден. <b class="arm">Ապրե՛ս!</b>','Тяжело, но прошёл. Дядя сказал: «Мужчина!» — и налил компот.'],
+ prac:['Хорошая тренировка! Держи сердечко.','Повторение — мать учения. А бабушка — мать повторения. Держи сердечко ❤️']
+};
+const MILES={7:'Теперь можешь читать вывески в Ереване и делать вид, что всегда умел.',30:'Бабушка рассказала уже всему подъезду.',100:'Дядя поднял за тебя тост. Третий за вечер — значит, серьёзно.'};
+function streakMile(){const n=streakNow();S.miles=S.miles||{};if(!MILES[n]||S.miles[n])return '';S.miles[n]=today();
+  return `<div class="unlock mile"><b>🔥 ${n} ${plural(n,'день','дня','дней')} подряд!</b><p style="margin:0">${MILES[n]}</p></div>`}
+function api(path,data){return window.__api?window.__api(path,data||{}):Promise.reject(new Error('offline'))}
+/* приглашения */
+function refMe(){return api('/r/me').then(j=>{if(!j||!j.code)return;const before=S.friends||0;S.refCode=j.code;
+  if(j.friends>before){S.friends=j.friends;save();const got=REFC.filter(c=>c.n>before&&c.n<=j.friends);if(got.length)friendSheet(got[got.length-1]);else if(location.hash.slice(1)==='profile')renderProfile()}else save()}).catch(()=>{})}
+function refClaim(){api('/r/claim',{code:S.refBy}).then(j=>{if(j&&(j.ok||j.reason)){S.refClaimed=1;save()}}).catch(()=>{})}
+function friendSheet(c){const s=sheet(`<div class="end" style="padding:0">${mascot('cheer','m-jump',c.id)}<h2>Друг прошёл первый урок!</h2><div class="bubble">Циро получил костюм <b>«${esc(c.t)}»</b>. ${esc(c.d)}.</div><div class="row" style="justify-content:center"><button class="btn" data-wear2="${c.id}">Надеть</button><button class="btn plain" data-close>Потом</button></div></div>`);
+  s.el.querySelector('[data-wear2]').onclick=()=>{S.outfit=c.id;save();s.close();route()};confetti()}
+function inviteLink(){return `https://t.me/${BOT}?startapp=r${S.refCode}`}
+const INV_TEXT='Учу читать по-армянски с абрикосом Циро 🍑 Присоединяйся — тебе сразу костюм для Циро!';
+function invite(btn){const go=()=>{if(!S.refCode){if(btn)btn.textContent='Нет связи, попробуйте позже';return}
+   const link=inviteLink();
+   if(TGW&&TGW.openTelegramLink)TGW.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(INV_TEXT));
+   else if(navigator.share)navigator.share({text:INV_TEXT,url:link}).catch(()=>{});
+   else{try{navigator.clipboard.writeText(INV_TEXT+' '+link);if(btn)btn.textContent='Ссылка скопирована'}catch(e){}}};
+  S.refCode?go():refMe().then(go)}
+function nextTier(){return REFC.find(c=>c.n>(S.friends||0))}
+function inviteBox(){const f=S.friends||0,nt=nextTier();
+  return `<div class="box invite"><h3>Пригласить родственника или друга</h3><div class="ciro-say">${mascot('wink','m-idle','family')}<div class="bubble"><p>Кто в вашей семье тоже не умеет читать по-армянски? Только честно. Когда друг пройдёт первый урок, Циро получит костюм, а друг — свой сразу.</p></div></div>
+   <p class="note">${f?`Пришло друзей: <b>${f}</b>. `:''}${nt?`До костюма «${esc(nt.t)}»: ${nt.n-f} ${plural(nt.n-f,'друг','друга','друзей')}.`:'Все костюмы за друзей собраны!'}</p>
+   <button class="btn" data-invite>Пригласить</button></div>`}
+function inviteNudge(){const nt=nextTier();if(!nt)return '';return `<button class="link" data-invite style="font-size:14px">Пригласить друга — костюм «${esc(nt.t)}» для Циро</button>`}
+/* напоминания */
+function askNotif(){if(!TGW||!TGW.requestWriteAccess||S.notif)return '';
+  return `<div class="bubble" id="ask-nt" style="text-align:left"><p>Можно я буду иногда напоминать о себе в Телеграме? Обещаю без спама — не чаще раза в день.</p><div class="row" style="margin-top:10px"><button class="btn sm" data-nt="1">Да, напоминай</button><button class="btn plain sm" data-nt="0">Не надо</button></div></div>`}
+function enableNotif(done){if(!TGW||!TGW.requestWriteAccess){done&&done(false);return}
+  try{TGW.requestWriteAccess(ok=>{S.notif=Object.assign({hour:null,freq:1},S.notif||{},{on:!!ok});save();syncU(true,true);done&&done(!!ok)})}catch(e){done&&done(false)}}
+const NT_HOURS=[null,9,12,15,18,19,20,21];
+function notifBox(){if(!TGW)return '';const n=S.notif||{},on=!!n.on;
+  return `<div class="box"><h3>Напоминания в Телеграме</h3>
+   <div class="toggle"><span>Циро напомнит о занятии<br><span class="note">Не чаще раза в день и только если вы ещё не занимались</span></span><button class="switch" role="switch" id="sw-nt" aria-checked="${on}" aria-label="Напоминания"></button></div>
+   ${on?`<div class="label">Во сколько</div><div class="chips" style="justify-content:flex-start">${NT_HOURS.map(h=>`<button class="chip2" data-nh="${h==null?'':h}" aria-pressed="${(n.hour??null)===h}">${h==null?'Когда обычно занимаюсь':h+':00'}</button>`).join('')}</div>
+   <div class="label">Как часто</div><div class="chips" style="justify-content:flex-start">${[[1,'Каждый день'],[3,'Раз в 3 дня']].map(([v,t])=>`<button class="chip2" data-nf="${v}" aria-pressed="${(n.freq||1)===v}">${t}</button>`).join('')}</div>`:''}</div>`}
+function wireGrowth(){
+  document.querySelectorAll('[data-invite]').forEach(b=>b.onclick=()=>invite(b));
+  document.querySelectorAll('[data-nt]').forEach(b=>b.onclick=()=>{const box=$('#ask-nt');
+    if(b.dataset.nt==='1')enableNotif(ok=>{if(box)box.innerHTML=ok?'<p>Договорились! 🍑 Выключить можно в профиле или кнопкой под сообщением.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'});
+    else{S.notif={on:false,freq:1,hour:null};save();syncU(true,true);if(box)box.innerHTML='<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'}});
+  const sw=$('#sw-nt');if(sw)sw.onclick=()=>{if(S.notif&&S.notif.on){S.notif.on=false;save();syncU(true,true);renderProfile()}else enableNotif(()=>renderProfile())};
+  document.querySelectorAll('[data-nh]').forEach(b=>b.onclick=()=>{S.notif.hour=b.dataset.nh===''?null:+b.dataset.nh;save();syncU(true,true);renderProfile()});
+  document.querySelectorAll('[data-nf]').forEach(b=>b.onclick=()=>{S.notif.freq=+b.dataset.nf;save();syncU(true,true);renderProfile()});
+}
+function prefHour(){const h=S.hrs||{},ks=Object.keys(h);if(ks.reduce((a,k)=>a+h[k],0)<3)return null;return +ks.sort((a,b)=>h[b]-h[a])[0]}
+/* explicit=true — человек сам поменял настройки в приложении; иначе сервер главнее (кнопки «Реже» / «Не напоминать» в боте) */
+let syncT,syncX=false;function syncU(now,explicit){if(!TGW)return;if(explicit)syncX=true;clearTimeout(syncT);syncT=setTimeout(()=>{const x=syncX;syncX=false;
+  api('/u',Object.assign({streak:streakNow(),day:S.lastDay,tz:-new Date().getTimezoneOffset(),hour:prefHour()},x?{notif:S.notif||{on:false}}:{})).then(j=>{
+   if(!j||!j.ok||!S.notif)return;const n=S.notif,ch=n.on!==j.on||(n.freq||1)!==j.freq||(n.hour??null)!==(j.hour??null);
+   if(ch){n.on=j.on;n.freq=j.freq;n.hour=j.hour??null;save();if(location.hash.slice(1)==='profile')renderProfile()}}).catch(()=>{})},now?50:1500)}
+/* старт: метка приглашения, «Заниматься 2 минуты» из бота */
+(function(){
+  const sp=(TGW&&TGW.initDataUnsafe&&TGW.initDataUnsafe.start_param)||'';
+  if(/^r[a-z0-9]{6,16}$/.test(sp)&&!S.refBy&&!Object.keys(S.done).length&&(S.xp||0)<60){S.refBy=sp.slice(1);save()}
+  setTimeout(()=>{refMe();syncU(true)},1500);
+  if(location.hash==='#go'||sp==='go'){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+    setTimeout(()=>{if(LS)return;const i=LESSONS.findIndex((l,i)=>unlocked(i)&&!S.done[l.id]);if(i<0)startPractice();else if(hearts()>0)startLesson(LESSONS[i],false)},400)}
+})();
 
 route();
 </script>
