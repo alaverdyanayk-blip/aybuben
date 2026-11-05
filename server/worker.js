@@ -168,13 +168,15 @@ async function tg(env, method, payload) {
   return j || { ok: false, error_code: r.status };
 }
 const hookSecret = async env => (await sha('hook:' + env.BOT_TOKEN)).slice(0, 32);
-async function ensureWebhook(env, origin) {
-  if (!env.BOT_TOKEN || !origin) return;
+let hookOk = false;
+async function ensureWebhook(env, origin, force) {
+  if (!env.BOT_TOKEN || !origin || (hookOk && !force)) return;
   await ensureSchema(env.DB);
   const sec = await hookSecret(env), want = origin + '/tg/' + sec;
   const m = await env.DB.prepare("SELECT v FROM meta WHERE k='webhook'").first();
-  if (m && m.v === want) return;
+  if (m && m.v === want && !force) { hookOk = true; return; }
   const r = await tg(env, 'setWebhook', { url: want, secret_token: sec, allowed_updates: ['message', 'callback_query'] });
+  if (r.ok) hookOk = true;
   if (r.ok) await env.DB.prepare("INSERT INTO meta(k,v) VALUES('webhook',?) ON CONFLICT(k) DO UPDATE SET v=excluded.v").bind(want).run();
 }
 const KB = env => ({ inline_keyboard: [[{ text: 'Заниматься 2 минуты', web_app: { url: appUrl(env) + '#go' } }], [{ text: 'Реже', callback_data: 'less' }, { text: 'Не напоминать', callback_data: 'off' }]] });
@@ -208,6 +210,18 @@ async function botHook(req, env, sec) {
     }
   }
   return new Response('ok');
+}
+
+/** Состояние подключения бота — без секретов: есть ли токен, стоит ли вебхук, последняя ошибка Telegram. */
+async function botStatus(env, origin) {
+  if (!env.BOT_TOKEN) return json({ token: false, hint: 'Секрет BOT_TOKEN не найден. Проверьте имя (ровно BOT_TOKEN) и что изменения сохранены (Deploy).' });
+  const me = await tg(env, 'getMe', {});
+  if (!me.ok) return json({ token: true, valid: false, telegram: me.description || me.error_code, hint: 'Telegram не принял токен — скопируйте его заново из BotFather.' });
+  let w = await tg(env, 'getWebhookInfo', {}), wi = w.result || {};
+  if (!wi.url || !wi.url.startsWith(origin + '/tg/')) { await ensureWebhook(env, origin, true); w = await tg(env, 'getWebhookInfo', {}); wi = w.result || {}; }
+  await ensureSchema(env.DB);
+  const n = await env.DB.prepare('SELECT COUNT(*) n FROM notify WHERE enabled=1 AND chat_id IS NOT NULL').first();
+  return json({ token: true, valid: true, bot: me.result && me.result.username, webhook: !!wi.url && wi.url.startsWith(origin + '/tg/'), pending: wi.pending_update_count || 0, lastError: wi.last_error_message || null, remindersOn: (n && n.n) || 0 });
 }
 
 /* ---------- напоминания по расписанию ---------- */
@@ -389,6 +403,8 @@ export default {
     if (url.pathname === '/r/claim' && req.method === 'POST') return refClaim(req, env, ctx);
     if (url.pathname === '/u' && req.method === 'POST') return userSync(req, env);
     if (url.pathname.startsWith('/tg/') && req.method === 'POST') return botHook(req, env, url.pathname.slice(4));
+    if (env.BOT_TOKEN && !hookOk && ctx && ctx.waitUntil) ctx.waitUntil(ensureWebhook(env, url.origin).catch(() => {})); // бот подключается сразу после добавления токена, не дожидаясь расписания
+    if (url.pathname === '/bot') return botStatus(env, url.origin);
     if (url.pathname === '/health') return new Response('ok');
     return new Response('Not found', { status: 404 });
   }
