@@ -576,6 +576,15 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .opt .or{display:block;margin-top:3px;font-family:var(--f-body);font-size:12.5px;font-weight:500;color:var(--muted);line-height:1.3}
 .opts.one{grid-template-columns:1fr;gap:8px}.opts.one .opt{font-size:20px;text-align:left;padding:12px 14px 11px 34px;min-height:0}.opts.one .opt .k{top:50%;left:12px;margin-top:-8px;font-size:12px}
 .wr-sub{margin:10px 0 6px;font-size:14px}
+.wr-col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.wr-cat{border:1.5px solid var(--line);border-radius:16px;background:var(--bg)}
+.wr-cat summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:15px}
+.wr-cat summary::-webkit-details-marker{display:none}
+.wr-cat summary span{margin-left:auto;color:var(--muted);font-size:13px;font-weight:600}
+.wr-cat summary::after{content:"";width:9px;height:9px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);margin:-4px 2px 0 4px;transition:transform .15s}
+.wr-cat[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.wr-cat .wr-grid{padding:0 10px 10px}
+.nt-opts{--c:var(--accent);display:flex;flex-direction:column;gap:8px;padding:2px 0 10px}.switch:disabled{opacity:.45;cursor:default}
 .path-sub{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;max-width:330px;background:var(--bg);padding:10px 14px;border-radius:18px;border:1.5px dashed color-mix(in srgb,var(--band) 55%,var(--line))}
 .path-sub .ps-k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--band)}
 .path-sub b{font-size:17px}.path-sub .ps-l{font-size:15px;color:var(--muted);letter-spacing:.06em}
@@ -2222,6 +2231,10 @@ function renderRules(){
 }
 
 /* ================= ПРОФИЛЬ ================= */
+/* гардероб по категориям: раскрывается та, где надетый костюм; выбор раскрытия помнится до перезагрузки */
+const WR_OPEN={};
+function wrGroup(id,title,owned,hasWorn,grid){const n=owned.filter(Boolean).length,open=WR_OPEN[id]??hasWorn;
+  return `<details class="wr-cat" data-wr="${id}" ${open?'open':''}><summary><b>${title}</b><span>${n} из ${owned.length}</span></summary><div class="wr-grid">${grid}</div></details>`}
 function renderProfile(){
   const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d});
   const vals=days.map(d=>S.daily[dstr(d)]||0),mx=Math.max(S.goal,...vals);
@@ -2234,9 +2247,9 @@ function renderProfile(){
   $('#view').innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
    <div class="box"><h3>Гардероб Циро</h3><div class="wr">
     <div class="wr-prev"><span id="wr-ciro">${mascot('happy','m-idle')}</span><div class="lv"><b>Уровень ${lv}</b><div class="bar"><i style="width:${into}%"></i></div><span class="note">до уровня ${lv+1}: ${100-into} XP</span></div></div>
-    <div class="wr-col"><div class="wr-grid">${OUTFITS.map(o=>{const op=lv>=o.lv,on=(S.outfit||null)===o.id;return `<button class="wr-item ${on?'on':''}" data-o="${o.id||''}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',o.id)}<b>${o.t}</b><span>${op?o.d:`Откроется на уровне ${o.lv}`}</span></button>`}).join('')}</div>
-    <h4 class="wr-sub">Костюмы за «Фразы»</h4><div class="wr-grid">${COSTUMES.map(c=>{const op=phDone(c.ph),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:`Диалог «${esc(PHR.find(p=>p.id===c.ph).t)}»`}</span></button>`}).join('')}</div>
-    <h4 class="wr-sub">Костюмы за друзей</h4><div class="wr-grid">${REFC.map(c=>{const op=refOwned(c),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:c.n?`${c.n} ${plural(c.n,'друг','друга','друзей')} пройдут первый урок`:'Если пришёл по приглашению'}</span></button>`}).join('')}</div></div>
+    <div class="wr-col">${wrGroup('lv','За уровень',OUTFITS.map(o=>level()>=o.lv),OUTFITS.some(o=>o.id&&o.id===S.outfit)||!S.outfit,`${OUTFITS.map(o=>{const op=lv>=o.lv,on=(S.outfit||null)===o.id;return `<button class="wr-item ${on?'on':''}" data-o="${o.id||''}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',o.id)}<b>${o.t}</b><span>${op?o.d:`Откроется на уровне ${o.lv}`}</span></button>`}).join('')}`)}
+    ${wrGroup('ph','За «Фразы»',COSTUMES.map(c=>phDone(c.ph)),COSTUMES.some(c=>c.id===S.outfit),`${COSTUMES.map(c=>{const op=phDone(c.ph),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:`Диалог «${esc(PHR.find(p=>p.id===c.ph).t)}»`}</span></button>`}).join('')}`)}
+    ${wrGroup('fr','За друзей',REFC.map(refOwned),REFC.some(c=>c.id===S.outfit),`${REFC.map(c=>{const op=refOwned(c),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:c.n?`${c.n} ${plural(c.n,'друг','друга','друзей')} пройдут первый урок`:'Если пришёл по приглашению'}</span></button>`}).join('')}`)}</div>
    </div></div>
    <div class="cards">
     <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div></div></div>
@@ -2248,9 +2261,9 @@ function renderProfile(){
    <div class="box"><h3>Цель дня</h3><div class="goals">${[[10,'Лёгкая','1 урок'],[20,'Обычная','2 урока'],[30,'Серьёзная','3 урока'],[50,'Интенсив','5 уроков']].map(([v,t,d])=>`<button data-g="${v}" aria-pressed="${S.goal===v}"><b>${t} · ${v} XP</b><span>около ${d} в день</span></button>`).join('')}</div></div>
    <div class="box"><h3>Достижения · ${Object.keys(S.ach).length} из ${ACH.length}</h3><div class="agrid2">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?'on':''}"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></div>
    ${inviteBox()}
-   ${notifBox()}
    ${contactBox()}
    <div class="box"><h3>Настройки</h3>
+    ${notifRow()}
     <div class="toggle"><span>Произносить слова автоматически<br><span class="note">Кнопка с динамиком работает всегда</span></span><button class="switch" role="switch" id="sw-voice" aria-checked="${S.voice!==false}" aria-label="Автоозвучка"></button></div>
     <div class="toggle"><span>Звуки в уроках</span><button class="switch" role="switch" id="sw-sound" aria-checked="${S.sound}" aria-label="Звуки"></button></div>
     <div class="toggle"><span>Открыть все уроки<br><span class="note">Для тех, кто уже знает часть материала</span></span><button class="switch" role="switch" id="sw-all" aria-checked="${S.unlockAll}" aria-label="Открыть все уроки"></button></div>
@@ -2263,6 +2276,7 @@ function renderProfile(){
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
   wireGrowth();
+  document.querySelectorAll('.wr-cat').forEach(d=>d.ontoggle=()=>{WR_OPEN[d.dataset.wr]=d.open});
   $('#reset').onclick=()=>{$('#rs-confirm').innerHTML='<button class="btn bad" id="rs-yes">Да, стереть всё</button>';$('#rs-yes').onclick=()=>{const b=$('#rs-yes');b.disabled=true;b.textContent='Стираю…';let gone=false;const go=()=>{if(gone)return;gone=true;try{localStorage.removeItem(KEY)}catch(e){}location.reload()};if(window.__resetCloud){window.__resetCloud(go);setTimeout(go,3000)}else go()}};
 }
 
@@ -2305,11 +2319,10 @@ function askNotif(){if(!TGW||!TGW.requestWriteAccess||S.notif)return '';
 function enableNotif(done){if(!TGW||!TGW.requestWriteAccess){done&&done(false);return}
   try{TGW.requestWriteAccess(ok=>{S.notif=Object.assign({hour:null,freq:1},S.notif||{},{on:!!ok});save();syncU(true,true);done&&done(!!ok)})}catch(e){done&&done(false)}}
 const NT_HOURS=[null,9,12,15,18,19,20,21];
-function notifBox(){if(!TGW)return '';const n=S.notif||{},on=!!n.on;
-  return `<div class="box"><h3>Напоминания в Телеграме</h3>
-   <div class="toggle"><span>Циро напомнит о занятии<br><span class="note">Не чаще раза в день и только если вы ещё не занимались</span></span><button class="switch" role="switch" id="sw-nt" aria-checked="${on}" aria-label="Напоминания"></button></div>
-   ${on?`<div class="label">Во сколько</div><div class="chips" style="justify-content:flex-start">${NT_HOURS.map(h=>`<button class="chip2" data-nh="${h==null?'':h}" aria-pressed="${(n.hour??null)===h}">${h==null?'Когда обычно занимаюсь':h+':00'}</button>`).join('')}</div>
-   <div class="label">Как часто</div><div class="chips" style="justify-content:flex-start">${[[1,'Каждый день'],[3,'Раз в 3 дня']].map(([v,t])=>`<button class="chip2" data-nf="${v}" aria-pressed="${(n.freq||1)===v}">${t}</button>`).join('')}</div>`:''}</div>`}
+function notifRow(){const n=S.notif||{},on=!!(TGW&&n.on),can=!!(TGW&&TGW.requestWriteAccess);
+  return `<div class="toggle"><span>Напоминания в Телеграме<br><span class="note">${can?'Не чаще раза в день и только если вы ещё не занимались':'Работают, когда приложение открыто в Телеграме'}</span></span><button class="switch" role="switch" id="sw-nt" aria-checked="${on}" aria-label="Напоминания" ${can?'':'disabled'}></button></div>
+   ${on?`<div class="nt-opts"><div class="label">Во сколько</div><div class="chips" style="justify-content:flex-start">${NT_HOURS.map(h=>`<button class="chip2" data-nh="${h==null?'':h}" aria-pressed="${(n.hour??null)===h}">${h==null?'Когда обычно занимаюсь':h+':00'}</button>`).join('')}</div>
+   <div class="label">Как часто</div><div class="chips" style="justify-content:flex-start">${[[1,'Каждый день'],[3,'Раз в 3 дня']].map(([v,t])=>`<button class="chip2" data-nf="${v}" aria-pressed="${(n.freq||1)===v}">${t}</button>`).join('')}</div></div>`:''}`}
 function wireGrowth(){
   document.querySelectorAll('[data-invite]').forEach(b=>b.onclick=()=>invite(b));
   document.querySelectorAll('[data-nt]').forEach(b=>b.onclick=()=>{const box=$('#ask-nt');
