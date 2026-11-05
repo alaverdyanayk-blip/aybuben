@@ -11,3 +11,11 @@ database_name = "aybuben"
 database_id = "8e5ecb9e-050d-4263-8829-06e9d21025c2"
 
 # Секреты ADMIN_PASSWORD, BOT_TOKEN, SALT задаются в панели Cloudflare (Settings → Variables and Secrets), не здесь.
+
+[vars]
+APP_URL = "https://alaverdyanayk-blip.github.io/aybuben/"
+SELF_URL = "https://aybuben-stats.alaverdyanayk.workers.dev"
+
+# Напоминания: раз в час проверяем, кому пора написать (время у каждого своё).
+[triggers]
+crons = ["5 * * * *"]
