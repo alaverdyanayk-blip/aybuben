@@ -584,6 +584,12 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .wr-cat summary::after{content:"";width:9px;height:9px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);margin:-4px 2px 0 4px;transition:transform .15s}
 .wr-cat[open] summary::after{transform:rotate(-135deg);margin-top:4px}
 .wr-cat .wr-grid{padding:0 10px 10px}
+.box.fold{gap:0}.box.fold[open]{gap:12px}
+.fold summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary span{margin-left:auto;color:var(--muted);font-size:13px;font-weight:600}
+.fold summary::after{content:"";width:9px;height:9px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);margin:-4px 2px 0 4px;transition:transform .15s}
+.fold[open] summary::after{transform:rotate(-135deg);margin-top:4px}
 .nt-opts{--c:var(--accent);display:flex;flex-direction:column;gap:8px;padding:2px 0 10px}.switch:disabled{opacity:.45;cursor:default}
 .path-sub{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;max-width:330px;background:var(--bg);padding:10px 14px;border-radius:18px;border:1.5px dashed color-mix(in srgb,var(--band) 55%,var(--line))}
 .path-sub .ps-k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--band)}
@@ -2259,7 +2265,7 @@ function renderProfile(){
    </div>
    <div class="box week"><h3>Неделя</h3>${chart}</div>
    <div class="box"><h3>Цель дня</h3><div class="goals">${[[10,'Лёгкая','1 урок'],[20,'Обычная','2 урока'],[30,'Серьёзная','3 урока'],[50,'Интенсив','5 уроков']].map(([v,t,d])=>`<button data-g="${v}" aria-pressed="${S.goal===v}"><b>${t} · ${v} XP</b><span>около ${d} в день</span></button>`).join('')}</div></div>
-   <div class="box"><h3>Достижения · ${Object.keys(S.ach).length} из ${ACH.length}</h3><div class="agrid2">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?'on':''}"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></div>
+   <details class="box fold" data-wr="ach" ${WR_OPEN.ach?'open':''}><summary><h3>Достижения</h3><span>${Object.keys(S.ach).length} из ${ACH.length}</span></summary><div class="agrid2">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?'on':''}"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></details>
    ${inviteBox()}
    ${contactBox()}
    <div class="box"><h3>Настройки</h3>
@@ -2276,7 +2282,7 @@ function renderProfile(){
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
   wireGrowth();
-  document.querySelectorAll('.wr-cat').forEach(d=>d.ontoggle=()=>{WR_OPEN[d.dataset.wr]=d.open});
+  document.querySelectorAll('.wr-cat,.fold').forEach(d=>d.ontoggle=()=>{WR_OPEN[d.dataset.wr]=d.open});
   $('#reset').onclick=()=>{$('#rs-confirm').innerHTML='<button class="btn bad" id="rs-yes">Да, стереть всё</button>';$('#rs-yes').onclick=()=>{const b=$('#rs-yes');b.disabled=true;b.textContent='Стираю…';let gone=false;const go=()=>{if(gone)return;gone=true;try{localStorage.removeItem(KEY)}catch(e){}location.reload()};if(window.__resetCloud){window.__resetCloud(go);setTimeout(go,3000)}else go()}};
 }
 
