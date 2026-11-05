@@ -114,6 +114,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .buddy{position:absolute;top:-2px;width:66px;height:66px;pointer-events:none}
 .buddy.l{right:calc(100% + 4px)}.buddy.r{left:calc(100% + 4px)}
 .buddy .mascot{width:66px;height:66px}
+.btns{display:grid;grid-template-columns:1fr;grid-auto-rows:1fr;gap:10px;margin-top:12px}.btns.two{grid-template-columns:1fr 1fr}.btns .btn{width:100%;padding:12px 10px;font-size:13.5px;white-space:normal;line-height:1.2;min-height:46px}
 .news-card{position:relative;background:var(--accent-soft);border:1.5px solid color-mix(in srgb,var(--accent) 40%,var(--line));border-radius:22px;padding:14px 14px 14px 12px}
 .news-card .x{position:absolute;top:6px;right:6px;width:34px;height:34px;font-size:16px}.news-card .ciro-say .mascot{width:70px;height:70px}.news-card .bubble{margin-right:22px}
 .invite .ciro-say .mascot{width:72px;height:72px}.unlock.mile{background:color-mix(in srgb,var(--accent) 18%,var(--surface))}.unlock.mile p{max-width:36ch}
@@ -2306,7 +2307,7 @@ function api(path,data){return window.__api?window.__api(path,data||{}):Promise.
 function refMe(){return api('/r/me').then(j=>{if(!j||!j.code)return;const before=S.friends||0;S.refCode=j.code;
   if(j.friends>before){S.friends=j.friends;save();const got=REFC.filter(c=>c.n>before&&c.n<=j.friends);if(got.length)friendSheet(got[got.length-1]);else if(location.hash.slice(1)==='profile')renderProfile()}else save()}).catch(()=>{})}
 function refClaim(){api('/r/claim',{code:S.refBy}).then(j=>{if(j&&(j.ok||j.reason)){S.refClaimed=1;save()}}).catch(()=>{})}
-function friendSheet(c){const s=sheet(`<div class="end" style="padding:0">${mascot('cheer','m-jump',c.id)}<h2>Друг прошёл первый урок!</h2><div class="bubble">Циро получил костюм <b>«${esc(c.t)}»</b>. ${esc(c.d)}.</div><div class="row" style="justify-content:center"><button class="btn" data-wear2="${c.id}">Надеть</button><button class="btn plain" data-close>Потом</button></div></div>`);
+function friendSheet(c){const s=sheet(`<div class="end" style="padding:0">${mascot('cheer','m-jump',c.id)}<h2>Друг прошёл первый урок!</h2><div class="bubble">Циро получил костюм <b>«${esc(c.t)}»</b>. ${esc(c.d)}.</div><div class="btns two" style="width:100%"><button class="btn" data-wear2="${c.id}">Надеть</button><button class="btn plain" data-close>Потом</button></div></div>`);
   s.el.querySelector('[data-wear2]').onclick=()=>{S.outfit=c.id;save();s.close();route()};confetti()}
 function inviteLink(){return `https://t.me/${BOT}?startapp=r${S.refCode}`}
 const INV_TEXT='Учу читать по-армянски с абрикосом Циро 🍑 Присоединяйся — тебе сразу костюм для Циро!';
@@ -2329,15 +2330,15 @@ let NEWS_NOW=false,NEWS_CLOSED=false;
 function whatsNew(){if(NEWS_CLOSED)return '';if(S.newsSeen===NEWS_ID&&!NEWS_NOW)return '';if(!Object.keys(S.done).length&&!(S.xp>0)){S.newsSeen=NEWS_ID;return ''}
   if(!NEWS_NOW){NEWS_NOW=true;S.newsSeen=NEWS_ID;save()}
   const can=!!(TGW&&TGW.requestWriteAccess&&!(S.notif&&S.notif.on));
-  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say">${mascot('cheer','m-idle','family')}<div class="bubble"><p><b>Я обновился!</b> Пригласите родственника или друга — получите костюмы для меня. И я теперь могу напоминать о себе в Телеграме${can?'':' — включается в профиле'}.</p>
-   <div class="row" style="margin-top:10px">${can?'<button class="btn sm" data-news-nt>Включить напоминания</button>':''}<button class="btn plain sm" data-invite>Пригласить друга</button></div></div></div></section>`}
+  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle','family')}<div class="bubble"><p><b>Я обновился!</b> Пригласите родственника или друга — получите костюмы для меня. И я теперь могу напоминать о себе в Телеграме${can?'':' — включается в профиле'}.</p>
+   <div class="btns">${can?'<button class="btn" data-news-nt>Включить напоминания</button>':''}<button class="btn plain" data-invite>Пригласить друга</button></div></div></div></section>`}
 function wireNews(){const done=()=>{NEWS_CLOSED=true;const c=$('.news-card');c&&c.remove()};
   const x=$('[data-news-x]');if(x)x.onclick=done;
   const nt=$('[data-news-nt]');if(nt)nt.onclick=()=>enableNotif(ok=>{const b=$('.news-card .bubble');if(b)b.innerHTML=ok?'<p>Договорились! 🍑 Не чаще раза в день. Выключить можно в профиле.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>';S.newsSeen=NEWS_ID;save();setTimeout(done,2500)});
   document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()})}
 /* напоминания */
 function askNotif(){if(!TGW||!TGW.requestWriteAccess||S.notif)return '';
-  return `<div class="bubble" id="ask-nt" style="text-align:left"><p>Можно я буду иногда напоминать о себе в Телеграме? Обещаю без спама — не чаще раза в день.</p><div class="row" style="margin-top:10px"><button class="btn sm" data-nt="1">Да, напоминай</button><button class="btn plain sm" data-nt="0">Не надо</button></div></div>`}
+  return `<div class="bubble" id="ask-nt" style="text-align:left"><p>Можно я буду иногда напоминать о себе в Телеграме? Обещаю без спама — не чаще раза в день.</p><div class="btns two"><button class="btn" data-nt="1">Да</button><button class="btn plain" data-nt="0">Не надо</button></div></div>`}
 function enableNotif(done){if(!TGW||!TGW.requestWriteAccess){done&&done(false);return}
   try{TGW.requestWriteAccess(ok=>{S.notif=Object.assign({hour:null,freq:1},S.notif||{},{on:!!ok});save();syncU(true,true);done&&done(!!ok)})}catch(e){done&&done(false)}}
 const NT_HOURS=[null,9,12,15,18,19,20,21];
