@@ -1,0 +1,25 @@
+/* alphabet */
+.intro{color:var(--muted);margin:0;max-width:62ch}
+.grp{display:flex;flex-direction:column;gap:10px}
+.grp h3{margin:0;font-size:15px}
+.grp h3 span{color:var(--muted);font-weight:500}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
+.at{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;box-shadow:0 3px 0 var(--line)}
+.at .gl{font-family:var(--f-display);font-size:28px;font-weight:600;line-height:1.2}
+.at .gl small{font-size:20px;font-weight:400;color:var(--muted);margin-left:3px}
+.at .sd{font-size:13px;color:var(--muted);font-weight:600}
+[hidden]{display:none!important}
+canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surface);border:1.5px dashed var(--line);touch-action:none;display:block}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+/* rules */
+.rules{display:flex;flex-direction:column;gap:12px}
+.rule{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r)}
+.rule summary{cursor:pointer;padding:14px 16px;font-weight:700;display:flex;justify-content:space-between;gap:10px;list-style:none}
+.rule summary::-webkit-details-marker{display:none}
+.rule summary span{color:var(--muted);font-weight:500;font-size:13px}
+.rule[open] summary{border-bottom:1px solid var(--line)}
+.rule .teach{padding:14px 16px}
+

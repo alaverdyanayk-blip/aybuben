@@ -1,16 +1,55 @@
 #!/usr/bin/env python3
-"""Собирает телеграм-версию Айбубена: src/aybuben.html + src/tg-adapter.js -> index.html в корне репозитория.
-Запуск из корня репозитория: python3 src/build.py"""
-import os
+"""Сборка Айбубена. Запуск из корня репозитория:  python3 src/build.py
+
+Исходники лежат раздельно, а в бот уходит один файл:
+  src/app.html   — каркас страницы (шапка, вкладки, пустые контейнеры)
+  src/css/*.css  — оформление
+  src/data/*.js  — учебный контент: буквы, слова, темы, фразы, правила, курс, реплики Циро
+  src/js/*.js    — логика и экраны
+Порядок файлов задан списками CSS и JS ниже: всё склеивается в один <style> и один <script>.
+
+Результат:
+  index.html + version.json — версия для Телеграма (с адаптером и статистикой); руками не править
+  build/aybuben.html        — та же страница без Телеграма, для превью-артефакта (в git не хранится)
+"""
+import hashlib, json, os
+
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 src = os.path.join(root, 'src')
-html = open(os.path.join(src, 'aybuben.html'), encoding='utf-8').read()
-adapter = open(os.path.join(src, 'tg-adapter.js'), encoding='utf-8').read()
+
+CSS = ['base', 'learn', 'lesson', 'reference', 'profile', 'home', 'games', 'polish', 'phrases']
+JS = [
+    'js/utils',
+    # контент
+    'data/outfits', 'data/ciro-lines', 'data/letters', 'data/words', 'data/themes', 'data/rules',
+    'data/phrases', 'data/achievements', 'data/audio-keys',
+    # логика
+    'js/icons', 'js/ciro', 'js/alphabet', 'js/exercises',
+    'data/course',  # курс собирается из генераторов упражнений, поэтому идёт после них
+    'js/state', 'js/sound', 'js/phrases', 'js/memory', 'js/app', 'js/path', 'js/lesson', 'js/games',
+    'js/reference', 'js/profile', 'js/growth',
+    'js/main',
+]
+
+
+def read(*parts):
+    return open(os.path.join(src, *parts), encoding='utf-8').read()
+
+
+css = '\n'.join(read('css', n + '.css').rstrip('\n') for n in CSS)
+js = '\n'.join(read(n + '.js').rstrip('\n') for n in JS)
+app = read('app.html')
+assert '/*@CSS*/' in app and '/*@JS*/' in app, 'в app.html нет меток /*@CSS*/ и /*@JS*/'
+html = app.replace('/*@CSS*/', css, 1).replace('/*@JS*/', js, 1)
+
+# 1. Страница без Телеграма — для превью
+os.makedirs(os.path.join(root, 'build'), exist_ok=True)
+open(os.path.join(root, 'build', 'aybuben.html'), 'w', encoding='utf-8').write(html)
+
+# 2. Версия для Телеграма
 cut = html.index('<header class="top">')
 head, body = html[:cut], html[cut:]
-marker = '\nroute();\n</script>'
-assert marker in body, 'не найден конец основного скрипта'
-body = body.replace(marker, marker + '\n<script>\n' + adapter + '</script>', 1)
+body = body.rstrip('\n') + '\n<script>\n' + read('tg-adapter.js') + '</script>'
 page = f'''<!doctype html>
 <html lang="ru">
 <head>
@@ -27,12 +66,11 @@ page = f'''<!doctype html>
 </body>
 </html>
 '''
-import hashlib, json
 an_path = os.path.join(src, 'analytics.json')
 if os.path.exists(an_path):
     server = json.load(open(an_path, encoding='utf-8')).get('server', '').strip().rstrip('/')
     if server:
-        sender = open(os.path.join(src, 'stats-sender.js'), encoding='utf-8').read().replace('__SERVER__', server)
+        sender = read('stats-sender.js').replace('__SERVER__', server)
         page = page.replace('</body>', '<script>\n' + sender + '</script>\n</body>', 1)
         print('статистика:', server)
 build_id = hashlib.sha1(page.encode('utf-8')).hexdigest()[:10]  # хэш всей страницы, включая подключённую статистику
