@@ -10,7 +10,8 @@
 
 Результат:
   index.html + version.json — версия для Телеграма (с адаптером и статистикой); руками не править
-  build/aybuben.html        — та же страница без Телеграма, для превью-артефакта (в git не хранится)
+  build/aybuben.html        — та же страница без Телеграма, для превью-артефакта (в git не хранится;
+                              шрифты там с Google Fonts, потому что папки fonts/ рядом с превью нет)
 """
 import hashlib, json, os
 
@@ -46,9 +47,15 @@ html = app.replace('/*@CSS*/', css, 1).replace('/*@JS*/', js, 1)
 os.makedirs(os.path.join(root, 'build'), exist_ok=True)
 open(os.path.join(root, 'build', 'aybuben.html'), 'w', encoding='utf-8').write(html)
 
-# 2. Версия для Телеграма
-cut = html.index('<header class="top">')
-head, body = html[:cut], html[cut:]
+# 2. Версия для Телеграма: шрифты берутся из папки fonts/, а не с Google Fonts
+import re
+tg = re.sub(r'<link [^>]*fonts\.(googleapis|gstatic)\.com[^>]*>\n', '', html)
+assert 'fonts.googleapis' not in tg
+tg = tg.replace('<style>\n', '<link rel="preload" href="fonts/golos-text-cyrillic.woff2" as="font" type="font/woff2" crossorigin>\n'
+                '<link rel="preload" href="fonts/noto-sans-armenian.woff2" as="font" type="font/woff2" crossorigin>\n'
+                '<style>\n' + read('css', 'fonts.css'), 1)
+cut = tg.index('<header class="top">')
+head, body = tg[:cut], tg[cut:]
 body = body.rstrip('\n') + '\n<script>\n' + read('tg-adapter.js') + '</script>'
 page = f'''<!doctype html>
 <html lang="ru">
