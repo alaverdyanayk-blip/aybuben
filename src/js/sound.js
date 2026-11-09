@@ -21,7 +21,6 @@ function say(t,rate=1){if(!hasAudio(t))return false;try{if(curAud){curAud.pause(
   const off=()=>btns.forEach(b=>b.classList.remove('playing'));a.onended=off;a.onpause=off;
   a.play().catch(()=>btns.forEach(b=>b.classList.remove('playing')));return true}catch(e){return false}}
 const SPK_SVG='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-const SLOW_SVG_OLD='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 15c0-4 3-7 7-7s6 3 6 5h2a2 2 0 0 1 0 4H5a1 1 0 0 1-1-1z"/><circle cx="8" cy="18.5" r="1.5"/><circle cx="15" cy="18.5" r="1.5"/></svg>';
 function spk(t,cls=''){return hasAudio(t)?`<button class="spk ${cls}" data-say="${esc(t)}" aria-label="Послушать">${SPK_SVG}</button>`:''}
 function spkSlow(t){return hasAudio(t)?`<button class="spk slow" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно"><b>0,7×</b><span>медленно</span></button>`:''}
 document.addEventListener('click',e=>{const b=e.target.closest('.spk');if(!b)return;e.stopPropagation();say(b.dataset.say,+(b.dataset.rate||1))},true);

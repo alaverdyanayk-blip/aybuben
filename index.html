@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="cc831b50e8"</script>
+<script>window.BUILD_ID="00e6335dcd"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -635,6 +635,17 @@ canvas#cv{width:100%;height:220px;border-radius:var(--r);background:var(--surfac
 .syl{display:flex;flex-direction:column;align-items:center;min-width:56px;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface)}
 .syl b{font-size:24px;font-weight:600;color:var(--accent)}.syl small{color:var(--muted);font-size:13px}
 .rv-tag{display:inline-block;margin-bottom:6px;padding:3px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+/* Зоны нажатия не меньше 44 px: мелкие элементы получают невидимое поле вокруг себя или вырастают сами. */
+.spk.sm,.x,.ph-back,.brand{position:relative}
+.spk.sm::after,.ph-back::after{content:"";position:absolute;inset:-6px}
+.ph-back::after{inset:-12px -8px}
+.x{width:44px;height:44px}
+.switch::before{content:"";position:absolute;inset:-8px -2px}
+.chip2,.thchips button{min-height:44px}
+.reftabs button,.seg button{min-height:44px;min-width:44px}
+.fold summary,.wr-cat summary{min-height:44px}
+.btn.sm{min-height:44px}
+.hy-top{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 </style>
 
 </head>
@@ -754,52 +765,58 @@ const MILES={7:'Теперь можешь читать вывески в Ере�
    LETTERS — по одной записи на букву:
      k — строчная, U — заглавная, nm — название буквы по-русски, s — как звучит,
      tip — подсказка (необязательно), w / m — запасной пример и его перевод, p — буква, с которой её путают.
-   ABC_STEPS — порядок изучения: 6 шагов, буквы через пробел. Меняя порядок, меняйте только ABC_STEPS.
-   GROUPS — названия шагов.
-   Поле L в LETTERS — прежний (первый) порядок шагов; оно нужно только для переноса старого прогресса, не трогайте его. */
+     L — шаг алфавита (1–6). Порядок изучения = порядок записей в этом списке.
+   GROUPS — названия шести шагов.
+   Буквы подобраны так, чтобы из первых же букв складывались настоящие слова. Если переставить буквы между шагами,
+   у уже занимающихся людей поменяется состав уроков — такие правки делайте только вместе с миграцией прогресса (js/state.js). */
 const GROUPS=['Первые слова','Скажи «привет»','Мама, папа, Армения','Скажи «спасибо»','Рычим по-армянски','Финал алфавита'];
 const LETTERS=[
+ // Шаг 1
  {k:'ա',U:'Ա',nm:'айб',s:'а',w:'ամառ',m:'лето',L:1},
- {k:'ն',U:'Ն',nm:'ну',s:'н',w:'նուռ',m:'гранат',L:1},
- {k:'մ',U:'Մ',nm:'мен',s:'м',w:'մայր',m:'мать',L:1},
- {k:'ր',U:'Ր',nm:'ре',s:'р',tip:'Короткое «р» в один удар языка, мягче русского. Раскатистое «рр» — это Ռ. Не проглатывайте его перед согласной: մատ (мат) — палец, а մարտ (март) — март. Одна буква меняет слово.',w:'հայր',m:'отец',L:1,p:'ռ'},
  {k:'տ',U:'Տ',nm:'тюн',s:'т',tip:'Обычное «т», как в русском. Есть похожая буква Թ — тоже «т», но с лёгким выдохом после звука. В подсказках она пишется «тʰ».',w:'տուն',m:'дом',L:1,p:'թ'},
- {k:'ու',U:'Ու',nm:'у',s:'у',tip:'Это сочетание Ո + Ւ, которое в современном алфавите считается одной буквой. Всегда читается «у».',w:'ուտել',m:'есть, кушать',L:1},
+ {k:'մ',U:'Մ',nm:'мен',s:'м',w:'մայր',m:'мать',L:1},
+ {k:'ի',U:'Ի',nm:'ини',s:'и',w:'ինչ',m:'что',L:1},
  {k:'ս',U:'Ս',nm:'се',s:'с',w:'սար',m:'гора',L:1},
- {k:'ե',U:'Ե',nm:'еч',s:'е / йе',tip:'В начале слова читается «йе»: ես — «йес». Внутри слова — просто «е».',w:'երազ',m:'мечта, сон',L:2,p:'է'},
- {k:'բ',U:'Բ',nm:'бен',s:'б',w:'բարև',m:'привет',L:2},
- {k:'վ',U:'Վ',nm:'вев',s:'в',w:'վարդ',m:'роза',L:2},
- {k:'և',U:'և',nm:'ев',s:'ев',tip:'Читается «ев», а отдельно и в начале слова — «йев». Само по себе значит «и». Заглавной формы нет: в начале предложения пишут Եվ.',w:'արև',m:'солнце',L:2},
- {k:'ի',U:'Ի',nm:'ини',s:'и',w:'ինչ',m:'что',L:2},
+ {k:'ր',U:'Ր',nm:'ре',s:'р',tip:'Короткое «р» в один удар языка, мягче русского. Раскатистое «рр» — это Ռ. Не проглатывайте его перед согласной: մատ (мат) — палец, а մարտ (март) — март. Одна буква меняет слово.',w:'հայր',m:'отец',L:1,p:'ռ'},
+ {k:'ու',U:'Ու',nm:'у',s:'у',tip:'Это сочетание Ո + Ւ, которое в современном алфавите считается одной буквой. Всегда читается «у».',w:'ուտել',m:'есть, кушать',L:1},
+ // Шаг 2
  {k:'կ',U:'Կ',nm:'кен',s:'к',tip:'Обычное «к», как в русском, коротко и чётко. Есть похожая буква Ք — тоже «к», но с лёгким выдохом после звука («кʰ»).',w:'կատու',m:'кошка',L:2,p:'ք'},
+ {k:'ե',U:'Ե',nm:'еч',s:'е / йе',tip:'В начале слова читается «йе»: ես — «йес». Внутри слова — просто «е».',w:'երազ',m:'мечта, сон',L:2,p:'է'},
  {k:'լ',U:'Լ',nm:'люн',s:'л',w:'լուսին',m:'луна',L:2},
+ {k:'ն',U:'Ն',nm:'ну',s:'н',w:'նուռ',m:'гранат',L:2},
+ {k:'գ',U:'Գ',nm:'гим',s:'г',tip:'Твёрдое «г», как в слове «гора». Гортанное «гъ» — это Ղ.',w:'գիրք',m:'книга',L:2,p:'ղ'},
+ {k:'բ',U:'Բ',nm:'бен',s:'б',w:'բարև',m:'привет',L:2},
+ {k:'և',U:'և',nm:'ев',s:'ев',tip:'Читается «ев», а отдельно и в начале слова — «йев». Само по себе значит «и». Заглавной формы нет: в начале предложения пишут Եվ.',w:'արև',m:'солнце',L:2},
+ // Шаг 3
+ {k:'ո',U:'Ո',nm:'во',s:'о / во',tip:'В начале слова — «во»: ոսկի читается «воски». Внутри слова — «о». Исключение: ով (кто) — «ов».',w:'ոսկի',m:'золото',L:3,p:'օ'},
  {k:'հ',U:'Հ',nm:'һо',s:'һ',tip:'Лёгкий выдох, как английское h в «hello». В подсказках этот звук пишется буквой «һ» — это не «н». Не путайте с Խ — это русское «х».',w:'հաց',m:'хлеб',L:3,p:'խ'},
  {k:'դ',U:'Դ',nm:'да',s:'д',w:'դուռ',m:'дверь',L:3},
- {k:'գ',U:'Գ',nm:'гим',s:'г',tip:'Твёрдое «г», как в слове «гора». Гортанное «гъ» — это Ղ.',w:'գիրք',m:'книга',L:3,p:'ղ'},
  {k:'յ',U:'Յ',nm:'һи',s:'й',tip:'Как русское «й». Часто стоит после гласной: հայ, մայր.',w:'յոթ',m:'семь',L:3},
- {k:'ո',U:'Ո',nm:'во',s:'о / во',tip:'В начале слова — «во»: ոսկի читается «воски». Внутри слова — «о». Исключение: ով (кто) — «ов».',w:'ոսկի',m:'золото',L:3,p:'օ'},
+ {k:'ք',U:'Ք',nm:'кʰе',s:'кʰ',tip:'«к» с лёгким выдохом после звука — будто за «к» слышно короткое «х». В подсказках «кʰ». Обычное «к» без выдоха — это Կ.',w:'քույր',m:'сестра',L:3,p:'կ'},
+ {k:'վ',U:'Վ',nm:'вев',s:'в',w:'վարդ',m:'роза',L:3},
  {k:'օ',U:'Օ',nm:'о',s:'о',tip:'Всегда «о», без «в». Пишется в начале слов и в сложных словах: օր — день.',w:'օր',m:'день',L:3,p:'ո'},
- {k:'շ',U:'Շ',nm:'ша',s:'ш',w:'շուն',m:'собака',L:3},
- {k:'ք',U:'Ք',nm:'кʰе',s:'кʰ',tip:'«к» с лёгким выдохом после звука — будто за «к» слышно короткое «х». В подсказках «кʰ». Обычное «к» без выдоха — это Կ.',w:'քույր',m:'сестра',L:4,p:'կ'},
- {k:'թ',U:'Թ',nm:'тʰо',s:'тʰ',tip:'«т» с лёгким выдохом после звука. В подсказках «тʰ». Обычное «т» без выдоха — это Տ.',w:'թութ',m:'тутовник',L:4,p:'տ'},
+ // Шаг 4
+ {k:'շ',U:'Շ',nm:'ша',s:'ш',w:'շուն',m:'собака',L:4},
  {k:'պ',U:'Պ',nm:'пе',s:'п',tip:'Обычное «п», как в русском, коротко и чётко. Есть похожая буква Փ — тоже «п», но с лёгким выдохом после звука («пʰ»).',w:'պանիր',m:'сыр',L:4,p:'փ'},
- {k:'փ',U:'Փ',nm:'пʰюр',s:'пʰ',tip:'«п» с лёгким выдохом после звука. В подсказках «пʰ». Обычное «п» без выдоха — это Պ.',w:'փող',m:'деньги',L:4,p:'պ'},
  {k:'չ',U:'Չ',nm:'чʰа',s:'чʰ',tip:'«ч» с лёгким выдохом — почти как русское «ч». В подсказках «чʰ». Есть похожая буква Ճ — короче и резче, без выдоха.',w:'չորս',m:'четыре',L:4,p:'ճ'},
- {k:'ճ',U:'Ճ',nm:'че',s:'ч',tip:'«ч» короткое и резкое, без выдоха. Есть похожая буква Չ — с лёгким выдохом, почти русское «ч» («чʰ»).',w:'ճաշ',m:'обед',L:4,p:'չ'},
  {k:'ց',U:'Ց',nm:'цʰо',s:'цʰ',tip:'«ц» с лёгким выдохом — почти как русское «ц». В подсказках «цʰ». Есть похожая буква Ծ — короче и резче, без выдоха.',w:'ցուրտ',m:'холод',L:4,p:'ծ'},
+ {k:'թ',U:'Թ',nm:'тʰо',s:'тʰ',tip:'«т» с лёгким выдохом после звука. В подсказках «тʰ». Обычное «т» без выдоха — это Տ.',w:'թութ',m:'тутовник',L:4,p:'տ'},
  {k:'ծ',U:'Ծ',nm:'ца',s:'ц',tip:'«ц» короткое и резкое, без выдоха. Есть похожая буква Ց — с лёгким выдохом, почти русское «ц» («цʰ»).',w:'ծառ',m:'дерево',L:4,p:'ց'},
- {k:'ժ',U:'Ժ',nm:'же',s:'ж',w:'ժամ',m:'час',L:5},
- {k:'խ',U:'Խ',nm:'хе',s:'х',tip:'Как русское «х» в слове «хлеб». Лёгкое h — это Հ.',w:'խնձոր',m:'яблоко',L:5,p:'հ'},
+ {k:'փ',U:'Փ',nm:'пʰюр',s:'пʰ',tip:'«п» с лёгким выдохом после звука. В подсказках «пʰ». Обычное «п» без выдоха — это Պ.',w:'փող',m:'деньги',L:4,p:'պ'},
+ // Шаг 5
  {k:'ղ',U:'Ղ',nm:'гъат',s:'гъ',tip:'Гортанное «г», похоже на французское r. Это звонкая пара к Խ.',w:'աղ',m:'соль',L:5,p:'գ'},
+ {k:'խ',U:'Խ',nm:'хе',s:'х',tip:'Как русское «х» в слове «хлеб». Лёгкое h — это Հ.',w:'խնձոր',m:'яблоко',L:5,p:'հ'},
  {k:'ռ',U:'Ռ',nm:'ра',s:'рр',tip:'Раскатистое «рр». Короткое «р» в один удар — это Ր.',w:'ձեռք',m:'рука',L:5,p:'ր'},
  {k:'ջ',U:'Ջ',nm:'дже',s:'дж',w:'ջուր',m:'вода',L:5},
  {k:'ձ',U:'Ձ',nm:'дза',s:'дз',w:'ձուկ',m:'рыба',L:5},
  {k:'զ',U:'Զ',nm:'за',s:'з',w:'զանգ',m:'звонок',L:5},
+ {k:'ճ',U:'Ճ',nm:'че',s:'ч',tip:'«ч» короткое и резкое, без выдоха. Есть похожая буква Չ — с лёгким выдохом, почти русское «ч» («чʰ»).',w:'ճաշ',m:'обед',L:5,p:'չ'},
+ // Шаг 6
+ {k:'ժ',U:'Ժ',nm:'же',s:'ж',w:'ժամ',m:'час',L:6},
  {k:'է',U:'Է',nm:'э',s:'э',tip:'Всегда «э», без «й». Пишется в начале слов, внутри обычно стоит Ե. Исключение — глагол է (есть, является).',w:'էջ',m:'страница',L:6,p:'ե'},
  {k:'ը',U:'Ը',nm:'ыт',s:'ы',tip:'Короткий глухой гласный. Часто слышен, но не пишется: խնձոր читается «хындзор». Пишется в начале слова и как артикль в конце.',w:'ընկեր',m:'друг',L:6},
  {k:'ֆ',U:'Ֆ',nm:'фе',s:'ф',tip:'Как русское «ф». Встречается в заимствованных словах.',w:'ֆուտբոլ',m:'футбол',L:6}
 ];
-const ABC_STEPS=['ա տ մ ի ս ր ու','կ ե լ ն գ բ և','ո հ դ յ ք վ օ','շ պ չ ց թ ծ փ','ղ խ ռ ջ ձ զ ճ','ժ է ը ֆ'].map(s=>s.split(' '));
 /* БАЗОВЫЕ СЛОВА (данные).
    WORDS — [слово, как звучит, перевод]. Слова тем лежат в data/themes.js и добавляются сюда автоматически.
    EXTRA_EX — слова только для примеров к первым буквам.
@@ -1283,19 +1300,9 @@ function contactBox(){return `<div class="box contact">${mascot('wink','m-idle')
 function ciroGreet(){const h=new Date().getHours();
  return h<5?{hy:'Բարի գիշեր',tr:'Спокойной ночи'}:h<12?{hy:'Բարի լույս',tr:'Доброе утро'}:h<18?{hy:'Բարև',tr:'Привет'}:{hy:'Բարի երեկո',tr:'Добрый вечер'}}
 /* Подготовка данных: слова тем добавляются в общий список, буквы раскладываются по шагам, словам считается «шаг, с которого их можно прочитать». */
-const GDESC_OLD=['Первые 7 букв — и уже читаются <b class="arm">տուն</b> (дом) и <b class="arm">սար</b> (гора).',
- 'Напишете <b class="arm">բարև</b> — привет, прочитаете <b class="arm">կատու</b> — кошка и <b class="arm">Երևան</b>.',
- 'Откроются <b class="arm">մայր</b> — мама, <b class="arm">հայր</b> — папа и <b class="arm">Հայաստան</b>.',
- 'Звуки с придыханием и без. Прочитаете <b class="arm">հաց</b>, <b class="arm">պանիր</b> и <b class="arm">ծիրան</b>.',
- 'Гортанное ղ, раскатистое ռ, дж и дз. Прочитаете <b class="arm">ջուր</b>, <b class="arm">ձուկ</b> и <b class="arm">նուռ</b>.',
- 'Последние три буквы — и читается всё: <b class="arm">ընկեր</b> — друг, <b class="arm">ֆուտբոլ</b>.'];
 // Слияние с базовым списком слов: новые слова добавляются, у старых появляется тема
 (function(){const by={};WORDS.forEach(w=>by[w.a]=w);
   THEMES.forEach(th=>{th.words=th.w.map(([a,r,m])=>{let w=by[a];if(!w){w={a,r,m};WORDS.push(w);by[a]=w}w.th=w.th||th.id;return w})})})();
-/* Порядок изучения букв (v2): сначала самые «урожайные» — из них складывается больше всего слов,
-   поэтому настоящие слова появляются уже в первом уроке. Прежний порядок нужен для пересчёта прогресса. */
-const OLD_GROUPS=[1,2,3,4,5,6].map(n=>LETTERS.filter(l=>l.L===n).map(l=>l.k));
-{const ord=ABC_STEPS.flat();LETTERS.sort((a,b)=>ord.indexOf(a.k)-ord.indexOf(b.k));ABC_STEPS.forEach((st,i)=>st.forEach(k=>{LETTERS.find(l=>l.k===k).L=i+1}))}
 const BY={};
 LETTERS.forEach(l=>BY[l.k]=l);
 function units(w){const s=w.toLowerCase(),o=[];for(let i=0;i<s.length;i++){if(s[i]==='ո'&&s[i+1]==='ւ'){o.push('ու');i++}else o.push(s[i])}return o}
@@ -1373,7 +1380,6 @@ function genTheme(th,part){
    id урока менять нельзя — по нему хранится прогресс. */
 const UNITS=[];
 const READW=['Читаем первые слова','Читаем «привет»','Читаем «мама» и «папа»','Читаем «спасибо»','Читаем трудные звуки','Читаем всё'];
-const GDESC=GDESC_OLD;
 {const lessons=[];
 GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n);const first=lessons.length;
   if(grp.length>3){const [a,b]=half(grp);
@@ -1381,7 +1387,7 @@ GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n);const first=le
     lessons.push({id:`ab${n}b`,t:`Буквы ${b.map(l=>l.U).join(' ')}`,g:b[0].U,gen:genLetters(b),abc:b.map(l=>l.k)});
   }else lessons.push({id:`ab${n}a`,t:`Буквы ${grp.map(l=>l.U).join(' ')}`,g:grp[0].U,gen:genLetters(grp),abc:grp.map(l=>l.k)});
   lessons.push({id:`ab${n}w`,t:READW[i],g:'Բառ',gen:genWords(n),abc:grp.map(l=>l.k)});
-  lessons[first].sub={n,t:g,d:GDESC[i],letters:grp.map(l=>l.U).join(' ')};
+  lessons[first].sub={n,t:g,letters:grp.map(l=>l.U).join(' ')};
 });
 UNITS.push({k:'Алфавит',t:'Армянский алфавит',d:'Все буквы за 6 шагов — от первых слов до свободного чтения.',lessons,alpha:true});}
 const L=(id,t,g,teach,items,n=10)=>({id,t,g,teach,gen:()=>{const fixed=items.filter(x=>x.first),rest=items.filter(x=>!x.first);const base=[{type:'teach',title:t,html:teach},...fixed,...sample(rest,n-fixed.length)];
@@ -1630,6 +1636,7 @@ const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
 const SCHEMA=3;
 const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},memV:0};
 const fresh=()=>Object.assign(JSON.parse(JSON.stringify(S0)),{heartsTs:Date.now()});
+const OLD_GROUPS=[['ա','ն','մ','ր','տ','ու','ս'],['ե','բ','վ','և','ի','կ','լ'],['հ','դ','գ','յ','ո','օ','շ'],['ք','թ','պ','փ','չ','ճ','ց','ծ'],['ժ','խ','ղ','ռ','ջ','ձ','զ'],['է','ը','ֆ']];   // шаги алфавита в схеме 1
 const MIGRATIONS={
   1:st=>migrateAbc(st),   // отметки уроков алфавита переносятся на новый порядок букв; только добавляются
   2:st=>{}                // поле v и resetAt появляются сами
@@ -1642,8 +1649,9 @@ function upgrade(st){
   st.hearts=Math.max(0,Math.min(MAXH,st.hearts|0));st.xp=Math.max(0,st.xp|0);if(!st.heartsTs)st.heartsTs=Date.now();
   if(st.outfit!=null&&typeof st.outfit!=='string')st.outfit=null;
   let v=+st.v;if(!isFinite(v)||v<1)v=1;
-  for(;v<SCHEMA;v++){try{MIGRATIONS[v]&&MIGRATIONS[v](st)}catch(e){}}
-  st.v=Math.max(v,SCHEMA);   // сохранение из более новой версии приложения не понижаем
+  // Если шаг не удался, версия не повышается: шаг повторится при следующем запуске, а не пропадёт молча
+  for(;v<SCHEMA;v++){try{MIGRATIONS[v]&&MIGRATIONS[v](st)}catch(e){console.error('миграция '+v,e);break}}
+  st.v=v;   // сохранение из более новой версии приложения не понижаем
   return st}
 let S=fresh();
 try{const r=localStorage.getItem(KEY);if(r)S=upgrade(JSON.parse(r))}catch(e){S=fresh()}   // сохранение без поля v считается версией 1
@@ -1731,7 +1739,6 @@ function say(t,rate=1){if(!hasAudio(t))return false;try{if(curAud){curAud.pause(
   const off=()=>btns.forEach(b=>b.classList.remove('playing'));a.onended=off;a.onpause=off;
   a.play().catch(()=>btns.forEach(b=>b.classList.remove('playing')));return true}catch(e){return false}}
 const SPK_SVG='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-const SLOW_SVG_OLD='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 15c0-4 3-7 7-7s6 3 6 5h2a2 2 0 0 1 0 4H5a1 1 0 0 1-1-1z"/><circle cx="8" cy="18.5" r="1.5"/><circle cx="15" cy="18.5" r="1.5"/></svg>';
 function spk(t,cls=''){return hasAudio(t)?`<button class="spk ${cls}" data-say="${esc(t)}" aria-label="Послушать">${SPK_SVG}</button>`:''}
 function spkSlow(t){return hasAudio(t)?`<button class="spk slow" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно"><b>0,7×</b><span>медленно</span></button>`:''}
 document.addEventListener('click',e=>{const b=e.target.closest('.spk');if(!b)return;e.stopPropagation();say(b.dataset.say,+(b.dataset.rate||1))},true);
@@ -1836,7 +1843,7 @@ function renderLearn(){
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
   let html=`<div class="home">${whatsNew()}<section class="hero">
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
-    <div class="bubble"><div class="hy"><b>${g.hy}!</b>${spk(g.hy,'sm')}<span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
+    <div class="bubble"><div class="hy"><span class="hy-top"><b>${g.hy}!</b>${spk(g.hy,'sm')}</span><span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <div class="goal"><div class="goal-top"><span>Цель дня</span><b>${tx} / ${S.goal} XP</b></div><div class="bar ${pct>=100?'good':''}"><i style="width:${pct}%"></i></div></div>
     <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>
    <div class="duo">

@@ -8,6 +8,7 @@ const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
 const SCHEMA=3;
 const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},memV:0};
 const fresh=()=>Object.assign(JSON.parse(JSON.stringify(S0)),{heartsTs:Date.now()});
+const OLD_GROUPS=[['ա','ն','մ','ր','տ','ու','ս'],['ե','բ','վ','և','ի','կ','լ'],['հ','դ','գ','յ','ո','օ','շ'],['ք','թ','պ','փ','չ','ճ','ց','ծ'],['ժ','խ','ղ','ռ','ջ','ձ','զ'],['է','ը','ֆ']];   // шаги алфавита в схеме 1
 const MIGRATIONS={
   1:st=>migrateAbc(st),   // отметки уроков алфавита переносятся на новый порядок букв; только добавляются
   2:st=>{}                // поле v и resetAt появляются сами
@@ -20,8 +21,9 @@ function upgrade(st){
   st.hearts=Math.max(0,Math.min(MAXH,st.hearts|0));st.xp=Math.max(0,st.xp|0);if(!st.heartsTs)st.heartsTs=Date.now();
   if(st.outfit!=null&&typeof st.outfit!=='string')st.outfit=null;
   let v=+st.v;if(!isFinite(v)||v<1)v=1;
-  for(;v<SCHEMA;v++){try{MIGRATIONS[v]&&MIGRATIONS[v](st)}catch(e){}}
-  st.v=Math.max(v,SCHEMA);   // сохранение из более новой версии приложения не понижаем
+  // Если шаг не удался, версия не повышается: шаг повторится при следующем запуске, а не пропадёт молча
+  for(;v<SCHEMA;v++){try{MIGRATIONS[v]&&MIGRATIONS[v](st)}catch(e){console.error('миграция '+v,e);break}}
+  st.v=v;   // сохранение из более новой версии приложения не понижаем
   return st}
 let S=fresh();
 try{const r=localStorage.getItem(KEY);if(r)S=upgrade(JSON.parse(r))}catch(e){S=fresh()}   // сохранение без поля v считается версией 1

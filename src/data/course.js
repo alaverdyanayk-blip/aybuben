@@ -3,7 +3,6 @@
    id урока менять нельзя — по нему хранится прогресс. */
 const UNITS=[];
 const READW=['Читаем первые слова','Читаем «привет»','Читаем «мама» и «папа»','Читаем «спасибо»','Читаем трудные звуки','Читаем всё'];
-const GDESC=GDESC_OLD;
 {const lessons=[];
 GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n);const first=lessons.length;
   if(grp.length>3){const [a,b]=half(grp);
@@ -11,7 +10,7 @@ GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n);const first=le
     lessons.push({id:`ab${n}b`,t:`Буквы ${b.map(l=>l.U).join(' ')}`,g:b[0].U,gen:genLetters(b),abc:b.map(l=>l.k)});
   }else lessons.push({id:`ab${n}a`,t:`Буквы ${grp.map(l=>l.U).join(' ')}`,g:grp[0].U,gen:genLetters(grp),abc:grp.map(l=>l.k)});
   lessons.push({id:`ab${n}w`,t:READW[i],g:'Բառ',gen:genWords(n),abc:grp.map(l=>l.k)});
-  lessons[first].sub={n,t:g,d:GDESC[i],letters:grp.map(l=>l.U).join(' ')};
+  lessons[first].sub={n,t:g,letters:grp.map(l=>l.U).join(' ')};
 });
 UNITS.push({k:'Алфавит',t:'Армянский алфавит',d:'Все буквы за 6 шагов — от первых слов до свободного чтения.',lessons,alpha:true});}
 const L=(id,t,g,teach,items,n=10)=>({id,t,g,teach,gen:()=>{const fixed=items.filter(x=>x.first),rest=items.filter(x=>!x.first);const base=[{type:'teach',title:t,html:teach},...fixed,...sample(rest,n-fixed.length)];
