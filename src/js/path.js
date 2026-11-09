@@ -15,7 +15,7 @@ function renderLearn(){
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
   let html=`<div class="home">${whatsNew()}<section class="hero">
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
-    <div class="bubble"><div class="hy"><b>${g.hy}!</b>${spk(g.hy,'sm')}<span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
+    <div class="bubble"><div class="hy"><span class="hy-top"><b>${g.hy}!</b>${spk(g.hy,'sm')}</span><span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <div class="goal"><div class="goal-top"><span>Цель дня</span><b>${tx} / ${S.goal} XP</b></div><div class="bar ${pct>=100?'good':''}"><i style="width:${pct}%"></i></div></div>
     <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>
    <div class="duo">

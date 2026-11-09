@@ -1,0 +1,11 @@
+/* Зоны нажатия не меньше 44 px: мелкие элементы получают невидимое поле вокруг себя или вырастают сами. */
+.spk.sm,.x,.ph-back,.brand{position:relative}
+.spk.sm::after,.ph-back::after{content:"";position:absolute;inset:-6px}
+.ph-back::after{inset:-12px -8px}
+.x{width:44px;height:44px}
+.switch::before{content:"";position:absolute;inset:-8px -2px}
+.chip2,.thchips button{min-height:44px}
+.reftabs button,.seg button{min-height:44px;min-width:44px}
+.fold summary,.wr-cat summary{min-height:44px}
+.btn.sm{min-height:44px}
+.hy-top{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
