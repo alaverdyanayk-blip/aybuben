@@ -18,7 +18,7 @@ import hashlib, json, os
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 src = os.path.join(root, 'src')
 
-CSS = ['base', 'learn', 'lesson', 'reference', 'profile', 'home', 'games', 'polish', 'phrases', 'touch']
+CSS = ['base', 'learn', 'lesson', 'reference', 'profile', 'home', 'games', 'polish', 'phrases', 'touch', 'tuf']
 JS = [
     'js/utils',
     # контент
