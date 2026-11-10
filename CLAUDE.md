@@ -14,6 +14,7 @@
   `phrases.js` (9 ситуаций), `rules.js` (карточки правил `RC/RX/RN/RP/SIGNS`), `course.js` (разделы и уроки; id уроков менять нельзя), `ciro-lines.js` (реплики Циро),
   `outfits.js`, `achievements.js`, `audio-keys.js`. В начале каждого файла описан формат.
 - Логика (`src/js/`): `state.js` (прогресс), `exercises.js`, `lesson.js`, `path.js` (главная), `games.js`, `reference.js` (буквы, словарь, правила), `phrases.js`, `profile.js`, `growth.js` (друзья, напоминания), `memory.js` (повторения), `sound.js`, `ciro.js`.
+- Тема: `S.theme` (`light`/`dark`/`auto`), переключатель в профиле; `applyThemePref()` в `js/app.js`, в Телеграме — `__applyTheme` в адаптере. Облик — `src/css/tuf.css` (идёт последним, цвета только через переменные).
 - Прогресс (`js/state.js`): один объект `S`, ключ localStorage `aybuben-v2`, поле `S.v` — версия схемы (`SCHEMA`). При изменении формата: поднять `SCHEMA` и добавить шаг в `MIGRATIONS` (только добавлять данные, ничего не удалять).
   С облаком Телеграма копии **сливаются** (`mergeState`): пройденное объединяется, числа по максимуму, настройки из более свежей копии; сброс помечается `resetAt`.
 - `src/tg-adapter.js` — Telegram WebApp: тема, вибро, кнопка «Назад», CloudStorage (`syncFromCloud`), сброс (`__resetCloud`).

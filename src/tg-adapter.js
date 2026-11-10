@@ -7,10 +7,12 @@
 
   // Тема: светлая/тёмная как в Телеграме, цвета шапки — как у приложения
   function applyTheme(){
-    var dark=tg.colorScheme==='dark',bg=dark?'#1A1416':'#EEE6E3';
+    var pref='auto';try{if(S.theme==='light'||S.theme==='dark')pref=S.theme}catch(e){}
+    var dark=pref==='auto'?tg.colorScheme==='dark':pref==='dark',bg=dark?'#1C1416':'#F1E4DE';
     document.documentElement.setAttribute('data-theme',dark?'dark':'light');
-    try{tg.setHeaderColor(bg);tg.setBackgroundColor(bg);if(tg.setBottomBarColor)tg.setBottomBarColor(dark?'#251D20':'#FBF8F7')}catch(e){}
+    try{tg.setHeaderColor(bg);tg.setBackgroundColor(bg);if(tg.setBottomBarColor)tg.setBottomBarColor(bg)}catch(e){}
   }
+  window.__applyTheme=applyTheme;
   applyTheme();tg.onEvent('themeChanged',applyTheme);
 
   // Вибро-отклик на ответы

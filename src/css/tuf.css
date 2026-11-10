@@ -188,3 +188,8 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .qc .w.arm.sm{font-size:17px}.qc .w.arm.xs{font-size:14px;white-space:normal}
 .hero-tx .hy b{font-size:clamp(22px,6.6vw,30px)}
 @media (max-width:350px){.tabs button[aria-selected="true"]{flex:1 1 40px;padding:0}.tabs button[aria-selected="true"] span:last-child{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
+/* реплика Циро внутри карточки не должна сливаться с ней */
+.box .bubble,.card .bubble,.sheet .bubble,.news-card .bubble{background:var(--bg);box-shadow:none}
+.theme-row{flex-wrap:wrap}
+.seg button{border:0;background:var(--sunk);font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}

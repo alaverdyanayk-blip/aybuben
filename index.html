@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="9cc6ed695d"</script>
+<script>window.BUILD_ID="c64d906c06"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -836,6 +836,11 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .qc .w.arm.sm{font-size:17px}.qc .w.arm.xs{font-size:14px;white-space:normal}
 .hero-tx .hy b{font-size:clamp(22px,6.6vw,30px)}
 @media (max-width:350px){.tabs button[aria-selected="true"]{flex:1 1 40px;padding:0}.tabs button[aria-selected="true"] span:last-child{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
+/* реплика Циро внутри карточки не должна сливаться с ней */
+.box .bubble,.card .bubble,.sheet .bubble,.news-card .bubble{background:var(--bg);box-shadow:none}
+.theme-row{flex-wrap:wrap}
+.seg button{border:0;background:var(--sunk);font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
 </style>
 
 </head>
@@ -2014,7 +2019,9 @@ function ring(v,max){const p=Math.min(1,v/max),c=2*Math.PI*9;return `<svg class=
 function drawHud(){const st=streakNow();
   $('#hud').innerHTML=`<span class="pill flame ${S.lastDay===today()?'':'off'}" title="Серия дней">${IC.flame}${st}</span><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`}
 const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases};
-function route(){const [hb,hs]=location.hash.slice(1).split('/'),v=VIEWS[hb]?hb:'learn';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));$('#logo').innerHTML=mascot('happy');drawHud();VIEWS[v](hs)}
+/* Тема: S.theme = 'light' | 'dark' | 'auto' (или пусто) — как в системе / Телеграме. */
+function applyThemePref(){if(window.__applyTheme)return window.__applyTheme();const t=S.theme,el=document.documentElement;if(t==='light'||t==='dark')el.setAttribute('data-theme',t);else el.removeAttribute('data-theme')}
+function route(){applyThemePref();const [hb,hs]=location.hash.slice(1).split('/'),v=VIEWS[hb]?hb:'learn';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));$('#logo').innerHTML=mascot('happy');drawHud();VIEWS[v](hs)}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{location.hash=b.dataset.view});
 window.addEventListener('hashchange',()=>{route();window.scrollTo(0,0)});
 setInterval(drawHud,60000);
@@ -2557,6 +2564,7 @@ function renderProfile(){
    ${contactBox()}
    <div class="box"><h3>Настройки</h3>
     ${notifRow()}
+    <div class="toggle theme-row"><span>Тема</span><div class="seg" role="group" aria-label="Тема">${[['auto','Как в системе'],['light','Светлая'],['dark','Тёмная']].map(([v,t])=>`<button data-theme-set="${v}" aria-pressed="${(S.theme||'auto')===v}">${t}</button>`).join('')}</div></div>
     <div class="toggle"><span>Произносить слова автоматически<br><span class="note">Кнопка с динамиком работает всегда</span></span><button class="switch" role="switch" id="sw-voice" aria-checked="${S.voice!==false}" aria-label="Автоозвучка"></button></div>
     <div class="toggle"><span>Звуки в уроках</span><button class="switch" role="switch" id="sw-sound" aria-checked="${S.sound}" aria-label="Звуки"></button></div>
     <div class="toggle"><span>Открыть все уроки<br><span class="note">Для тех, кто уже знает часть материала</span></span><button class="switch" role="switch" id="sw-all" aria-checked="${S.unlockAll}" aria-label="Открыть все уроки"></button></div>
@@ -2565,6 +2573,7 @@ function renderProfile(){
   </div>`;
   document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.g;save();route()});
   document.querySelectorAll('.wr-item').forEach(b=>b.onclick=()=>{S.outfit=b.dataset.o||null;save();route()});
+  document.querySelectorAll('[data-theme-set]').forEach(b=>b.onclick=()=>{S.theme=b.dataset.themeSet;save();applyThemePref();renderProfile()});
   $('#sw-voice').onclick=()=>{S.voice=S.voice===false;save();renderProfile()};
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
@@ -2658,10 +2667,12 @@ route();
 
   // Тема: светлая/тёмная как в Телеграме, цвета шапки — как у приложения
   function applyTheme(){
-    var dark=tg.colorScheme==='dark',bg=dark?'#1A1416':'#EEE6E3';
+    var pref='auto';try{if(S.theme==='light'||S.theme==='dark')pref=S.theme}catch(e){}
+    var dark=pref==='auto'?tg.colorScheme==='dark':pref==='dark',bg=dark?'#1C1416':'#F1E4DE';
     document.documentElement.setAttribute('data-theme',dark?'dark':'light');
-    try{tg.setHeaderColor(bg);tg.setBackgroundColor(bg);if(tg.setBottomBarColor)tg.setBottomBarColor(dark?'#251D20':'#FBF8F7')}catch(e){}
+    try{tg.setHeaderColor(bg);tg.setBackgroundColor(bg);if(tg.setBottomBarColor)tg.setBottomBarColor(bg)}catch(e){}
   }
+  window.__applyTheme=applyTheme;
   applyTheme();tg.onEvent('themeChanged',applyTheme);
 
   // Вибро-отклик на ответы
