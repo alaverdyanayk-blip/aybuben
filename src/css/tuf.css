@@ -269,3 +269,5 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .at.s1{box-shadow:0 4px 0 color-mix(in srgb,var(--brand) 45%,var(--line)),inset 0 0 0 2px color-mix(in srgb,var(--brand) 45%,transparent)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .weak .arm{color:#FF8FA0}}
 :root[data-theme="dark"] .weak .arm{color:#FF8FA0}
+.snd-row,.nm-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nm-row{color:var(--muted);font-size:14px}.nm-row .arm{color:var(--ink);font-weight:600}

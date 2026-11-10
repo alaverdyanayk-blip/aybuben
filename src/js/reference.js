@@ -21,7 +21,7 @@ function renderAlphabet(){const nL=LETTERS.filter(letterLearned).length,st=LETTE
 let traceCase='U';
 function letterSheet(k){const l=BY[k];
   const s=sheet(`<div class="sheet-top"><span class="chip">${GROUPS[l.L-1]}</span><button class="x" data-close aria-label="Закрыть">✕</button></div>
-   <div class="lc-hero" style="border:0;padding:0"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="chip lg">${esc(l.s)}</span><span style="color:var(--muted)">Название: «${esc(l.nm)}»</span></div></div>
+   <div class="lc-hero" style="border:0;padding:0"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="snd-row"><span class="chip lg">${esc(l.s)}</span>${spk(letterSnd(l))}</span><span class="nm-row">Название: «${esc(l.nm)}» <span class="arm">${esc(l.hn)}</span>${spk(l.hn,'sm')}</span></div></div>
    <p style="margin:0">${esc(tipOf(l))}</p>${exWord(l)}
    <div class="row" style="justify-content:space-between"><b>Пропишите букву</b><div class="seg">${l.U!==l.k&&l.U!=='Ու'?`<button data-c="U" aria-pressed="${traceCase==='U'}" class="arm">${l.U}</button><button data-c="l" aria-pressed="${traceCase==='l'}" class="arm">${l.k}</button>`:''}<button id="clr">Стереть</button></div></div>
    <canvas id="cv" aria-label="Поле для письма"></canvas>`);
