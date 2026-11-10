@@ -1,6 +1,6 @@
 /* Пропись: обводка буквы по штрихам с проверкой порядка и направления.
    Данные — STROKES (data/strokes.js): для каждой буквы список штрихов, каждый штрих — SVG-путь в системе координат прописи:
-   y: 0 — верх высоких букв, 35 — линия строчных, 75 — строка, 110 — низ хвостов; x: 0…w (ширина буквы, w в данных).
+   y: 15 — верх заглавных и высоких букв, 35 — линия строчных, 75 — строка, 92 — низ хвостов; x: 0…w (ширина буквы, w в данных).
    Штрих проверяется сразу после того, как палец оторвался: похож ли он на нужный, в ту ли сторону и тот ли по счёту. */
 const TR_N=32;
 let _trSvg=null;
@@ -21,12 +21,15 @@ function trJudge(user,exp,tol){const u=trResample(user),e=exp.pts,f=trMean(u,e),
   const lenOk=short?ul<el+tol*2.2:(ul>el*0.45&&ul<el*1.9);
   if(short){const c=u.reduce((s,p)=>[s[0]+p[0]/u.length,s[1]+p[1]/u.length],[0,0]),ce=e.reduce((s,p)=>[s[0]+p[0]/e.length,s[1]+p[1]/e.length],[0,0]);
     return Math.hypot(c[0]-ce[0],c[1]-ce[1])<tol*1.3&&lenOk?'ok':'miss'}
+  /* короткая перекладина: «туда» и «обратно» почти совпадают по среднему расстоянию — решает, с какого конца начали */
+  const d0=Math.hypot(u[0][0]-e[0][0],u[0][1]-e[0][1]),d1=Math.hypot(u[0][0]-e[e.length-1][0],u[0][1]-e[e.length-1][1]);
+  if(f<tol&&lenOk&&r<f&&d1<d0&&el>8)return 'dir';
   if(f<tol&&lenOk)return 'ok';if(r<tol&&lenOk&&r<f)return 'dir';return 'miss'}
 
 /* Нарисовать пропись в box (элемент). opts: {key, onDone(mistakes), compact} */
 function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
   const w=G.w||70,strokes=G.s.map(d=>({d,...trSample(d)}));
-  const ys=strokes.flatMap(s=>s.pts.map(p=>p[1])),TR_TOP=Math.min(...ys,35)-14,TR_BOT=Math.max(...ys,75)+14;
+  const ys=strokes.flatMap(s=>s.pts.map(p=>p[1])),TR_TOP=Math.min(...ys,15)-8,TR_BOT=Math.max(...ys,92)+8;
   box.innerHTML=`<div class="tracer"><canvas aria-label="Поле для прописи: обведите букву ${esc(key)} пальцем"></canvas>
     <div class="tr-bar"><span class="tr-msg" role="status" aria-live="polite">Штрих 1 из ${strokes.length}: начните с точки</span>
     <div class="tr-btns"><button class="btn plain sm" data-tr="show">Показать</button><button class="btn plain sm" data-tr="again">Заново</button></div></div></div>`;
@@ -44,7 +47,7 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
   function draw(prog){const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);
     /* линейки прописи */
     const line=(y,dash,a)=>{const [,yy]=P([0,y]);ctx.strokeStyle=css('--line');ctx.globalAlpha=a;ctx.lineWidth=1.5;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(8,yy);ctx.lineTo(r.width-8,yy);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1};
-    line(0,[4,6],.8);line(35,[4,6],.9);line(75,[],1);line(110,[4,6],.8);
+    line(15,[4,6],.8);line(35,[4,6],.9);line(75,[],1);line(92,[4,6],.8);
     ctx.lineCap='round';ctx.lineJoin='round';
     /* контур буквы */
     ctx.strokeStyle=css('--sunk');ctx.lineWidth=Math.max(14,k*9);strokes.forEach(s=>{path(s.pts);ctx.stroke()});
@@ -59,7 +62,7 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
     if(raw&&raw.length){ctx.strokeStyle=css('--ink');ctx.globalAlpha=.75;ctx.lineWidth=Math.max(5,k*3.2);ctx.beginPath();raw.forEach((p,i)=>{const [x,y]=P(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.globalAlpha=1}}
   function show(from=0,to=strokes.length,after){cancelAnimationFrame(anim);const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(reduce){draw();after&&after();return}
-    const t0=performance.now(),per=650;const step=now=>{const t=from+(now-t0)/per;if(t>=to){draw();after&&after();return}draw({t});anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
+    const t0=performance.now(),per=650;const step=now=>{const t=from+Math.max(0,now-t0)/per;if(t>=to){draw();after&&after();return}draw({t});anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
   const inv=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left-ox)/k,(e.clientY-r.top-oy)/k+TR_TOP]};
   cv.onpointerdown=e=>{if(done)return;cancelAnimationFrame(anim);cv.setPointerCapture(e.pointerId);raw=[inv(e)];draw()};
   cv.onpointermove=e=>{if(!raw)return;raw.push(inv(e));draw()};

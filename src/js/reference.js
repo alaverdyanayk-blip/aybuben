@@ -29,8 +29,10 @@ function letterSheet(k){const l=BY[k];
   s.el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{traceCase=b.dataset.c;s.el.querySelectorAll('[data-c]').forEach(x=>x.setAttribute('aria-pressed',x===b));setupCanvas(l)});
 }
 /* Если для буквы есть школьная пропись по штрихам — показываем её, иначе свободное поле поверх печатной буквы */
-function setupCanvas(l){const ch0=(l.U!==l.k&&traceCase==='l')?l.k:l.U,cv0=$('#cv');
-  if(cv0&&STROKES[ch0]){const d=document.createElement('div');d.id='cv-tr';cv0.replaceWith(d);const c=$('#clr');if(c)c.hidden=true;tracer(d,ch0,{});return}
+let _tr=null;
+function setupCanvas(l){const ch0=(l.U!==l.k&&traceCase==='l')?l.k:l.U,cv0=$('#cv')||$('#cv-tr');
+  if(_tr){_tr.destroy();_tr=null}
+  if(cv0&&STROKES[ch0]){const d=document.createElement('div');d.id='cv-tr';cv0.replaceWith(d);const c=$('#clr');if(c)c.hidden=true;_tr=tracer(d,ch0,{});return}
   const tb=$('#cv-tr');if(tb){const c=document.createElement('canvas');c.id='cv';c.setAttribute('aria-label','Поле для письма');tb.replaceWith(c);const b=$('#clr');if(b)b.hidden=false}
   const cv=$('#cv');if(!cv)return;const ctx=cv.getContext('2d');const ch=(l.U!==l.k&&traceCase==='l')?l.k:l.U;
   function guide(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);const cs=getComputedStyle(document.documentElement);
