@@ -17,7 +17,7 @@ function invite(btn){const go=()=>{
    const link=S.refCode?inviteLink():`https://t.me/${BOT}`;
    if(TGW&&TGW.openTelegramLink)TGW.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(INV_TEXT));
    else if(navigator.share)navigator.share({text:INV_TEXT,url:link}).catch(()=>{});
-   else{try{navigator.clipboard.writeText(INV_TEXT+' '+link);if(btn)btn.textContent='Ссылка скопирована'}catch(e){}}};
+   else{try{navigator.clipboard.writeText(INV_TEXT+' '+link).then(()=>{if(btn)btn.textContent='Ссылка скопирована'}).catch(()=>{})}catch(e){}}};
   S.refCode?go():refMe().then(go)}
 function nextTier(){return REFC.find(c=>c.n>(S.friends||0))}
 function inviteBox(){const f=S.friends||0,nt=nextTier();

@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="8ad70e15ce"</script>
+<script>window.BUILD_ID="0afcf9be54"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -2675,7 +2675,7 @@ function invite(btn){const go=()=>{
    const link=S.refCode?inviteLink():`https://t.me/${BOT}`;
    if(TGW&&TGW.openTelegramLink)TGW.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(INV_TEXT));
    else if(navigator.share)navigator.share({text:INV_TEXT,url:link}).catch(()=>{});
-   else{try{navigator.clipboard.writeText(INV_TEXT+' '+link);if(btn)btn.textContent='Ссылка скопирована'}catch(e){}}};
+   else{try{navigator.clipboard.writeText(INV_TEXT+' '+link).then(()=>{if(btn)btn.textContent='Ссылка скопирована'}).catch(()=>{})}catch(e){}}};
   S.refCode?go():refMe().then(go)}
 function nextTier(){return REFC.find(c=>c.n>(S.friends||0))}
 function inviteBox(){const f=S.friends||0,nt=nextTier();
