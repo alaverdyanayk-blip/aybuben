@@ -215,3 +215,27 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .bd span.hl{box-shadow:0 2px 0 var(--apri-deep);background:var(--apri-soft)}
 .end .unlock{border-radius:22px}
 .homefoot a{color:var(--accent)}
+
+/* приветствие новичка */
+.hero.welcome{grid-template-areas:"t c" "s s" "w w" "a a"}
+.steps3{grid-area:s;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.steps3 li{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 8px;border-radius:14px;background:rgb(0 0 0/.2);font-size:12.5px;font-weight:600;color:#F6D9DD}
+.steps3 li b{font-size:19px;font-weight:700;color:#fff;line-height:1.25}
+.steps3 li+li::before{content:"";position:absolute;left:-7px;top:50%;width:6px;height:6px;margin-top:-3px;border-top:2px solid #FFE3B0;border-right:2px solid #FFE3B0;transform:rotate(45deg)}
+.w-goal{grid-area:w;display:flex;flex-direction:column;gap:8px;font-size:13.5px;font-weight:600;color:#F6D9DD}
+.w-goals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.w-goals button{font:inherit;font-size:14.5px;font-weight:700;min-height:44px;border:0;border-radius:12px;background:rgb(255 255 255/.14);color:#fff;transition:background .12s}
+.w-goals button[aria-pressed="true"]{background:#fff;color:var(--brand-deep)}
+
+/* конец урока и новый уровень: короткий праздник */
+.end h2{animation:rise .35s .1s both}
+.end .stats .stat{animation:statin .4s cubic-bezier(.3,1.5,.5,1) both}
+.end .stats .stat:nth-child(1){animation-delay:.2s}.end .stats .stat:nth-child(2){animation-delay:.3s}.end .stats .stat:nth-child(3){animation-delay:.4s}
+@keyframes statin{from{opacity:0;transform:translateY(14px) scale(.9)}}
+.unlock{border-radius:22px;background:var(--apri-soft);box-shadow:0 4px 0 var(--apri-deep);animation:unlockin .5s .5s cubic-bezier(.3,1.5,.5,1) both}
+.unlock>b{font-size:19px;font-weight:800;color:var(--brand)}
+.unlock .unlock-item .mascot{animation:wig 1.2s .9s ease-in-out}
+@keyframes unlockin{from{opacity:0;transform:scale(.85)}}
+@keyframes wig{0%,100%{transform:none}25%{transform:rotate(-8deg) scale(1.08)}60%{transform:rotate(7deg) scale(1.08)}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .unlock>b{color:var(--apri)}}
+:root[data-theme="dark"] .unlock>b{color:var(--apri)}

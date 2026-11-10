@@ -33,9 +33,9 @@ function costumeSvg(o){const K='#2B1E22';
 function mascot(mood='happy',cls='',outfit){
  if(outfit===undefined){try{outfit=S.outfit||null}catch(e){outfit=null}}
  const D='#2B1A12',M='#5A2114',ey=mood==='sad'?63:61,px=mood==='think'?-2.5:mood==='sad'?0:1.4,py=mood==='think'?-3:mood==='sad'?2.2:1.4;
- const nub=(x,y,r)=>`<ellipse cx="${x}" cy="${y}" rx="7" ry="10.5" transform="rotate(${r} ${x} ${y})" fill="#E8892E"/>`;
+ const nub=(x,y,r)=>`<ellipse cx="${x}" cy="${y}" rx="7" ry="10.5" transform="rotate(${r} ${x} ${y})" fill="url(#cg-limb)"/>`;
  const arms=mood==='cheer'?nub(17,40,-35)+nub(103,40,35):nub(16,78,22)+nub(104,78,-22);
- const open=x=>`<ellipse cx="${x}" cy="${ey}" rx="8.5" ry="10" fill="#fff"/><circle cx="${x+px}" cy="${ey+py}" r="5.3" fill="${D}"/><circle cx="${x+px+2}" cy="${ey+py-2.6}" r="1.9" fill="#fff"/>`;
+ const open=x=>`<ellipse cx="${x}" cy="${ey}" rx="8.7" ry="10.2" fill="#fff" stroke="#C9631C" stroke-opacity=".55" stroke-width="1"/><circle cx="${x+px}" cy="${ey+py}" r="5.6" fill="#4A2A16"/><circle cx="${x+px}" cy="${ey+py+.3}" r="3.5" fill="${D}"/><circle cx="${x+px+2.1}" cy="${ey+py-2.7}" r="2" fill="#fff"/><circle cx="${x+px-2}" cy="${ey+py+2.4}" r=".9" fill="#fff" opacity=".8"/>`;
  const up=x=>`<path d="M${x-7} ${ey+2}Q${x} ${ey-7} ${x+7} ${ey+2}" stroke="${D}" stroke-width="3.6" fill="none" stroke-linecap="round"/>`;
  const dn=x=>`<path d="M${x-7} ${ey}Q${x} ${ey+5} ${x+7} ${ey}" stroke="${D}" stroke-width="3.6" fill="none" stroke-linecap="round"/>`;
  const eyes=mood==='cheer'?up(47)+up(73):mood==='sleep'?dn(47)+dn(73):mood==='wink'?`<g class="eyes">${open(47)}</g>`+up(73):`<g class="eyes">${open(47)+open(73)}</g>`;
@@ -51,10 +51,17 @@ function mascot(mood='happy',cls='',outfit){
  const mouth=mouths[mood]||mouths.happy;
  let extra='';
  if(mood==='sad')extra+=`<path d="M40 71Q36.5 77.5 40 80Q43.5 77.5 40 71Z" fill="#7FC4F0"/>`;
- if(mood==='think')extra+=`<ellipse cx="80" cy="91" rx="7" ry="9" transform="rotate(-30 80 91)" fill="#E8892E"/>`;
+ if(mood==='think')extra+=`<ellipse cx="80" cy="91" rx="7" ry="9" transform="rotate(-30 80 91)" fill="url(#cg-limb)" stroke="#C9631C" stroke-width=".8"/>`;
  if(mood==='sleep')extra+=`<text x="88" y="36" font-size="15" font-weight="800" fill="#B08A70" font-family="sans-serif">z</text><text x="99" y="24" font-size="11" font-weight="800" fill="#B08A70" font-family="sans-serif">z</text>`;
- const top=HATS.has(outfit)?'':`<path d="M60 31C60 25 61 20 63.5 15" stroke="#7A4E2A" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M63 19C70 7 85 5 93 10C87 20 74 25 63 19Z" fill="#63A34F"/><path d="M64.5 18C72 14 81 11.5 89 10.5" stroke="#3F7A35" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
- return `<svg class="mascot ${cls}" viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="113" rx="30" ry="4.5" fill="#000" opacity=".13"/>${arms}<ellipse cx="46" cy="104" rx="9" ry="5.5" fill="#D9792A"/><ellipse cx="74" cy="104" rx="9" ry="5.5" fill="#D9792A"/>${top}<ellipse cx="60" cy="66" rx="42" ry="39" fill="#E8892E"/><ellipse cx="56.5" cy="62" rx="38" ry="35" fill="#F5A640"/><path d="M60 28.5C57 35 57 41 60 46" stroke="#DE7F2A" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="42" rx="8" ry="4.5" transform="rotate(-30 40 42)" fill="#FFDCA6" opacity=".9"/><ellipse cx="35" cy="77" rx="7" ry="4.5" fill="#EF6F4A" opacity=".5"/><ellipse cx="85" cy="77" rx="7" ry="4.5" fill="#EF6F4A" opacity=".5"/>${brows}${eyes}${mouth}${extra}${outfitSvg(outfit)}</svg>`;
+ const top=HATS.has(outfit)?'':`<path d="M60 31C60 25 61 20 63.5 15" stroke="#7A4E2A" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M63 19C70 7 85 5 93 10C87 20 74 25 63 19Z" fill="url(#cg-leaf)"/><path d="M64.5 18C72 14 81 11.5 89 10.5M73 14.6 76 10.5M79.5 12.6 82 16.5" stroke="#3A7332" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M68 13.5C74 9 81 7.6 87 8.6" stroke="#B5E08F" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".7"/>`;
+ const foot=x=>`<ellipse cx="${x}" cy="104" rx="9.5" ry="5.8" fill="url(#cg-limb)"/><ellipse cx="${x-2}" cy="102.4" rx="4.5" ry="1.8" fill="#FFD9A0" opacity=".45"/>`;
+ return `<svg class="mascot ${cls}" viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="113" rx="30" ry="4.5" fill="#000" opacity=".13"/>${arms}${foot(46)}${foot(74)}${top}
+ <ellipse cx="60" cy="66" rx="42" ry="39" fill="url(#cg-body)"/>
+ <path d="M21 78C30 102 76 112 97 84C88 100 44 104 21 78Z" fill="#C4601A" opacity=".28"/>
+ <path d="M60 28C56.5 35 56.5 42 59.5 48" stroke="#D5701F" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".8"/>
+ <ellipse cx="40" cy="42" rx="9" ry="4.8" transform="rotate(-30 40 42)" fill="#FFE9C4" opacity=".92"/><circle cx="29.5" cy="53.5" r="2.3" fill="#FFE9C4" opacity=".8"/>
+ <g fill="#C9631C" opacity=".4"><circle cx="27" cy="88" r="1.2"/><circle cx="31.5" cy="92" r="1"/><circle cx="92" cy="89" r="1.2"/><circle cx="88.5" cy="93.5" r="1"/></g>
+ <ellipse cx="34.5" cy="77" rx="8.5" ry="5.5" fill="url(#cg-blush)"/><ellipse cx="85.5" cy="77" rx="8.5" ry="5.5" fill="url(#cg-blush)"/>${brows}${eyes}${mouth}${extra}${outfitSvg(outfit)}</svg>`;
 }
 function ciroSay(mood,html,cls=''){return `<div class="ciro-say ${cls}">${mascot(mood,'m-idle')}<div class="bubble">${html}</div></div>`}
 function bounce(el,cls='m-jump'){if(!el)return;el.classList.remove('m-jump','m-shake');void el.getBoundingClientRect();el.classList.add(cls);el.addEventListener('animationend',()=>el.classList.remove(cls),{once:true})}

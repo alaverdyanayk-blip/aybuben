@@ -14,11 +14,20 @@ function renderLearn(){
   if(S.factI==null)S.factI=Math.floor(Math.random()*FACTS.length);
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
   const due=dueKeys().length,wl=wod?[...wod.a].length:0;
-  let html=`<div class="home">${whatsNew()}<section class="hero">
+  const fresh=!S.xp&&!Object.keys(S.done).length;
+  /* Новичок видит приветствие: кто такой Циро, как устроен курс, выбор цели дня. */
+  const heroHtml=fresh?`<section class="hero welcome">
+    <div class="hero-tx"><div class="hy"><span class="hy-top"><b>Բարև!</b>${spk('Բարև','sm')}</span><span class="tr">Привет! Я Циро, армянский абрикос</span></div><p>Научу читать и писать по-армянски. Уроки короткие — по 3–5 минут.</p></div>
+    <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot('happy','m-idle')}</button>
+    <ol class="steps3"><li><b class="arm">Ա</b>буквы</li><li><b class="arm">տուն</b>слова</li><li><b class="arm">Բարև</b>фразы</li></ol>
+    <div class="w-goal"><span>Сколько заниматься в день?</span><div class="w-goals" role="group" aria-label="Цель дня">${[[10,'1 урок'],[20,'2 урока'],[30,'3 урока']].map(([v,t])=>`<button data-wg="${v}" aria-pressed="${S.goal===v}">${t}</button>`).join('')}</div></div>
+    <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>`
+   :`<section class="hero">
     <div class="hero-tx"><div class="hy"><span class="hy-top"><b>${g.hy}!</b>${spk(g.hy,'sm')}</span><span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
     <div class="goal"><div class="bar ${pct>=100?'good':''}" role="img" aria-label="Цель дня: ${tx} из ${S.goal} XP"><i style="width:${pct}%"></i></div><b>${tx} / ${S.goal} XP</b></div>
-    <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>
+    <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>`;
+  let html=`<div class="home">${whatsNew()}${heroHtml}
    <div class="quick">
     ${wod?`<div class="qc wod" id="wod" role="button" tabindex="0" aria-label="Слово дня: послушать"><span class="qtx"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></span>${spk(wod.a)}</div>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">появится после первых букв</span></div>`}
     ${Object.keys(S.done).length?`<button class="qc" id="prac"><span class="lbl">Тренировка</span><span class="w">${due>30?'30+ слов':due?`${due} ${plural(due,'слово','слова','слов')}`:'10 заданий'}</span><span class="m">${due?'пора повторить':'+5 XP и сердце'}</span></button>`:''}
@@ -45,6 +54,7 @@ function renderLearn(){
   $('#ciro').onclick=()=>{bounce($('#ciro .mascot'));say(g.hy)};
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
+  document.querySelectorAll('[data-wg]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.wg;save();document.querySelectorAll('[data-wg]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawHud()});
   const pr=$('#prac');if(pr)pr.onclick=startPractice;
   const wd=$('#wod');if(wd){wd.onclick=()=>say(wod.a);wd.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();say(wod.a)}}}
   wireNews();
