@@ -5,13 +5,13 @@ const lref=l=>`${LESSONS.indexOf(l)}|${l.id}|${l.t}`;
 function startPractice(){let items=[];
   for(const k of dueKeys()){if(items.length>=10)break;const ex=reviewEx(k);if(ex)items.push(ex)}
   if(items.length<10){const pool=LESSONS.filter(l=>S.done[l.id]);const src=pool.length?pool:[LESSONS[0]];let more=[];
-    shuffle(src).slice(0,4).forEach(l=>more.push(...l.gen().filter(x=>x.type!=='teach'&&x.type!=='letter')));items.push(...sample(more,10-items.length))}
+    shuffle(src).slice(0,4).forEach(l=>more.push(...l.gen().filter(x=>x.type!=='teach'&&x.type!=='letter'&&x.type!=='trace')));items.push(...sample(more,10-items.length))}
   startLesson({id:'practice',t:'Тренировка',gen:()=>shuffle(items)},true)}
 function startLesson(lesson,practice){
   const items=lesson.gen();
   if(!practice&&LESSONS.includes(lesson)){const rv=dueKeys().filter(k=>!items.some(x=>x.item===k)).slice(0,2).map(reviewEx).filter(Boolean).map(x=>({...x,review:true}));
     if(rv.length)items.splice(Math.max(1,items.length-1),0,...rv)}
-  LS={lesson,practice,queue:items.slice(),total:items.filter(x=>x.type!=='teach'&&x.type!=='letter').length,done:0,mistakes:0,combo:0,best:0,start:Date.now(),cur:null,state:'answer'};
+  LS={lesson,practice,queue:items.slice(),total:items.filter(x=>x.type!=='teach'&&x.type!=='letter'&&x.type!=='trace').length,done:0,mistakes:0,combo:0,best:0,start:Date.now(),cur:null,state:'answer'};
   const el=document.createElement('div');el.className='lesson';el.id='lesson';
   el.innerHTML=`<div class="l-top"><button class="x" id="lquit" aria-label="Выйти из урока">✕</button><div class="prog"><i id="lprog" style="width:0"></i></div><span class="pill heart" id="lhearts"></span></div><div class="l-body"><div class="ex" id="ex"></div></div><div class="l-foot" id="lfoot"></div>`;
   $('#layer').appendChild(el);document.body.classList.add('locked');
@@ -32,6 +32,7 @@ function next(){
   box.innerHTML=`<div class="combo">${LS.combo>=3?`<span class="chipf">${IC.flame}${LS.combo} подряд</span>`:''}</div>`;
   if(ex.type==='teach')renderTeach(ex,box);
   else if(ex.type==='letter')renderLetterCard(ex.l,box,ex);
+  else if(ex.type==='trace')renderTrace(ex,box);
   else if(ex.type==='choice')renderChoice(ex,box);
   else if(ex.type==='build')renderBuild(ex,box);
   else if(ex.type==='match')renderMatch(ex,box);
@@ -41,6 +42,11 @@ function next(){
 function foot(html){$('#lfoot').innerHTML=`<div class="foot-in">${html}</div>`}
 function footCheck(enabled){foot(`<span></span><button class="btn" id="chk" ${enabled?'':'disabled'}>Проверить</button>`);$('#chk').onclick=check}
 function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);$('#nxt').onclick=()=>next();$('#nxt').focus();LS.state='info'}
+/* Пропись в уроке: ошибки не отнимают сердца, можно пропустить */
+function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напишите букву <span class="arm">${esc(ex.key)}</span></h2><p class="tr-hint">Обведите пальцем по порядку штрихов. Зелёная точка — начало.</p><div id="tr-box"></div>`);
+  foot(`<button class="link" id="tr-skip">Пропустить</button><button class="btn" id="nxt" disabled>Дальше</button>`);LS.state='info';
+  $('#nxt').onclick=()=>next();$('#tr-skip').onclick=()=>next();
+  tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}
 function renderTeach(ex,box){box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.title)}</h2><div class="ciro-say stack">${mascot('happy','m-idle',ex.outfit)}<div class="bubble teach">${ex.html}</div></div>`);footNext('Понятно')}
 function exWord(l,ex){const a=ex?ex.a:l.w,m=ex?ex.m:l.m,w=ex||WORDS.find(x=>x.a===l.w);
   return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(a,l.k)}</span>${spk(a,'sm')}</div><div class="ew-mean"><b>${esc(m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(a,l.k)}</div>`}

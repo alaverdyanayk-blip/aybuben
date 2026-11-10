@@ -271,3 +271,14 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 :root[data-theme="dark"] .weak .arm{color:#FF8FA0}
 .snd-row,.nm-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .nm-row{color:var(--muted);font-size:14px}.nm-row .arm{color:var(--ink);font-weight:600}
+
+/* пропись */
+.tracer{display:flex;flex-direction:column;gap:10px}
+.tracer canvas{width:100%;height:clamp(220px,52vw,300px);border-radius:22px;background:var(--surface);box-shadow:0 5px 0 var(--line);touch-action:none;display:block}
+.tracer.ok canvas{box-shadow:0 5px 0 var(--good)}
+.tracer.shake canvas{animation:shake .4s}
+.tr-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tr-msg{font-size:14.5px;font-weight:600;color:var(--muted);flex:1 1 160px}
+.tracer.ok .tr-msg{color:var(--good)}
+.tr-btns{display:flex;gap:8px}
+.tr-hint{margin:-6px 0 0;color:var(--muted);font-size:14.5px}

@@ -35,7 +35,7 @@ function syllables(l,known){const V=['ա','ե','ի','ո','ու','օ','է','ը'];
   return out.slice(0,4)}
 function genLetters(group){
   return ()=>{const before=LETTERS.slice(0,LETTERS.indexOf(group[0])),known=new Set(before.map(l=>l.k));const pool=[...before,...group];const items=[];
-    group.forEach(l=>{known.add(l.k);const ex=pickExample(l,known);items.push({type:'letter',l,ex,syl:ex?null:syllables(l,known)});items.push(qL2S(l,pool,true))});
+    group.forEach(l=>{known.add(l.k);const ex=pickExample(l,known);items.push({type:'letter',l,ex,syl:ex?null:syllables(l,known)});items.push(qL2S(l,pool,true));if(STROKES[l.k])items.push({type:'trace',key:l.k})});
     shuffle(group).forEach(l=>items.push(Math.random()<.5?qS2L(l,pool,true):qL2S(l,pool,true)));
     const cm=caseMatch(group,pool);if(cm)items.push(cm);const cl=group.filter(caseable);if(cl.length)items.push(qCase(pick(cl),pool));
     const okW=WORDS.filter(w=>readable(w,known)),ws=okW.filter(w=>w.u.some(u=>group.some(g=>g.k===u)));
