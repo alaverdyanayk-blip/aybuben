@@ -82,7 +82,6 @@ button:focus-visible{outline-color:var(--brand)}
 .hero-tx p{margin:0;font-size:14.5px;line-height:1.4;color:#FBE9EC}
 .hero .spk.sm{background:rgb(255 255 255/.18);box-shadow:none;border-radius:99px}
 .hero-ciro{grid-area:c;justify-self:end;margin:-52px -4px 0 0;position:relative}
-.hero-ciro::before{content:"";position:absolute;inset:6px -8px -8px;border-radius:50%;background:#fff;opacity:.07;z-index:-1}
 .hero-ciro .mascot{width:124px;height:124px}
 .hero .goal{grid-area:g;flex-direction:row;align-items:center;gap:10px}
 .hero .goal .bar{flex:1;height:12px;background:rgb(0 0 0/.28)}
@@ -239,3 +238,10 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 @keyframes wig{0%,100%{transform:none}25%{transform:rotate(-8deg) scale(1.08)}60%{transform:rotate(7deg) scale(1.08)}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .unlock>b{color:var(--apri)}}
 :root[data-theme="dark"] .unlock>b{color:var(--apri)}
+
+/* плитка с буквой: ярче, буква гранатовая «вырезанная» (в тёмной — абрикосовая) */
+:root{--slab-a:#F2DED6;--slab-b:#E2C4B9;--slab-edge:#C9A497;--glyph:#8A1F33;--glyph-hi:#FFF4EF;--glyph-lo:#5A1220}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--slab-a:#6A4A4F;--slab-b:#4E3539;--slab-edge:#2E1F22;--glyph:#FFC778;--glyph-hi:rgb(255 255 255/.18);--glyph-lo:#2A1A1D}}
+:root[data-theme="dark"]{--slab-a:#6A4A4F;--slab-b:#4E3539;--slab-edge:#2E1F22;--glyph:#FFC778;--glyph-hi:rgb(255 255 255/.18);--glyph-lo:#2A1A1D}
+.big.glyph,.ex .lc-hero{background:radial-gradient(120% 90% at 30% 15%,var(--slab-a),var(--slab-b));box-shadow:0 8px 0 var(--slab-edge),inset 0 2px 0 rgb(255 255 255/.25)}
+.big.glyph,.ex .lc-hero .gl{color:var(--glyph);text-shadow:0 2px 0 var(--glyph-hi),0 -1px 0 var(--glyph-lo)}

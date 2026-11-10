@@ -12,8 +12,9 @@ function friendSheet(c){const s=sheet(`<div class="end" style="padding:0">${masc
   s.el.querySelector('[data-wear2]').onclick=()=>{S.outfit=c.id;save();s.close();route()};confetti()}
 function inviteLink(){return `https://t.me/${BOT}?startapp=r${S.refCode}`}
 const INV_TEXT='Учу читать по-армянски с абрикосом Циро 🍑 Присоединяйся — тебе сразу костюм для Циро!';
-function invite(btn){const go=()=>{if(!S.refCode){if(btn)btn.textContent='Нет связи, попробуйте позже';return}
-   const link=inviteLink();
+/* Без кода (нет связи с сервером) зовём просто в бота — друг не засчитается, но ссылка рабочая. */
+function invite(btn){const go=()=>{
+   const link=S.refCode?inviteLink():`https://t.me/${BOT}`;
    if(TGW&&TGW.openTelegramLink)TGW.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(INV_TEXT));
    else if(navigator.share)navigator.share({text:INV_TEXT,url:link}).catch(()=>{});
    else{try{navigator.clipboard.writeText(INV_TEXT+' '+link);if(btn)btn.textContent='Ссылка скопирована'}catch(e){}}};

@@ -34,7 +34,7 @@ function mascot(mood='happy',cls='',outfit){
  if(outfit===undefined){try{outfit=S.outfit||null}catch(e){outfit=null}}
  const D='#2B1A12',M='#5A2114',ey=mood==='sad'?63:61,px=mood==='think'?-2.5:mood==='sad'?0:1.4,py=mood==='think'?-3:mood==='sad'?2.2:1.4;
  const nub=(x,y,r)=>`<ellipse cx="${x}" cy="${y}" rx="7" ry="10.5" transform="rotate(${r} ${x} ${y})" fill="url(#cg-limb)"/>`;
- const arms=mood==='cheer'?nub(17,40,-35)+nub(103,40,35):nub(16,78,22)+nub(104,78,-22);
+ const arms=mood==='cheer'?nub(17,40,-35)+nub(103,40,35):mood==='think'?nub(16,78,22):nub(16,78,22)+nub(104,78,-22);
  const open=x=>`<ellipse cx="${x}" cy="${ey}" rx="8.7" ry="10.2" fill="#fff" stroke="#C9631C" stroke-opacity=".55" stroke-width="1"/><circle cx="${x+px}" cy="${ey+py}" r="5.6" fill="#4A2A16"/><circle cx="${x+px}" cy="${ey+py+.3}" r="3.5" fill="${D}"/><circle cx="${x+px+2.1}" cy="${ey+py-2.7}" r="2" fill="#fff"/><circle cx="${x+px-2}" cy="${ey+py+2.4}" r=".9" fill="#fff" opacity=".8"/>`;
  const up=x=>`<path d="M${x-7} ${ey+2}Q${x} ${ey-7} ${x+7} ${ey+2}" stroke="${D}" stroke-width="3.6" fill="none" stroke-linecap="round"/>`;
  const dn=x=>`<path d="M${x-7} ${ey}Q${x} ${ey+5} ${x+7} ${ey}" stroke="${D}" stroke-width="3.6" fill="none" stroke-linecap="round"/>`;
