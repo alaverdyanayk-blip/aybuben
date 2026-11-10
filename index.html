@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="0afcf9be54"</script>
+<script>window.BUILD_ID="b2d7ec6726"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -893,6 +893,7 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 :root[data-theme="dark"]{--slab-a:#6A4A4F;--slab-b:#4E3539;--slab-edge:#2E1F22;--glyph:#FFC778;--glyph-hi:rgb(255 255 255/.18);--glyph-lo:#2A1A1D}
 .big.glyph,.ex .lc-hero{background:radial-gradient(120% 90% at 30% 15%,var(--slab-a),var(--slab-b));box-shadow:0 8px 0 var(--slab-edge),inset 0 2px 0 rgb(255 255 255/.25)}
 .big.glyph,.ex .lc-hero .gl{color:var(--glyph);text-shadow:0 2px 0 var(--glyph-hi),0 -1px 0 var(--glyph-lo)}
+.match.lt .mi{font-size:30px;min-height:64px}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -1582,6 +1583,13 @@ function sndOpts(l,pool,strict){const out=[];if(l.p&&BY[l.p]&&(!strict||pool.inc
 function letOpts(l,pool,strict){const out=[];if(l.p&&BY[l.p]&&(!strict||pool.includes(BY[l.p])))out.push(BY[l.p]);for(const x of shuffle(strict||pool.length>=4?pool:LETTERS))if(x!==l&&!out.includes(x)&&x.s!==l.s)out.push(x);return out.slice(0,3)}
 function qL2S(l,pool,strict){const up=l.U!==l.k&&l.U.length===1&&Math.random()<.5;return CH('Как читается эта буква?',up?l.U:l.k,l.s,sndOpts(l,pool,strict),{item:'#'+l.k,bigCls:'glyph',explain:esc(tipOf(l))})}
 function qS2L(l,pool,strict){const up=Math.random()<.5&&l.U!=='և';const d=x=>up&&x.U!=='և'?x.U:x.k;return CH('Какая буква даёт этот звук?',l.s,d(l),letOpts(l,pool,strict).map(d),{item:'#'+l.k,bigCls:'snd',optArm:true,explain:`<span class="a">${l.U}${l.U!==l.k?' '+l.k:''}</span> — «${esc(l.s)}»`})}
+/* Заглавная ↔ строчная: многие пары выглядят по-разному (Ք/ք, Ե/ե, Ղ/ղ), их надо узнавать в обе стороны */
+const caseable=l=>l.U!==l.k&&l.k!=='և';
+function qCase(l,pool){const up=Math.random()<.5,src=(pool.filter(caseable).length>=4?pool:LETTERS).filter(x=>caseable(x)&&x!==l);
+  const wr=shuffle(src).slice(0,3);
+  return CH(up?'Найдите строчную пару':'Найдите заглавную пару',up?l.U:l.k,up?l.k:l.U,wr.map(x=>up?x.k:x.U),{item:'#'+l.k,bigCls:'glyph',optArm:true,explain:`<span class="a">${l.U} ${l.k}</span> — одна и та же буква, «${esc(l.s)}»`})}
+function caseMatch(group,pool){const g=group.filter(caseable),rest=shuffle(pool.filter(x=>caseable(x)&&!g.includes(x)));const ls=[...g,...rest].slice(0,4);
+  return ls.length>=3?MT(ls.map(l=>[l.U,l.k])):null}
 function senses(m){const out=new Set(m.toLowerCase().split(/[,;]/).map(x=>x.replace(/\(.*?\)/g,'').trim()).filter(Boolean));for(const g of SYN)if(g.some(x=>out.has(x)))g.forEach(x=>out.add(x));return out}
 function clash(a,b){if(a===b)return true;const A=senses(a);for(const x of senses(b))if(A.has(x))return true;return false}
 function pairsOf(ws,n){const out=[],ms=[];for(const w of shuffle(ws)){if(out.length>=n)break;if(ms.some(m=>clash(m,w.m)))continue;ms.push(w.m);out.push([w.a,w.m])}return out}
@@ -1601,6 +1609,7 @@ function genLetters(group){
   return ()=>{const before=LETTERS.slice(0,LETTERS.indexOf(group[0])),known=new Set(before.map(l=>l.k));const pool=[...before,...group];const items=[];
     group.forEach(l=>{known.add(l.k);const ex=pickExample(l,known);items.push({type:'letter',l,ex,syl:ex?null:syllables(l,known)});items.push(qL2S(l,pool,true))});
     shuffle(group).forEach(l=>items.push(Math.random()<.5?qS2L(l,pool,true):qL2S(l,pool,true)));
+    const cm=caseMatch(group,pool);if(cm)items.push(cm);const cl=group.filter(caseable);if(cl.length)items.push(qCase(pick(cl),pool));
     const okW=WORDS.filter(w=>readable(w,known)),ws=okW.filter(w=>w.u.some(u=>group.some(g=>g.k===u)));
     if(okW.length>=3){sample(ws,2).forEach(w=>items.push(qRead(w,okW,true)));
       sample(ws.filter(w=>hasAudio(w.a)),1).forEach(w=>items.push(qListen(w,okW,true)))}
@@ -2068,7 +2077,7 @@ const recall=m=>Math.pow(2,-((nowS()-m[1])/86400)/Math.max(0.05,m[0]));
 function dueKeys(){const kn=learnedSet();return Object.keys(S.mem).filter(k=>Array.isArray(S.mem[k])&&recall(S.mem[k])<0.5&&(k[0]==='#'?kn.has(k.slice(1)):(WORDS.find(w=>w.a===k)&&readable(WORDS.find(w=>w.a===k),kn)))).sort((a,b)=>recall(S.mem[a])-recall(S.mem[b]))}
 function learnedSet(){return new Set(LETTERS.filter(letterLearned).map(l=>l.k))}
 function reviewEx(key){const kn=learnedSet(),lp=LETTERS.filter(x=>kn.has(x.k));
-  if(key[0]==='#'){const l=BY[key.slice(1)];if(!l)return null;const st=lp.length>=4;return Math.random()<.5?qS2L(l,st?lp:LETTERS,st):qL2S(l,st?lp:LETTERS,st)}
+  if(key[0]==='#'){const l=BY[key.slice(1)];if(!l)return null;const st=lp.length>=4;const r=Math.random();return caseable(l)&&r<.25?qCase(l,st?lp:LETTERS):r<.62?qS2L(l,st?lp:LETTERS,st):qL2S(l,st?lp:LETTERS,st)}
   const w=WORDS.find(x=>x.a===key);if(!w)return null;const pool=WORDS.filter(x=>readable(x,kn)),pl=pool.length>=6?pool:WORDS;
   const f=[()=>qRead(w,pl),()=>qWrite(w,pl)];if(hasAudio(w.a)){f.push(()=>qListen(w,pl));if(w.u.length<=8)f.push(()=>qDict(w,lp.length>=4?lp:LETTERS))}
   return pick(f)()}
@@ -2271,7 +2280,8 @@ function renderBuild(ex,box){
 function renderMatch(ex,box){
   const left=shuffle(ex.pairs.map((p,i)=>({t:p[0],i}))),right=shuffle(ex.pairs.map((p,i)=>({t:p[1],i})));
   const armL=/[Ա-֏]/.test(ex.pairs[0][0]),armR=/[Ա-֏]/.test(ex.pairs[0][1]);
-  box.insertAdjacentHTML('beforeend',`<h2>Найдите пары</h2><div class="match"><div class="col">${left.map((o,k)=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:1;grid-row:${k+1}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map((o,k)=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:2;grid-row:${k+1}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
+  const lt=ex.pairs.every(p=>[...p[0]].length<=2&&[...p[1]].length<=2);
+  box.insertAdjacentHTML('beforeend',`<h2>${lt?'Заглавная и строчная':'Найдите пары'}</h2><div class="match${lt?' lt':''}"><div class="col">${left.map((o,k)=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:1;grid-row:${k+1}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map((o,k)=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:2;grid-row:${k+1}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
   let selL=null,selR=null,matched=0,errs=0;
   box.querySelectorAll('.mi').forEach(b=>b.onclick=()=>{
     if(ARMRE.test(b.textContent)&&S.voice!==false)say(b.textContent.trim());
@@ -2282,7 +2292,7 @@ function renderMatch(ex,box){
         if(matched===ex.pairs.length){LS.state='checked';LS.done++;LS.combo++;if(errs===0){}feedback(true,errs?`Ошибок в парах: ${errs}`:'Все пары найдены')}}
       else{errs++;a.classList.add('no');c.classList.add('no');sBad();setTimeout(()=>{a.classList.remove('no');c.classList.remove('no')},450)}}
   });
-  foot(`<span style="color:var(--muted)">Нажмите слово слева, потом его пару справа</span><span></span>`);
+  foot(`<span style="color:var(--muted)">${lt?'Нажмите букву слева, потом её пару справа':'Нажмите слово слева, потом его пару справа'}</span><span></span>`);
 }
 function check(){
   const ex=LS.cur;if(LS.state!=='answer')return;let ok=false;

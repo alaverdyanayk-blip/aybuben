@@ -81,7 +81,8 @@ function renderBuild(ex,box){
 function renderMatch(ex,box){
   const left=shuffle(ex.pairs.map((p,i)=>({t:p[0],i}))),right=shuffle(ex.pairs.map((p,i)=>({t:p[1],i})));
   const armL=/[Ա-֏]/.test(ex.pairs[0][0]),armR=/[Ա-֏]/.test(ex.pairs[0][1]);
-  box.insertAdjacentHTML('beforeend',`<h2>Найдите пары</h2><div class="match"><div class="col">${left.map((o,k)=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:1;grid-row:${k+1}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map((o,k)=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:2;grid-row:${k+1}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
+  const lt=ex.pairs.every(p=>[...p[0]].length<=2&&[...p[1]].length<=2);
+  box.insertAdjacentHTML('beforeend',`<h2>${lt?'Заглавная и строчная':'Найдите пары'}</h2><div class="match${lt?' lt':''}"><div class="col">${left.map((o,k)=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:1;grid-row:${k+1}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map((o,k)=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:2;grid-row:${k+1}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
   let selL=null,selR=null,matched=0,errs=0;
   box.querySelectorAll('.mi').forEach(b=>b.onclick=()=>{
     if(ARMRE.test(b.textContent)&&S.voice!==false)say(b.textContent.trim());
@@ -92,7 +93,7 @@ function renderMatch(ex,box){
         if(matched===ex.pairs.length){LS.state='checked';LS.done++;LS.combo++;if(errs===0){}feedback(true,errs?`Ошибок в парах: ${errs}`:'Все пары найдены')}}
       else{errs++;a.classList.add('no');c.classList.add('no');sBad();setTimeout(()=>{a.classList.remove('no');c.classList.remove('no')},450)}}
   });
-  foot(`<span style="color:var(--muted)">Нажмите слово слева, потом его пару справа</span><span></span>`);
+  foot(`<span style="color:var(--muted)">${lt?'Нажмите букву слева, потом её пару справа':'Нажмите слово слева, потом его пару справа'}</span><span></span>`);
 }
 function check(){
   const ex=LS.cur;if(LS.state!=='answer')return;let ok=false;

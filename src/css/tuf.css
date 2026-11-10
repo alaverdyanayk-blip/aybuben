@@ -245,3 +245,4 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 :root[data-theme="dark"]{--slab-a:#6A4A4F;--slab-b:#4E3539;--slab-edge:#2E1F22;--glyph:#FFC778;--glyph-hi:rgb(255 255 255/.18);--glyph-lo:#2A1A1D}
 .big.glyph,.ex .lc-hero{background:radial-gradient(120% 90% at 30% 15%,var(--slab-a),var(--slab-b));box-shadow:0 8px 0 var(--slab-edge),inset 0 2px 0 rgb(255 255 255/.25)}
 .big.glyph,.ex .lc-hero .gl{color:var(--glyph);text-shadow:0 2px 0 var(--glyph-hi),0 -1px 0 var(--glyph-lo)}
+.match.lt .mi{font-size:30px;min-height:64px}

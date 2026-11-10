@@ -11,7 +11,7 @@ const recall=m=>Math.pow(2,-((nowS()-m[1])/86400)/Math.max(0.05,m[0]));
 function dueKeys(){const kn=learnedSet();return Object.keys(S.mem).filter(k=>Array.isArray(S.mem[k])&&recall(S.mem[k])<0.5&&(k[0]==='#'?kn.has(k.slice(1)):(WORDS.find(w=>w.a===k)&&readable(WORDS.find(w=>w.a===k),kn)))).sort((a,b)=>recall(S.mem[a])-recall(S.mem[b]))}
 function learnedSet(){return new Set(LETTERS.filter(letterLearned).map(l=>l.k))}
 function reviewEx(key){const kn=learnedSet(),lp=LETTERS.filter(x=>kn.has(x.k));
-  if(key[0]==='#'){const l=BY[key.slice(1)];if(!l)return null;const st=lp.length>=4;return Math.random()<.5?qS2L(l,st?lp:LETTERS,st):qL2S(l,st?lp:LETTERS,st)}
+  if(key[0]==='#'){const l=BY[key.slice(1)];if(!l)return null;const st=lp.length>=4;const r=Math.random();return caseable(l)&&r<.25?qCase(l,st?lp:LETTERS):r<.62?qS2L(l,st?lp:LETTERS,st):qL2S(l,st?lp:LETTERS,st)}
   const w=WORDS.find(x=>x.a===key);if(!w)return null;const pool=WORDS.filter(x=>readable(x,kn)),pl=pool.length>=6?pool:WORDS;
   const f=[()=>qRead(w,pl),()=>qWrite(w,pl)];if(hasAudio(w.a)){f.push(()=>qListen(w,pl));if(w.u.length<=8)f.push(()=>qDict(w,lp.length>=4?lp:LETTERS))}
   return pick(f)()}

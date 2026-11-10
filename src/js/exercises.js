@@ -11,6 +11,13 @@ function sndOpts(l,pool,strict){const out=[];if(l.p&&BY[l.p]&&(!strict||pool.inc
 function letOpts(l,pool,strict){const out=[];if(l.p&&BY[l.p]&&(!strict||pool.includes(BY[l.p])))out.push(BY[l.p]);for(const x of shuffle(strict||pool.length>=4?pool:LETTERS))if(x!==l&&!out.includes(x)&&x.s!==l.s)out.push(x);return out.slice(0,3)}
 function qL2S(l,pool,strict){const up=l.U!==l.k&&l.U.length===1&&Math.random()<.5;return CH('Как читается эта буква?',up?l.U:l.k,l.s,sndOpts(l,pool,strict),{item:'#'+l.k,bigCls:'glyph',explain:esc(tipOf(l))})}
 function qS2L(l,pool,strict){const up=Math.random()<.5&&l.U!=='և';const d=x=>up&&x.U!=='և'?x.U:x.k;return CH('Какая буква даёт этот звук?',l.s,d(l),letOpts(l,pool,strict).map(d),{item:'#'+l.k,bigCls:'snd',optArm:true,explain:`<span class="a">${l.U}${l.U!==l.k?' '+l.k:''}</span> — «${esc(l.s)}»`})}
+/* Заглавная ↔ строчная: многие пары выглядят по-разному (Ք/ք, Ե/ե, Ղ/ղ), их надо узнавать в обе стороны */
+const caseable=l=>l.U!==l.k&&l.k!=='և';
+function qCase(l,pool){const up=Math.random()<.5,src=(pool.filter(caseable).length>=4?pool:LETTERS).filter(x=>caseable(x)&&x!==l);
+  const wr=shuffle(src).slice(0,3);
+  return CH(up?'Найдите строчную пару':'Найдите заглавную пару',up?l.U:l.k,up?l.k:l.U,wr.map(x=>up?x.k:x.U),{item:'#'+l.k,bigCls:'glyph',optArm:true,explain:`<span class="a">${l.U} ${l.k}</span> — одна и та же буква, «${esc(l.s)}»`})}
+function caseMatch(group,pool){const g=group.filter(caseable),rest=shuffle(pool.filter(x=>caseable(x)&&!g.includes(x)));const ls=[...g,...rest].slice(0,4);
+  return ls.length>=3?MT(ls.map(l=>[l.U,l.k])):null}
 function senses(m){const out=new Set(m.toLowerCase().split(/[,;]/).map(x=>x.replace(/\(.*?\)/g,'').trim()).filter(Boolean));for(const g of SYN)if(g.some(x=>out.has(x)))g.forEach(x=>out.add(x));return out}
 function clash(a,b){if(a===b)return true;const A=senses(a);for(const x of senses(b))if(A.has(x))return true;return false}
 function pairsOf(ws,n){const out=[],ms=[];for(const w of shuffle(ws)){if(out.length>=n)break;if(ms.some(m=>clash(m,w.m)))continue;ms.push(w.m);out.push([w.a,w.m])}return out}
@@ -30,6 +37,7 @@ function genLetters(group){
   return ()=>{const before=LETTERS.slice(0,LETTERS.indexOf(group[0])),known=new Set(before.map(l=>l.k));const pool=[...before,...group];const items=[];
     group.forEach(l=>{known.add(l.k);const ex=pickExample(l,known);items.push({type:'letter',l,ex,syl:ex?null:syllables(l,known)});items.push(qL2S(l,pool,true))});
     shuffle(group).forEach(l=>items.push(Math.random()<.5?qS2L(l,pool,true):qL2S(l,pool,true)));
+    const cm=caseMatch(group,pool);if(cm)items.push(cm);const cl=group.filter(caseable);if(cl.length)items.push(qCase(pick(cl),pool));
     const okW=WORDS.filter(w=>readable(w,known)),ws=okW.filter(w=>w.u.some(u=>group.some(g=>g.k===u)));
     if(okW.length>=3){sample(ws,2).forEach(w=>items.push(qRead(w,okW,true)));
       sample(ws.filter(w=>hasAudio(w.a)),1).forEach(w=>items.push(qListen(w,okW,true)))}
