@@ -170,3 +170,21 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .qc .w{font-size:16.5px;white-space:nowrap}
 .qc .w.arm{font-size:21px}.qc .w.arm.sm{font-size:15px}.qc .w.arm.xs{font-size:12.5px;white-space:normal}
 @media (max-width:640px){.tabs button[aria-selected="true"]{flex:0 1 auto;padding:0 18px}}
+/* слово дня: видно, что звучит */
+.quick{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(0,1fr))}
+.quick:has(.wod+.qc){grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+.qc.wod{flex-direction:row;align-items:center;gap:10px;cursor:pointer}
+.qc.wod .qtx{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.qc.wod:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.qc .w.arm{font-size:24px}.qc .w.arm.sm{font-size:19px}.qc .w.arm.xs{font-size:15px;white-space:normal}
+.fact{margin-top:0}
+/* шесть вкладок */
+@media (max-width:640px){
+  .tabs{padding:6px}
+  .tabs button{flex:1 1 40px;min-width:40px}
+  .tabs button[aria-selected="true"]{flex:0 0 auto;padding:0 14px;gap:6px;font-size:13.5px}
+}
+@media (max-width:1000px) and (min-width:641px){.tabs button{padding:7px 9px}}
+.qc .w.arm.sm{font-size:17px}.qc .w.arm.xs{font-size:14px;white-space:normal}
+.hero-tx .hy b{font-size:clamp(22px,6.6vw,30px)}
+@media (max-width:350px){.tabs button[aria-selected="true"]{flex:1 1 40px;padding:0}.tabs button[aria-selected="true"] span:last-child{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}

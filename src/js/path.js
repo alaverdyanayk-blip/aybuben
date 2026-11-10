@@ -13,17 +13,17 @@ function renderLearn(){
   const kn=new Set(LETTERS.filter(letterLearned).map(l=>l.k)),wr=WORDS.filter(w=>hasAudio(w.a)&&readable(w,kn)),wpool=wr.length>=5?wr:WORDS.filter(w=>hasAudio(w.a)),wod=wpool.length?wpool[Math.floor(Date.now()/864e5)%wpool.length]:null;
   if(S.factI==null)S.factI=Math.floor(Math.random()*FACTS.length);
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
-  const due=dueKeys().length,phN=PHR.filter(p=>phDone(p.id)).length,wl=wod?[...wod.a].length:0;
+  const due=dueKeys().length,wl=wod?[...wod.a].length:0;
   let html=`<div class="home">${whatsNew()}<section class="hero">
     <div class="hero-tx"><div class="hy"><span class="hy-top"><b>${g.hy}!</b>${spk(g.hy,'sm')}</span><span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
     <div class="goal"><div class="bar ${pct>=100?'good':''}" role="img" aria-label="Цель дня: ${tx} из ${S.goal} XP"><i style="width:${pct}%"></i></div><b>${tx} / ${S.goal} XP</b></div>
     <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>
    <div class="quick">
-    ${wod?`<button class="qc" id="wod"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></button>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">после первых букв</span></div>`}
+    ${wod?`<div class="qc wod" id="wod" role="button" tabindex="0" aria-label="Слово дня: послушать"><span class="qtx"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></span>${spk(wod.a)}</div>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">появится после первых букв</span></div>`}
     ${Object.keys(S.done).length?`<button class="qc" id="prac"><span class="lbl">Тренировка</span><span class="w">${due>30?'30+ слов':due?`${due} ${plural(due,'слово','слова','слов')}`:'10 заданий'}</span><span class="m">${due?'пора повторить':'+5 XP и сердце'}</span></button>`:''}
-    <button class="qc" id="phr-tile"><span class="lbl">Фразы</span><span class="w">${phN} из ${PHR.length}</span><span class="m">такси, рынок, кафе…</span></button>
-   </div></div>
+   </div>
+   <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button></div>
   <div class="units">`;
   const curUnit=curIdx<0?-1:LESSONS[curIdx].unit;
   UNITS.forEach((u,ui)=>{const dn=u.lessons.filter(l=>S.done[l.id]).length,all=dn===u.lessons.length,locked=u.lessons.every(l=>!unlocked(LESSONS.indexOf(l)));
@@ -38,7 +38,7 @@ function renderLearn(){
         <span class="st-wrap" ${cur?`style="--p:${Math.round(Math.min(3,done)/3*100)}"`:''}><button class="stone" data-l="${gi}" aria-label="${esc(l.t)}${open?'':' (закрыто)'}" ${l.g.length>2?'style="font-size:19px"':''}>${open||done?esc(l.g):'<svg class="i" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</button></span>
         <span class="lv">${[0,1,2].map(i=>`<b class="${i<Math.min(3,done)?'on':''}"></b>`).join('')}</span><span class="cap">${esc(l.t)}</span></div>`});
     html+='</div></section>'});
-  html+=`</div><button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button><p class="homefoot">Есть идея или нашли ошибку? <a href="${CONTACT.url}" target="_blank" rel="noopener">Напишите @${CONTACT.tg}</a></p>`;
+  html+=`</div><p class="homefoot">Есть идея или нашли ошибку? <a href="${CONTACT.url}" target="_blank" rel="noopener">Напишите @${CONTACT.tg}</a></p>`;
   $('#view').innerHTML=html;
   document.querySelectorAll('.stone').forEach(b=>b.onclick=()=>lessonSheet(+b.dataset.l));
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>guideSheet(+b.dataset.guide));
@@ -46,8 +46,7 @@ function renderLearn(){
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   const pr=$('#prac');if(pr)pr.onclick=startPractice;
-  const wd=$('#wod');if(wd)wd.onclick=()=>say(wod.a);
-  $('#phr-tile').onclick=()=>{location.hash='phrases'};
+  const wd=$('#wod');if(wd){wd.onclick=()=>say(wod.a);wd.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();say(wod.a)}}}
   wireNews();
   document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{EXPANDED.add(+b.dataset.exp);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
   document.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{EXPANDED.delete(+b.dataset.col);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});

@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="b07dd2ec4f"</script>
+<script>window.BUILD_ID="9cc6ed695d"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -818,6 +818,24 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .qc .w{font-size:16.5px;white-space:nowrap}
 .qc .w.arm{font-size:21px}.qc .w.arm.sm{font-size:15px}.qc .w.arm.xs{font-size:12.5px;white-space:normal}
 @media (max-width:640px){.tabs button[aria-selected="true"]{flex:0 1 auto;padding:0 18px}}
+/* слово дня: видно, что звучит */
+.quick{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(0,1fr))}
+.quick:has(.wod+.qc){grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+.qc.wod{flex-direction:row;align-items:center;gap:10px;cursor:pointer}
+.qc.wod .qtx{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.qc.wod:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.qc .w.arm{font-size:24px}.qc .w.arm.sm{font-size:19px}.qc .w.arm.xs{font-size:15px;white-space:normal}
+.fact{margin-top:0}
+/* шесть вкладок */
+@media (max-width:640px){
+  .tabs{padding:6px}
+  .tabs button{flex:1 1 40px;min-width:40px}
+  .tabs button[aria-selected="true"]{flex:0 0 auto;padding:0 14px;gap:6px;font-size:13.5px}
+}
+@media (max-width:1000px) and (min-width:641px){.tabs button{padding:7px 9px}}
+.qc .w.arm.sm{font-size:17px}.qc .w.arm.xs{font-size:14px;white-space:normal}
+.hero-tx .hy b{font-size:clamp(22px,6.6vw,30px)}
+@media (max-width:350px){.tabs button[aria-selected="true"]{flex:1 1 40px;padding:0}.tabs button[aria-selected="true"] span:last-child{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
 </style>
 
 </head>
@@ -826,6 +844,7 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
   <a class="brand" href="#learn" aria-label="Айбубен — на главную"><span id="logo"></span><b class="arm">Այբ<span>ուբեն</span></b></a>
   <nav class="tabs" role="tablist" aria-label="Разделы">
     <button role="tab" data-view="learn"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z"/></svg><span>Учиться</span></button>
+    <button role="tab" data-view="phrases"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 4h14a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-6.2L8 21.6V18H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3zm2 5v2h10V9zm0 4v2h6v-2z"/></svg><span>Фразы</span></button>
     <button role="tab" data-view="games"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.5 7h9a5.5 5.5 0 0 1 5.2 7.3l-1 2.6a2.6 2.6 0 0 1-4.4.8L14.6 16H9.4l-1.7 1.7a2.6 2.6 0 0 1-4.4-.8l-1-2.6A5.5 5.5 0 0 1 7.5 7zM7 10v1.5H5.5V13H7v1.5h1.5V13H10v-1.5H8.5V10zm8.5.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm2 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg><span>Игры</span></button>
     <button role="tab" data-view="alphabet"><span class="abc" aria-hidden="true">Ա</span><span>Буквы</span></button>
     <button role="tab" data-view="rules"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v13H7a1.5 1.5 0 0 0 0 3h12v1H7a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1zm3 4v2h8V7zm0 4v2h6v-2z"/></svg><span>Справка</span></button>
@@ -2014,17 +2033,17 @@ function renderLearn(){
   const kn=new Set(LETTERS.filter(letterLearned).map(l=>l.k)),wr=WORDS.filter(w=>hasAudio(w.a)&&readable(w,kn)),wpool=wr.length>=5?wr:WORDS.filter(w=>hasAudio(w.a)),wod=wpool.length?wpool[Math.floor(Date.now()/864e5)%wpool.length]:null;
   if(S.factI==null)S.factI=Math.floor(Math.random()*FACTS.length);
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
-  const due=dueKeys().length,phN=PHR.filter(p=>phDone(p.id)).length,wl=wod?[...wod.a].length:0;
+  const due=dueKeys().length,wl=wod?[...wod.a].length:0;
   let html=`<div class="home">${whatsNew()}<section class="hero">
     <div class="hero-tx"><div class="hy"><span class="hy-top"><b>${g.hy}!</b>${spk(g.hy,'sm')}</span><span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
     <div class="goal"><div class="bar ${pct>=100?'good':''}" role="img" aria-label="Цель дня: ${tx} из ${S.goal} XP"><i style="width:${pct}%"></i></div><b>${tx} / ${S.goal} XP</b></div>
     <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>
    <div class="quick">
-    ${wod?`<button class="qc" id="wod"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></button>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">после первых букв</span></div>`}
+    ${wod?`<div class="qc wod" id="wod" role="button" tabindex="0" aria-label="Слово дня: послушать"><span class="qtx"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></span>${spk(wod.a)}</div>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">появится после первых букв</span></div>`}
     ${Object.keys(S.done).length?`<button class="qc" id="prac"><span class="lbl">Тренировка</span><span class="w">${due>30?'30+ слов':due?`${due} ${plural(due,'слово','слова','слов')}`:'10 заданий'}</span><span class="m">${due?'пора повторить':'+5 XP и сердце'}</span></button>`:''}
-    <button class="qc" id="phr-tile"><span class="lbl">Фразы</span><span class="w">${phN} из ${PHR.length}</span><span class="m">такси, рынок, кафе…</span></button>
-   </div></div>
+   </div>
+   <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button></div>
   <div class="units">`;
   const curUnit=curIdx<0?-1:LESSONS[curIdx].unit;
   UNITS.forEach((u,ui)=>{const dn=u.lessons.filter(l=>S.done[l.id]).length,all=dn===u.lessons.length,locked=u.lessons.every(l=>!unlocked(LESSONS.indexOf(l)));
@@ -2039,7 +2058,7 @@ function renderLearn(){
         <span class="st-wrap" ${cur?`style="--p:${Math.round(Math.min(3,done)/3*100)}"`:''}><button class="stone" data-l="${gi}" aria-label="${esc(l.t)}${open?'':' (закрыто)'}" ${l.g.length>2?'style="font-size:19px"':''}>${open||done?esc(l.g):'<svg class="i" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</button></span>
         <span class="lv">${[0,1,2].map(i=>`<b class="${i<Math.min(3,done)?'on':''}"></b>`).join('')}</span><span class="cap">${esc(l.t)}</span></div>`});
     html+='</div></section>'});
-  html+=`</div><button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button><p class="homefoot">Есть идея или нашли ошибку? <a href="${CONTACT.url}" target="_blank" rel="noopener">Напишите @${CONTACT.tg}</a></p>`;
+  html+=`</div><p class="homefoot">Есть идея или нашли ошибку? <a href="${CONTACT.url}" target="_blank" rel="noopener">Напишите @${CONTACT.tg}</a></p>`;
   $('#view').innerHTML=html;
   document.querySelectorAll('.stone').forEach(b=>b.onclick=()=>lessonSheet(+b.dataset.l));
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>guideSheet(+b.dataset.guide));
@@ -2047,8 +2066,7 @@ function renderLearn(){
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   const pr=$('#prac');if(pr)pr.onclick=startPractice;
-  const wd=$('#wod');if(wd)wd.onclick=()=>say(wod.a);
-  $('#phr-tile').onclick=()=>{location.hash='phrases'};
+  const wd=$('#wod');if(wd){wd.onclick=()=>say(wod.a);wd.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();say(wod.a)}}}
   wireNews();
   document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{EXPANDED.add(+b.dataset.exp);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
   document.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{EXPANDED.delete(+b.dataset.col);const y=window.scrollY;renderLearn();window.scrollTo(0,y)});
