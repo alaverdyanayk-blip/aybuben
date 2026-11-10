@@ -246,3 +246,26 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .big.glyph,.ex .lc-hero{background:radial-gradient(120% 90% at 30% 15%,var(--slab-a),var(--slab-b));box-shadow:0 8px 0 var(--slab-edge),inset 0 2px 0 rgb(255 255 255/.25)}
 .big.glyph,.ex .lc-hero .gl{color:var(--glyph);text-shadow:0 2px 0 var(--glyph-hi),0 -1px 0 var(--glyph-lo)}
 .match.lt .mi{font-size:30px;min-height:64px}
+
+/* сила памяти по буквам */
+.mem-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.ms{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:8px 10px;border-radius:14px;background:var(--bg);font-size:12.5px;font-weight:600;color:var(--muted)}
+.ms b{font-size:22px;font-weight:800;line-height:1.2;color:var(--ink)}
+.ms.s3 b{color:var(--good)}.ms.s1 b{color:var(--brand)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ms.s1 b{color:#FF8FA0}}
+:root[data-theme="dark"] .ms.s1 b{color:#FF8FA0}
+.weak{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.weak .arm{font-size:22px;font-weight:700;letter-spacing:.06em;color:var(--brand)}
+.mem-ok{margin:10px 0 0;color:var(--muted);font-size:14px}
+.at{position:relative}
+.at .str{display:flex;gap:3px;justify-content:center;margin-top:4px}
+.at .str i{width:12px;height:4px;border-radius:2px;background:var(--line)}
+.at.s1 .str i:nth-child(1){background:var(--brand)}
+.at.s2 .str i:nth-child(-n+2){background:var(--apri)}
+.at.s3 .str i{background:var(--good)}
+.at.s1{box-shadow:0 4px 0 var(--line),inset 0 0 0 2px color-mix(in srgb,var(--brand) 55%,transparent)}
+.at.learned::after{display:none}
+.at.learned{border-color:transparent;background:var(--surface);box-shadow:0 4px 0 var(--line)}
+.at.s1{box-shadow:0 4px 0 color-mix(in srgb,var(--brand) 45%,var(--line)),inset 0 0 0 2px color-mix(in srgb,var(--brand) 45%,transparent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .weak .arm{color:#FF8FA0}}
+:root[data-theme="dark"] .weak .arm{color:#FF8FA0}
