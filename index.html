@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="40f8cbe03d"</script>
+<script>window.BUILD_ID="d03c391d75"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1736,16 +1736,18 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
     <div class="tr-btns"><button class="btn plain sm" data-tr="show">Показать</button><button class="btn plain sm" data-tr="again">Заново</button></div></div></div>`;
   const cv=box.querySelector('canvas'),ctx=cv.getContext('2d'),msg=box.querySelector('.tr-msg');
   let cur=0,mist=0,drawn=[],raw=null,anim=0,done=false,k=1,ox=0,oy=0;
-  const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let COL={},W=0,H=0,dead=false;
+  const readCol=()=>{const cs=getComputedStyle(document.documentElement);['--line','--sunk','--brand','--apri','--apri-deep','--good','--ink'].forEach(n=>COL[n]=cs.getPropertyValue(n).trim())};
+  const css=n=>COL[n];
   const P=([x,y])=>[ox+x*k,oy+(y-TR_TOP)*k];
-  function fit(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);
+  function fit(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;W=r.width;H=r.height;readCol();cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);
     k=Math.min(r.height/(TR_BOT-TR_TOP),r.width/(w+24));ox=(r.width-w*k)/2;oy=(r.height-(TR_BOT-TR_TOP)*k)/2}
   function path(pts,upto=1){const n=Math.max(2,Math.round(pts.length*upto));ctx.beginPath();pts.slice(0,n).forEach((p,i)=>{const [x,y]=P(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y)})}
   function arrow(st,col){const a=st.pts[0],b=st.pts[Math.min(5,st.pts.length-1)],[x,y]=P(a),[x2,y2]=P(b),ang=Math.atan2(y2-y,x2-x);
     ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 11px Golos Text, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(strokes.indexOf(st)+1),x,y+.5);
     const m=st.pts[Math.min(9,st.pts.length-1)],[mx,my]=P(m),m2=st.pts[Math.min(11,st.pts.length-1)],[mx2,my2]=P(m2),aa=Math.atan2(my2-my,mx2-mx);
     ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(mx2-Math.cos(aa-0.5)*8,my2-Math.sin(aa-0.5)*8);ctx.lineTo(mx2,my2);ctx.lineTo(mx2-Math.cos(aa+0.5)*8,my2-Math.sin(aa+0.5)*8);ctx.stroke()}
-  function draw(prog){const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);
+  function draw(prog){if(dead||!W)return;const r={width:W,height:H};ctx.clearRect(0,0,W,H);
     /* линейки прописи */
     const line=(y,dash,a)=>{const [,yy]=P([0,y]);ctx.strokeStyle=css('--line');ctx.globalAlpha=a;ctx.lineWidth=1.5;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(8,yy);ctx.lineTo(r.width-8,yy);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1};
     line(15,[4,6],.8);line(35,[4,6],.9);line(75,[],1);line(92,[4,6],.8);
@@ -1761,7 +1763,7 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
     else if(!done&&strokes[cur])arrow(strokes[cur],css('--good'));
     /* что рисует человек */
     if(raw&&raw.length){ctx.strokeStyle=css('--ink');ctx.globalAlpha=.75;ctx.lineWidth=Math.max(5,k*3.2);ctx.beginPath();raw.forEach((p,i)=>{const [x,y]=P(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.globalAlpha=1}}
-  function show(from=0,to=strokes.length,after){cancelAnimationFrame(anim);const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(from=0,to=strokes.length,after){if(dead)return;cancelAnimationFrame(anim);readCol();const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(reduce){draw();after&&after();return}
     const t0=performance.now(),per=650;const step=now=>{const t=from+Math.max(0,now-t0)/per;if(t>=to){draw();after&&after();return}draw({t});anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
   const inv=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left-ox)/k,(e.clientY-r.top-oy)/k+TR_TOP]};
@@ -1780,8 +1782,8 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
   box.querySelector('[data-tr="show"]').onclick=()=>show(0,strokes.length);
   box.querySelector('[data-tr="again"]').onclick=()=>{cancelAnimationFrame(anim);cur=0;mist=0;done=false;box.querySelector('.tracer').classList.remove('ok');msg.textContent=`Штрих 1 из ${strokes.length}: начните с точки`;draw()};
   const ro=new ResizeObserver(()=>{fit();draw()});ro.observe(cv);
-  fit();draw();if(opts.demo!==false)setTimeout(()=>show(0,strokes.length),350);
-  return {destroy(){ro.disconnect();cancelAnimationFrame(anim)}}}
+  fit();draw();const demoT=opts.demo!==false?setTimeout(()=>show(0,strokes.length),350):0;
+  return {destroy(){dead=true;ro.disconnect();cancelAnimationFrame(anim);clearTimeout(demoT);cv.onpointerdown=cv.onpointermove=cv.onpointerup=cv.onpointercancel=null}}}
 /* Конструкторы упражнений и генераторы уроков алфавита и словарных тем. */
 const CH=(prompt,big,correct,wrong,o={})=>({type:'choice',prompt,big,correct,options:uniq([correct,...wrong]).slice(0,4),...o});
 const PR=(word,correct,wrong,explain)=>CH('Как это читается?',word,correct,wrong,{bigCls:'word',explain});
@@ -2131,6 +2133,7 @@ function upgrade(st){
     if(d!==null&&(v==null||typeof v!==typeof d||Array.isArray(v)!==Array.isArray(d)||(typeof d==='number'&&!isFinite(v))))st[k]=JSON.parse(JSON.stringify(d))}
   st.hearts=Math.max(0,Math.min(MAXH,st.hearts|0));st.xp=Math.max(0,st.xp|0);if(!st.heartsTs)st.heartsTs=Date.now();
   if(st.outfit!=null&&typeof st.outfit!=='string')st.outfit=null;
+  if(!(st.goal>0))st.goal=S0.goal;st.streak=Math.max(0,st.streak|0);
   let v=+st.v;if(!isFinite(v)||v<1)v=1;
   // Если шаг не удался, версия не повышается: шаг повторится при следующем запуске, а не пропадёт молча
   for(;v<SCHEMA;v++){try{MIGRATIONS[v]&&MIGRATIONS[v](st)}catch(e){console.error('миграция '+v,e);break}}
@@ -2194,14 +2197,16 @@ const streakNow=()=>S.lastDay&&daysBetween(S.lastDay,today())<=1?S.streak:0;
 const todayXP=()=>S.daily[today()]||0;
 function hearts(){if(S.hearts>=MAXH){S.heartsTs=Date.now();return MAXH}const n=Math.floor((Date.now()-S.heartsTs)/REGEN);if(n>0){S.hearts=Math.min(MAXH,S.hearts+n);S.heartsTs+=n*REGEN;save()}return S.hearts}
 function addXP(n){S.xp+=n;const t=today();S.daily[t]=(S.daily[t]||0)+n;
-  if(S.lastDay!==t){S.streak=S.lastDay&&daysBetween(S.lastDay,t)===1?S.streak+1:1;S.lastDay=t}
+  /* Часы перевели назад или сменился часовой пояс (последний день занятий «в будущем») — серию не трогаем */
+  const gap=S.lastDay?daysBetween(S.lastDay,t):null;
+  if(gap===null||gap>1){S.streak=1;S.lastDay=t}else if(gap===1){S.streak++;S.lastDay=t}else if(!S.streak)S.streak=1;
   S.best=Math.max(S.best||0,S.streak);save()}
 const level=()=>Math.floor(S.xp/100)+1;
 const unlocked=i=>S.unlockAll||i===0||!!S.done[LESSONS[i].id]||LESSONS.slice(0,i).every(l=>S.done[l.id]);
 function checkAch(){const n=[];ACH.forEach(a=>{if(!S.ach[a.id]&&a.ok()){S.ach[a.id]=today();n.push(a)}});save();return n}
 /* Звук: сигналы интерфейса и озвучка слов. */
 let AC=null;
-function tone(seq){if(!S.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime;seq.forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.09,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.8})}catch(e){}}
+function tone(seq){if(!S.sound)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state!=='running'&&AC.resume)AC.resume();let t=AC.currentTime;seq.forEach(([f,d])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.09,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d);t+=d*.8})}catch(e){}}
 const akey=t=>String(t).replace(/։/g,'').trim().toLowerCase();
 function fnv(t){let h=0x811C9DC5;for(const ch of t){h^=ch.codePointAt(0);h=Math.imul(h,0x01000193)>>>0}return h.toString(16).padStart(8,'0')}
 const hasAudio=t=>t!=null&&AUDIO_KEYS.has(akey(t));
@@ -2209,7 +2214,7 @@ let curAud=null;
 const PLAYER=new Audio();
 PLAYER.preload='auto';
 let audioReady=false;
-function unlockAudio(){if(audioReady)return;audioReady=true;
+function unlockAudio(){if(audioReady){try{if(AC&&AC.state!=='running')AC.resume()}catch(e){}return}audioReady=true;
   try{PLAYER.src='data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//NwwAAAAAAAAAAAAEluZm8AAAAPAAAABAAAAlgAenp6enp6enp6enp6enp6enp6enp6enp6pqampqampqampqampqampqampqampqamptPT09PT09PT09PT09PT09PT09PT09PT09P/////////////////////////////////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQCcQAAAAAAAAJY+/rsqgAAAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NCxKMAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';PLAYER.play().then(()=>PLAYER.pause()).catch(()=>{})}catch(e){}
   try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}}
 document.addEventListener('pointerdown',unlockAudio,{capture:true,once:false});
@@ -2256,7 +2261,7 @@ function phGen2(P){
 function phLesson(P,n){return {id:`ph-${P.id}-${n}`,t:`${P.t} · ${n===1?'фразы':'диалог'}`,ph:{id:P.id,n},gen:()=>n===1?phGen1(P):phGen2(P)}}
 function phStart(P,n){if(hearts()<=0){const s=sheet(`<div class="row">${mascot('sleep')}<h3 style="flex:1">Сердца закончились. Сердечко восстанавливается за 30 минут — или потренируйтесь на пройденном.</h3></div><div class="row"><button class="btn" id="phpr">Тренировка</button><button class="btn plain" data-close>Позже</button></div>`);s.el.querySelector('#phpr').onclick=()=>{s.close();startPractice()};return}
   startLesson(phLesson(P,n),false)}
-function phCard(P){const st=phStars(P),c=COSTUMES.find(x=>x.ph===P.id);
+function phCard(P){const st=phStars(P.id),c=COSTUMES.find(x=>x.ph===P.id);
   return `<button class="phc" data-ph="${P.id}" style="--pc:${P.c}"><span class="phc-art">${mascot(P.mood,'',P.o)}</span><span class="phc-tx"><b>${esc(P.t)}</b><span class="arm hy">${esc(P.hy)}</span><span class="d">${P.ph.length} фраз · ${P.dl.length} диалога</span><span class="phc-st">${[0,1].map(i=>`<i class="${i<st?'on':''}"></i>`).join('')}${phDone(P.id)?`<em>костюм: ${esc(c.t.toLowerCase())}</em>`:''}</span></span></button>`}
 function renderPhrases(sub){const P=PHR.find(p=>p.id===sub);
   if(!P){const n=PHR.filter(p=>phDone(p.id)).length;
@@ -2282,11 +2287,14 @@ function renderPhrases(sub){const P=PHR.find(p=>p.id===sub);
    Вероятность вспомнить p = 2^(−прошло/период). Повторять пора, когда p < 0,5.
    Верный ответ удлиняет период, ошибка — сокращает (как модель half-life regression у Duolingo, только проще). */
 const nowS=()=>Date.now()/1000|0;
-function memUpdate(key,ok){if(!key)return;const t=nowS(),m=S.mem[key];let h;
+function memUpdate(key,ok){if(!key)return;const t=nowS();let m=S.mem[key],h;
+  if(!Array.isArray(m)||!isFinite(m[0])||!isFinite(m[1]))m=null;   // повреждённая запись — считаем, что видим впервые
   if(!m)h=ok?1:0.3;else{const el=(t-m[1])/86400;h=m[0];h=ok?Math.min(180,h*(el>=h*0.5?2.2:1.2)):Math.max(0.2,h*0.4)}
   S.mem[key]=[+h.toFixed(2),t]}
 const recall=m=>Math.pow(2,-((nowS()-m[1])/86400)/Math.max(0.05,m[0]));
-function dueKeys(){const kn=learnedSet();return Object.keys(S.mem).filter(k=>Array.isArray(S.mem[k])&&recall(S.mem[k])<0.5&&(k[0]==='#'?kn.has(k.slice(1)):(WORDS.find(w=>w.a===k)&&readable(WORDS.find(w=>w.a===k),kn)))).sort((a,b)=>recall(S.mem[a])-recall(S.mem[b]))}
+let _wordBy=null;
+const wordBy=a=>{if(!_wordBy||_wordBy.size!==WORDS.length){_wordBy=new Map();WORDS.forEach(w=>_wordBy.set(w.a,w))}return _wordBy.get(a)};
+function dueKeys(){const kn=learnedSet();return Object.keys(S.mem).filter(k=>{const m=S.mem[k];if(!Array.isArray(m)||!(recall(m)<0.5))return false;if(k[0]==='#')return kn.has(k.slice(1));const w=wordBy(k);return !!w&&readable(w,kn)}).sort((a,b)=>recall(S.mem[a])-recall(S.mem[b]))}
 function learnedSet(){return new Set(LETTERS.filter(letterLearned).map(l=>l.k))}
 function reviewEx(key){const kn=learnedSet(),lp=LETTERS.filter(x=>kn.has(x.k));
   if(key[0]==='#'){const l=BY[key.slice(1)];if(!l)return null;const st=lp.length>=4;const r=Math.random();return caseable(l)&&r<.25?qCase(l,st?lp:LETTERS):r<.62?qS2L(l,st?lp:LETTERS,st):qL2S(l,st?lp:LETTERS,st)}
@@ -2419,6 +2427,7 @@ function startPractice(){let items=[];
     shuffle(src).slice(0,4).forEach(l=>more.push(...l.gen().filter(x=>x.type!=='teach'&&x.type!=='letter'&&x.type!=='trace')));items.push(...sample(more,10-items.length))}
   startLesson({id:'practice',t:'Тренировка',gen:()=>shuffle(items)},true)}
 function startLesson(lesson,practice){
+  if($('#lesson'))return;   // уже открыт (двойное нажатие на «Начать»)
   const items=lesson.gen();
   if(!practice&&LESSONS.includes(lesson)){const rv=dueKeys().filter(k=>!items.some(x=>x.item===k)).slice(0,2).map(reviewEx).filter(Boolean).map(x=>({...x,review:true}));
     if(rv.length)items.splice(Math.max(1,items.length-1),0,...rv)}
@@ -2432,13 +2441,14 @@ function startLesson(lesson,practice){
 function quitLesson(){
   if(LS&&LS.done>0&&LS.state!=='end'){const s=sheet(`<div class="row">${mascot('sad')}<h3 style="flex:1">Выйти из урока? Прогресс этого урока не сохранится.</h3></div><div class="row"><button class="btn bad" id="qy">Выйти</button><button class="btn plain" data-close>Остаться</button></div>`);s.el.querySelector('#qy').onclick=()=>{s.close();closeLesson()};return}
   closeLesson()}
-function closeLesson(){const el=$('#lesson');el&&el.remove();if(!$('#layer').children.length)document.body.classList.remove('locked');LS=null;route()}
+function stopTrace(){if(LS&&LS.tr){LS.tr.destroy();LS.tr=null}}
+function closeLesson(){stopTrace();const el=$('#lesson');el&&el.remove();if(!$('#layer').children.length)document.body.classList.remove('locked');LS=null;route()}
 function hudLesson(){$('#lprog').style.width=(LS.total?LS.done/LS.total*100:0)+'%';$('#lhearts').innerHTML=LS.practice?`${IC.heart}∞`:`${IC.heart}${S.hearts}`}
 function next(){
   hudLesson();
   if(!LS.queue.length)return finishLesson();
   if(!LS.practice&&S.hearts<=0)return failLesson();
-  const ex=LS.queue.shift();LS.cur=ex;LS.state='answer';LS.sel=null;
+  stopTrace();const ex=LS.queue.shift();LS.cur=ex;LS.state='answer';LS.sel=null;
   const box=$('#ex');box.innerHTML='';$('#lfoot').className='l-foot';
   box.innerHTML=`<div class="combo">${LS.combo>=3?`<span class="chipf">${IC.flame}${LS.combo} подряд</span>`:''}</div>`;
   if(ex.type==='teach')renderTeach(ex,box);
@@ -2451,13 +2461,16 @@ function next(){
   $('.l-body').scrollTop=0;
 }
 function foot(html){$('#lfoot').innerHTML=`<div class="foot-in">${html}</div>`}
+/* Кнопка появляется там же, где только что нажимали («Проверить» → «Дальше»): второе касание двойного нажатия
+   не должно проскакивать объяснение или карточку новой буквы. Срабатывает только спустя треть секунды после показа. */
+function tapNext(b,fn){const t0=performance.now();b.onclick=e=>{if(e&&e.isTrusted&&e.detail>0&&performance.now()-t0<320)return;fn()}}
 function footCheck(enabled){foot(`<span></span><button class="btn" id="chk" ${enabled?'':'disabled'}>Проверить</button>`);$('#chk').onclick=check}
-function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);$('#nxt').onclick=()=>next();$('#nxt').focus();LS.state='info'}
+function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);tapNext($('#nxt'),()=>next());$('#nxt').focus();LS.state='info'}
 /* Пропись в уроке: ошибки не отнимают сердца, можно пропустить */
 function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напишите букву <span class="arm">${esc(ex.key)}</span></h2><p class="tr-hint">Обведите пальцем по порядку штрихов. Зелёная точка — начало.</p><div id="tr-box"></div>`);
   foot(`<button class="link" id="tr-skip">Пропустить</button><button class="btn" id="nxt" disabled>Дальше</button>`);LS.state='info';
   $('#nxt').onclick=()=>next();$('#tr-skip').onclick=()=>next();
-  tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}
+  LS.tr=tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}
 function renderTeach(ex,box){box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.title)}</h2><div class="ciro-say stack">${mascot('happy','m-idle',ex.outfit)}<div class="bubble teach">${ex.html}</div></div>`);footNext('Понятно')}
 function exWord(l,ex){const a=ex?ex.a:l.w,m=ex?ex.m:l.m,w=ex||WORDS.find(x=>x.a===l.w);
   return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(a,l.k)}</span>${spk(a,'sm')}</div><div class="ew-mean"><b>${esc(m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(a,l.k)}</div>`}
@@ -2502,12 +2515,13 @@ function renderMatch(ex,box){
   box.insertAdjacentHTML('beforeend',`<h2>${lt?'Заглавная и строчная':'Найдите пары'}</h2><div class="match${lt?' lt':''}"><div class="col">${left.map((o,k)=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:1;grid-row:${k+1}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map((o,k)=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:2;grid-row:${k+1}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
   let selL=null,selR=null,matched=0,errs=0;
   box.querySelectorAll('.mi').forEach(b=>b.onclick=()=>{
-    if(ARMRE.test(b.textContent)&&S.voice!==false)say(b.textContent.trim());
+    if(!lt&&ARMRE.test(b.textContent)&&S.voice!==false)say(b.textContent.trim());
     if(b.dataset.s==='L'){selL=b;box.querySelectorAll('.mi[data-s="L"]').forEach(x=>x.setAttribute('aria-pressed',x===b))}else{selR=b;box.querySelectorAll('.mi[data-s="R"]').forEach(x=>x.setAttribute('aria-pressed',x===b))}
     if(selL&&selR){const ok=selL.dataset.i===selR.dataset.i,a=selL,c=selR;selL=selR=null;
       [a,c].forEach(x=>x.setAttribute('aria-pressed','false'));
-      if(ok){a.classList.add('ok');c.classList.add('ok');matched++;if(!(S.voice!==false&&(ARMRE.test(a.textContent)||ARMRE.test(c.textContent))))tone([[700+matched*60,.1]]);
-        if(matched===ex.pairs.length){LS.state='checked';LS.done++;LS.combo++;if(errs===0){}feedback(true,errs?`Ошибок в парах: ${errs}`:'Все пары найдены')}}
+      if(ok){a.classList.add('ok');c.classList.add('ok');matched++;const lk=lt&&BY[units(c.textContent.trim())[0]];
+        if(lk&&S.voice!==false&&say(letterSnd(lk))){}else if(lt||!(S.voice!==false&&(ARMRE.test(a.textContent)||ARMRE.test(c.textContent))))tone([[700+matched*60,.1]]);
+        if(matched===ex.pairs.length){LS.state='checked';LS.done++;LS.combo++;LS.best=Math.max(LS.best,LS.combo);feedback(true,errs?`Ошибок в парах: ${errs}`:'Все пары найдены')}}
       else{errs++;a.classList.add('no');c.classList.add('no');sBad();setTimeout(()=>{a.classList.remove('no');c.classList.remove('no')},450)}}
   });
   foot(`<span style="color:var(--muted)">${lt?'Нажмите букву слева, потом её пару справа':'Нажмите слово слева, потом его пару справа'}</span><span></span>`);
@@ -2535,7 +2549,7 @@ function feedback(ok,detail){
   const p=pick(PRAISE),hot=ok&&LS.combo>=3;
   const title=ok?`<span class="arm">${p[0]}</span><span class="tr">${hot?`${LS.combo} подряд — ты в ударе!`:p[1]}</span>`:'Не совсем';
   foot(`<div class="fb">${mascot(ok?(hot?'cheer':'happy'):'sad',ok?'m-jump':'m-shake')}<div style="min-width:0"><div class="t">${title}</div>${ok?'':`<div class="ciro-line">${pick(OOPS)}</div>`}<div class="d">${detail||''}</div></div></div><button class="btn ${ok?'good':'bad'}" id="nxt">Дальше</button>`);
-  $('#nxt').onclick=()=>next();$('#nxt').focus();
+  tapNext($('#nxt'),()=>next());$('#nxt').focus();
 }
 function finishLesson(){
   LS.state='end';const prac=LS.practice,perfect=LS.mistakes===0;
@@ -2555,13 +2569,13 @@ function finishLesson(){
    ${mile}${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}
    <div class="tiles3"><div class="stat" style="--c:var(--gold-deep)"><div class="h">XP</div><div class="v">+${xp}</div></div><div class="stat" style="--c:var(--good)"><div class="h">Точность</div><div class="v">${acc}%</div></div><div class="stat" style="--c:var(--b3)"><div class="h">Время</div><div class="v">${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</div></div></div>
    ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<span class="chip">${IC[a.ic]} ${esc(a.t)}</span>`).join('')}</div></div>`:''}${!prac?askNotif():''}${!prac&&!PL?inviteNudge():''}</div>`;
-  $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);$('#nxt').onclick=closeLesson;$('#nxt').focus();
+  $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);tapNext($('#nxt'),closeLesson);$('#nxt').focus();
   wireWear('#end-ciro');wireGrowth();sWin();confetti();
 }
 function failLesson(){LS.state='end';if(LS.lesson.id!=='practice')track('fail',lref(LS.lesson));
   $('#ex').innerHTML=`<div class="end">${mascot('sleep','m-idle')}<h2 style="color:var(--bad)">Сердца закончились</h2><div class="bubble">Сердечко восстанавливается за 30 минут. Или давай потренируемся на пройденном — сразу получишь одно.</div></div>`;
   $('#lfoot').className='l-foot';foot(`<button class="btn plain" id="out">Выйти</button><button class="btn" id="pr">Тренировка</button>`);
-  $('#out').onclick=closeLesson;$('#pr').onclick=()=>{const el=$('#lesson');el&&el.remove();LS=null;startPractice()}}
+  $('#out').onclick=closeLesson;$('#pr').onclick=()=>{stopTrace();const el=$('#lesson');el&&el.remove();LS=null;startPractice()}}
 function costumeUnlock(id){const c=COSTUMES.find(x=>x.ph===id);return `<div class="unlock"><b>Новый костюм для Циро!</b><div class="unlock-item">${mascot('cheer','',c.id)}<div>Циро теперь <b>${esc(c.t.toLowerCase())}</b><br><button class="btn plain sm" data-wear="${c.id}">Надеть</button></div></div></div>`}
 function levelUps(lvBefore){const lv=level();if(lv<=lvBefore)return '';const items=OUTFITS.filter(o=>o.id&&o.lv>lvBefore&&o.lv<=lv);
   return `<div class="unlock"><b>Новый уровень: ${lv}</b>${items.map(o=>`<div class="unlock-item">${mascot('cheer','',o.id)}<div>Новая вещь для Циро: <b>${o.t}</b><br><button class="btn plain sm" data-wear="${o.id}">Надеть</button></div></div>`).join('')}</div>`}
@@ -2608,7 +2622,7 @@ function renderGames(){const mx=gameMax();
   <div class="games">${GAMES.map(g=>{const st=S.games[recKey(g.id,defMode(g))];return `<button class="gcard" data-g="${g.id}" style="--c:var(${g.c})"><span class="gart arm">${g.g}</span><span class="gtx"><b>${g.t}${g.isNew?'':''}</b><span>${g.d}</span><span class="gbest">${st?`Рекорд: ${st.best} ${g.unit} · игр: ${st.plays}`:'Ещё не играли'}</span></span></button>`}).join('')}</div></div>`;
   document.querySelectorAll('.gcard').forEach(b=>b.onclick=()=>openGame(b.dataset.g));
 }
-function openGame(id){const g=GAMES.find(x=>x.id===id),mx=gameMax();
+function openGame(id){if($('#game'))return;const g=GAMES.find(x=>x.id===id),mx=gameMax();
   let set=S.gameSet&&S.gameSet.k?Object.assign({},S.gameSet):{k:'abc',lvl:mx};
   if(set.k==='abc')set.lvl=Math.min(set.lvl||mx,mx);if(set.k==='theme'&&!THEMES.some(t=>t.id===set.id))set={k:'abc',lvl:mx};
   G={g,set,mode:defMode(g),timers:[],raf:0,miss:[]};
@@ -2743,10 +2757,10 @@ PLAY.odd=function(){gStop();const th=oddThemes();const N=10;let round=0,right=0;
     const three=[];for(const w of shuffle(M.ws)){if(three.length>=3)break;if(!three.some(x=>clash(x.m,w.m)))three.push(w)}
     const adjM=M.t.id==='adj'||M.t.id==='colors';
     const others=th.filter(x=>x.t.id!==M.t.id&&!(adjM&&(x.t.id==='adj'||x.t.id==='colors'))).flatMap(x=>x.ws.map(w=>({w,t:x.t}))).filter(o=>!M.t.words.includes(o.w)&&!three.some(x=>clash(x.m,o.w.m))&&!(adjM&&ODD_ADJ.has(o.w.a)));
-    const fresh=others.filter(o=>!used.has(o.w.a));const O=pick(fresh.length?fresh:others);used.add(O.w.a);
+    const fresh=others.filter(o=>!used.has(o.w.a));const O=pick(fresh.length?fresh:others);if(!O||three.length<3)return null;used.add(O.w.a);
     return {M:M.t,O:O.t,odd:O.w,items:shuffle([...three.map(w=>({w,t:M.t})),{w:O.w,t:O.t}])}}
   function next(){if(round>=N)return gameOver(right,right,`Верно ${right} из ${N}`);
-    const R=makeRound();G.R=R;G.done=false;
+    let R=null;for(let i=0;i<20&&!R;i++)R=makeRound();if(!R)return gameOver(right,right,`Верно ${right} из ${round}`);G.R=R;G.done=false;
     gstat(`<span class="pill">${round+1}/${N}</span><span class="pill">${IC.star}${right}</span>`);
     $('#gbody').innerHTML=`<h2>Какое слово лишнее?</h2><p class="sub" style="margin:0;text-align:left">Три слова — из одной темы, одно — из другой.</p><div class="opts odd">${R.items.map((x,i)=>`<button class="opt arm" data-i="${i}"><span class="k">${i+1}</span><span class="ow">${esc(x.w.a)}</span><span class="om">${esc(x.w.m)}<i>${esc(x.t.t)}</i></span></button>`).join('')}</div>`;
     gfoot(`<span style="color:var(--muted)">Подсказка: подумайте, о чём три слова</span><span></span>`);
@@ -2814,7 +2828,7 @@ function letterSheet(k){const l=BY[k];
    <div class="lc-hero" style="border:0;padding:0"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="snd-row"><span class="chip lg">${esc(l.s)}</span>${spk(letterSnd(l))}</span><span class="nm-row">Название: «${esc(l.nm)}» <span class="arm">${esc(l.hn)}</span>${spk(l.hn,'sm')}</span></div></div>
    <p style="margin:0">${esc(tipOf(l))}</p>${exWord(l)}
    <div class="row" style="justify-content:space-between"><b>Пропишите букву</b><div class="seg">${l.U!==l.k&&l.U!=='Ու'?`<button data-c="U" aria-pressed="${traceCase==='U'}" class="arm">${l.U}</button><button data-c="l" aria-pressed="${traceCase==='l'}" class="arm">${l.k}</button>`:''}<button id="clr">Стереть</button></div></div>
-   <canvas id="cv" aria-label="Поле для письма"></canvas>`);
+   <canvas id="cv" aria-label="Поле для письма"></canvas>`,()=>{if(_tr){_tr.destroy();_tr=null}});
   setupCanvas(l);
   s.el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{traceCase=b.dataset.c;s.el.querySelectorAll('[data-c]').forEach(x=>x.setAttribute('aria-pressed',x===b));setupCanvas(l)});
 }
@@ -2889,7 +2903,7 @@ function renderProfile(){
     <div class="toggle"><span>Звуки в уроках</span><button class="switch" role="switch" id="sw-sound" aria-checked="${S.sound}" aria-label="Звуки"></button></div>
     <div class="toggle"><span>Открыть все уроки<br><span class="note">Для тех, кто уже знает часть материала</span></span><button class="switch" role="switch" id="sw-all" aria-checked="${S.unlockAll}" aria-label="Открыть все уроки"></button></div>
     <div class="row"><button class="btn plain" id="reset">Сбросить прогресс</button><span id="rs-confirm"></span></div>
-    <p class="note">Прогресс хранится в этом браузере на этом устройстве.</p></div>
+    <p class="note">${TGW?'Прогресс хранится в облаке Телеграма: он общий для телефона и компьютера.':'Прогресс хранится в этом браузере на этом устройстве.'}</p></div>
   </div>`;
   document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.g;save();route()});
   document.querySelectorAll('.wr-item').forEach(b=>b.onclick=()=>{S.outfit=b.dataset.o||null;save();route()});

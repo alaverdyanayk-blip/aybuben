@@ -24,7 +24,7 @@ function letterSheet(k){const l=BY[k];
    <div class="lc-hero" style="border:0;padding:0"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="snd-row"><span class="chip lg">${esc(l.s)}</span>${spk(letterSnd(l))}</span><span class="nm-row">Название: «${esc(l.nm)}» <span class="arm">${esc(l.hn)}</span>${spk(l.hn,'sm')}</span></div></div>
    <p style="margin:0">${esc(tipOf(l))}</p>${exWord(l)}
    <div class="row" style="justify-content:space-between"><b>Пропишите букву</b><div class="seg">${l.U!==l.k&&l.U!=='Ու'?`<button data-c="U" aria-pressed="${traceCase==='U'}" class="arm">${l.U}</button><button data-c="l" aria-pressed="${traceCase==='l'}" class="arm">${l.k}</button>`:''}<button id="clr">Стереть</button></div></div>
-   <canvas id="cv" aria-label="Поле для письма"></canvas>`);
+   <canvas id="cv" aria-label="Поле для письма"></canvas>`,()=>{if(_tr){_tr.destroy();_tr=null}});
   setupCanvas(l);
   s.el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{traceCase=b.dataset.c;s.el.querySelectorAll('[data-c]').forEach(x=>x.setAttribute('aria-pressed',x===b));setupCanvas(l)});
 }

@@ -31,7 +31,7 @@ function renderGames(){const mx=gameMax();
   <div class="games">${GAMES.map(g=>{const st=S.games[recKey(g.id,defMode(g))];return `<button class="gcard" data-g="${g.id}" style="--c:var(${g.c})"><span class="gart arm">${g.g}</span><span class="gtx"><b>${g.t}${g.isNew?'':''}</b><span>${g.d}</span><span class="gbest">${st?`Рекорд: ${st.best} ${g.unit} · игр: ${st.plays}`:'Ещё не играли'}</span></span></button>`}).join('')}</div></div>`;
   document.querySelectorAll('.gcard').forEach(b=>b.onclick=()=>openGame(b.dataset.g));
 }
-function openGame(id){const g=GAMES.find(x=>x.id===id),mx=gameMax();
+function openGame(id){if($('#game'))return;const g=GAMES.find(x=>x.id===id),mx=gameMax();
   let set=S.gameSet&&S.gameSet.k?Object.assign({},S.gameSet):{k:'abc',lvl:mx};
   if(set.k==='abc')set.lvl=Math.min(set.lvl||mx,mx);if(set.k==='theme'&&!THEMES.some(t=>t.id===set.id))set={k:'abc',lvl:mx};
   G={g,set,mode:defMode(g),timers:[],raf:0,miss:[]};
@@ -166,10 +166,10 @@ PLAY.odd=function(){gStop();const th=oddThemes();const N=10;let round=0,right=0;
     const three=[];for(const w of shuffle(M.ws)){if(three.length>=3)break;if(!three.some(x=>clash(x.m,w.m)))three.push(w)}
     const adjM=M.t.id==='adj'||M.t.id==='colors';
     const others=th.filter(x=>x.t.id!==M.t.id&&!(adjM&&(x.t.id==='adj'||x.t.id==='colors'))).flatMap(x=>x.ws.map(w=>({w,t:x.t}))).filter(o=>!M.t.words.includes(o.w)&&!three.some(x=>clash(x.m,o.w.m))&&!(adjM&&ODD_ADJ.has(o.w.a)));
-    const fresh=others.filter(o=>!used.has(o.w.a));const O=pick(fresh.length?fresh:others);used.add(O.w.a);
+    const fresh=others.filter(o=>!used.has(o.w.a));const O=pick(fresh.length?fresh:others);if(!O||three.length<3)return null;used.add(O.w.a);
     return {M:M.t,O:O.t,odd:O.w,items:shuffle([...three.map(w=>({w,t:M.t})),{w:O.w,t:O.t}])}}
   function next(){if(round>=N)return gameOver(right,right,`Верно ${right} из ${N}`);
-    const R=makeRound();G.R=R;G.done=false;
+    let R=null;for(let i=0;i<20&&!R;i++)R=makeRound();if(!R)return gameOver(right,right,`Верно ${right} из ${round}`);G.R=R;G.done=false;
     gstat(`<span class="pill">${round+1}/${N}</span><span class="pill">${IC.star}${right}</span>`);
     $('#gbody').innerHTML=`<h2>Какое слово лишнее?</h2><p class="sub" style="margin:0;text-align:left">Три слова — из одной темы, одно — из другой.</p><div class="opts odd">${R.items.map((x,i)=>`<button class="opt arm" data-i="${i}"><span class="k">${i+1}</span><span class="ow">${esc(x.w.a)}</span><span class="om">${esc(x.w.m)}<i>${esc(x.t.t)}</i></span></button>`).join('')}</div>`;
     gfoot(`<span style="color:var(--muted)">Подсказка: подумайте, о чём три слова</span><span></span>`);

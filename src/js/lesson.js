@@ -8,6 +8,7 @@ function startPractice(){let items=[];
     shuffle(src).slice(0,4).forEach(l=>more.push(...l.gen().filter(x=>x.type!=='teach'&&x.type!=='letter'&&x.type!=='trace')));items.push(...sample(more,10-items.length))}
   startLesson({id:'practice',t:'Тренировка',gen:()=>shuffle(items)},true)}
 function startLesson(lesson,practice){
+  if($('#lesson'))return;   // уже открыт (двойное нажатие на «Начать»)
   const items=lesson.gen();
   if(!practice&&LESSONS.includes(lesson)){const rv=dueKeys().filter(k=>!items.some(x=>x.item===k)).slice(0,2).map(reviewEx).filter(Boolean).map(x=>({...x,review:true}));
     if(rv.length)items.splice(Math.max(1,items.length-1),0,...rv)}
@@ -21,13 +22,14 @@ function startLesson(lesson,practice){
 function quitLesson(){
   if(LS&&LS.done>0&&LS.state!=='end'){const s=sheet(`<div class="row">${mascot('sad')}<h3 style="flex:1">Выйти из урока? Прогресс этого урока не сохранится.</h3></div><div class="row"><button class="btn bad" id="qy">Выйти</button><button class="btn plain" data-close>Остаться</button></div>`);s.el.querySelector('#qy').onclick=()=>{s.close();closeLesson()};return}
   closeLesson()}
-function closeLesson(){const el=$('#lesson');el&&el.remove();if(!$('#layer').children.length)document.body.classList.remove('locked');LS=null;route()}
+function stopTrace(){if(LS&&LS.tr){LS.tr.destroy();LS.tr=null}}
+function closeLesson(){stopTrace();const el=$('#lesson');el&&el.remove();if(!$('#layer').children.length)document.body.classList.remove('locked');LS=null;route()}
 function hudLesson(){$('#lprog').style.width=(LS.total?LS.done/LS.total*100:0)+'%';$('#lhearts').innerHTML=LS.practice?`${IC.heart}∞`:`${IC.heart}${S.hearts}`}
 function next(){
   hudLesson();
   if(!LS.queue.length)return finishLesson();
   if(!LS.practice&&S.hearts<=0)return failLesson();
-  const ex=LS.queue.shift();LS.cur=ex;LS.state='answer';LS.sel=null;
+  stopTrace();const ex=LS.queue.shift();LS.cur=ex;LS.state='answer';LS.sel=null;
   const box=$('#ex');box.innerHTML='';$('#lfoot').className='l-foot';
   box.innerHTML=`<div class="combo">${LS.combo>=3?`<span class="chipf">${IC.flame}${LS.combo} подряд</span>`:''}</div>`;
   if(ex.type==='teach')renderTeach(ex,box);
@@ -40,13 +42,16 @@ function next(){
   $('.l-body').scrollTop=0;
 }
 function foot(html){$('#lfoot').innerHTML=`<div class="foot-in">${html}</div>`}
+/* Кнопка появляется там же, где только что нажимали («Проверить» → «Дальше»): второе касание двойного нажатия
+   не должно проскакивать объяснение или карточку новой буквы. Срабатывает только спустя треть секунды после показа. */
+function tapNext(b,fn){const t0=performance.now();b.onclick=e=>{if(e&&e.isTrusted&&e.detail>0&&performance.now()-t0<320)return;fn()}}
 function footCheck(enabled){foot(`<span></span><button class="btn" id="chk" ${enabled?'':'disabled'}>Проверить</button>`);$('#chk').onclick=check}
-function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);$('#nxt').onclick=()=>next();$('#nxt').focus();LS.state='info'}
+function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);tapNext($('#nxt'),()=>next());$('#nxt').focus();LS.state='info'}
 /* Пропись в уроке: ошибки не отнимают сердца, можно пропустить */
 function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напишите букву <span class="arm">${esc(ex.key)}</span></h2><p class="tr-hint">Обведите пальцем по порядку штрихов. Зелёная точка — начало.</p><div id="tr-box"></div>`);
   foot(`<button class="link" id="tr-skip">Пропустить</button><button class="btn" id="nxt" disabled>Дальше</button>`);LS.state='info';
   $('#nxt').onclick=()=>next();$('#tr-skip').onclick=()=>next();
-  tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}
+  LS.tr=tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}
 function renderTeach(ex,box){box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.title)}</h2><div class="ciro-say stack">${mascot('happy','m-idle',ex.outfit)}<div class="bubble teach">${ex.html}</div></div>`);footNext('Понятно')}
 function exWord(l,ex){const a=ex?ex.a:l.w,m=ex?ex.m:l.m,w=ex||WORDS.find(x=>x.a===l.w);
   return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(a,l.k)}</span>${spk(a,'sm')}</div><div class="ew-mean"><b>${esc(m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(a,l.k)}</div>`}
@@ -91,12 +96,13 @@ function renderMatch(ex,box){
   box.insertAdjacentHTML('beforeend',`<h2>${lt?'Заглавная и строчная':'Найдите пары'}</h2><div class="match${lt?' lt':''}"><div class="col">${left.map((o,k)=>`<button class="mi ${armL?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:1;grid-row:${k+1}" data-s="L" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div><div class="col">${right.map((o,k)=>`<button class="mi ${armR?'arm':''} ${o.t.length>11?'long':''}" style="grid-column:2;grid-row:${k+1}" data-s="R" data-i="${o.i}" aria-pressed="false">${esc(o.t)}</button>`).join('')}</div></div>`);
   let selL=null,selR=null,matched=0,errs=0;
   box.querySelectorAll('.mi').forEach(b=>b.onclick=()=>{
-    if(ARMRE.test(b.textContent)&&S.voice!==false)say(b.textContent.trim());
+    if(!lt&&ARMRE.test(b.textContent)&&S.voice!==false)say(b.textContent.trim());
     if(b.dataset.s==='L'){selL=b;box.querySelectorAll('.mi[data-s="L"]').forEach(x=>x.setAttribute('aria-pressed',x===b))}else{selR=b;box.querySelectorAll('.mi[data-s="R"]').forEach(x=>x.setAttribute('aria-pressed',x===b))}
     if(selL&&selR){const ok=selL.dataset.i===selR.dataset.i,a=selL,c=selR;selL=selR=null;
       [a,c].forEach(x=>x.setAttribute('aria-pressed','false'));
-      if(ok){a.classList.add('ok');c.classList.add('ok');matched++;if(!(S.voice!==false&&(ARMRE.test(a.textContent)||ARMRE.test(c.textContent))))tone([[700+matched*60,.1]]);
-        if(matched===ex.pairs.length){LS.state='checked';LS.done++;LS.combo++;if(errs===0){}feedback(true,errs?`Ошибок в парах: ${errs}`:'Все пары найдены')}}
+      if(ok){a.classList.add('ok');c.classList.add('ok');matched++;const lk=lt&&BY[units(c.textContent.trim())[0]];
+        if(lk&&S.voice!==false&&say(letterSnd(lk))){}else if(lt||!(S.voice!==false&&(ARMRE.test(a.textContent)||ARMRE.test(c.textContent))))tone([[700+matched*60,.1]]);
+        if(matched===ex.pairs.length){LS.state='checked';LS.done++;LS.combo++;LS.best=Math.max(LS.best,LS.combo);feedback(true,errs?`Ошибок в парах: ${errs}`:'Все пары найдены')}}
       else{errs++;a.classList.add('no');c.classList.add('no');sBad();setTimeout(()=>{a.classList.remove('no');c.classList.remove('no')},450)}}
   });
   foot(`<span style="color:var(--muted)">${lt?'Нажмите букву слева, потом её пару справа':'Нажмите слово слева, потом его пару справа'}</span><span></span>`);
@@ -124,7 +130,7 @@ function feedback(ok,detail){
   const p=pick(PRAISE),hot=ok&&LS.combo>=3;
   const title=ok?`<span class="arm">${p[0]}</span><span class="tr">${hot?`${LS.combo} подряд — ты в ударе!`:p[1]}</span>`:'Не совсем';
   foot(`<div class="fb">${mascot(ok?(hot?'cheer':'happy'):'sad',ok?'m-jump':'m-shake')}<div style="min-width:0"><div class="t">${title}</div>${ok?'':`<div class="ciro-line">${pick(OOPS)}</div>`}<div class="d">${detail||''}</div></div></div><button class="btn ${ok?'good':'bad'}" id="nxt">Дальше</button>`);
-  $('#nxt').onclick=()=>next();$('#nxt').focus();
+  tapNext($('#nxt'),()=>next());$('#nxt').focus();
 }
 function finishLesson(){
   LS.state='end';const prac=LS.practice,perfect=LS.mistakes===0;
@@ -144,13 +150,13 @@ function finishLesson(){
    ${mile}${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}
    <div class="tiles3"><div class="stat" style="--c:var(--gold-deep)"><div class="h">XP</div><div class="v">+${xp}</div></div><div class="stat" style="--c:var(--good)"><div class="h">Точность</div><div class="v">${acc}%</div></div><div class="stat" style="--c:var(--b3)"><div class="h">Время</div><div class="v">${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</div></div></div>
    ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<span class="chip">${IC[a.ic]} ${esc(a.t)}</span>`).join('')}</div></div>`:''}${!prac?askNotif():''}${!prac&&!PL?inviteNudge():''}</div>`;
-  $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);$('#nxt').onclick=closeLesson;$('#nxt').focus();
+  $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);tapNext($('#nxt'),closeLesson);$('#nxt').focus();
   wireWear('#end-ciro');wireGrowth();sWin();confetti();
 }
 function failLesson(){LS.state='end';if(LS.lesson.id!=='practice')track('fail',lref(LS.lesson));
   $('#ex').innerHTML=`<div class="end">${mascot('sleep','m-idle')}<h2 style="color:var(--bad)">Сердца закончились</h2><div class="bubble">Сердечко восстанавливается за 30 минут. Или давай потренируемся на пройденном — сразу получишь одно.</div></div>`;
   $('#lfoot').className='l-foot';foot(`<button class="btn plain" id="out">Выйти</button><button class="btn" id="pr">Тренировка</button>`);
-  $('#out').onclick=closeLesson;$('#pr').onclick=()=>{const el=$('#lesson');el&&el.remove();LS=null;startPractice()}}
+  $('#out').onclick=closeLesson;$('#pr').onclick=()=>{stopTrace();const el=$('#lesson');el&&el.remove();LS=null;startPractice()}}
 function costumeUnlock(id){const c=COSTUMES.find(x=>x.ph===id);return `<div class="unlock"><b>Новый костюм для Циро!</b><div class="unlock-item">${mascot('cheer','',c.id)}<div>Циро теперь <b>${esc(c.t.toLowerCase())}</b><br><button class="btn plain sm" data-wear="${c.id}">Надеть</button></div></div></div>`}
 function levelUps(lvBefore){const lv=level();if(lv<=lvBefore)return '';const items=OUTFITS.filter(o=>o.id&&o.lv>lvBefore&&o.lv<=lv);
   return `<div class="unlock"><b>Новый уровень: ${lv}</b>${items.map(o=>`<div class="unlock-item">${mascot('cheer','',o.id)}<div>Новая вещь для Циро: <b>${o.t}</b><br><button class="btn plain sm" data-wear="${o.id}">Надеть</button></div></div>`).join('')}</div>`}

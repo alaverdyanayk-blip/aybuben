@@ -20,6 +20,7 @@ function upgrade(st){
     if(d!==null&&(v==null||typeof v!==typeof d||Array.isArray(v)!==Array.isArray(d)||(typeof d==='number'&&!isFinite(v))))st[k]=JSON.parse(JSON.stringify(d))}
   st.hearts=Math.max(0,Math.min(MAXH,st.hearts|0));st.xp=Math.max(0,st.xp|0);if(!st.heartsTs)st.heartsTs=Date.now();
   if(st.outfit!=null&&typeof st.outfit!=='string')st.outfit=null;
+  if(!(st.goal>0))st.goal=S0.goal;st.streak=Math.max(0,st.streak|0);
   let v=+st.v;if(!isFinite(v)||v<1)v=1;
   // Если шаг не удался, версия не повышается: шаг повторится при следующем запуске, а не пропадёт молча
   for(;v<SCHEMA;v++){try{MIGRATIONS[v]&&MIGRATIONS[v](st)}catch(e){console.error('миграция '+v,e);break}}
@@ -83,7 +84,9 @@ const streakNow=()=>S.lastDay&&daysBetween(S.lastDay,today())<=1?S.streak:0;
 const todayXP=()=>S.daily[today()]||0;
 function hearts(){if(S.hearts>=MAXH){S.heartsTs=Date.now();return MAXH}const n=Math.floor((Date.now()-S.heartsTs)/REGEN);if(n>0){S.hearts=Math.min(MAXH,S.hearts+n);S.heartsTs+=n*REGEN;save()}return S.hearts}
 function addXP(n){S.xp+=n;const t=today();S.daily[t]=(S.daily[t]||0)+n;
-  if(S.lastDay!==t){S.streak=S.lastDay&&daysBetween(S.lastDay,t)===1?S.streak+1:1;S.lastDay=t}
+  /* Часы перевели назад или сменился часовой пояс (последний день занятий «в будущем») — серию не трогаем */
+  const gap=S.lastDay?daysBetween(S.lastDay,t):null;
+  if(gap===null||gap>1){S.streak=1;S.lastDay=t}else if(gap===1){S.streak++;S.lastDay=t}else if(!S.streak)S.streak=1;
   S.best=Math.max(S.best||0,S.streak);save()}
 const level=()=>Math.floor(S.xp/100)+1;
 const unlocked=i=>S.unlockAll||i===0||!!S.done[LESSONS[i].id]||LESSONS.slice(0,i).every(l=>S.done[l.id]);

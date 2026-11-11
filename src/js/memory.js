@@ -4,11 +4,14 @@
    Вероятность вспомнить p = 2^(−прошло/период). Повторять пора, когда p < 0,5.
    Верный ответ удлиняет период, ошибка — сокращает (как модель half-life regression у Duolingo, только проще). */
 const nowS=()=>Date.now()/1000|0;
-function memUpdate(key,ok){if(!key)return;const t=nowS(),m=S.mem[key];let h;
+function memUpdate(key,ok){if(!key)return;const t=nowS();let m=S.mem[key],h;
+  if(!Array.isArray(m)||!isFinite(m[0])||!isFinite(m[1]))m=null;   // повреждённая запись — считаем, что видим впервые
   if(!m)h=ok?1:0.3;else{const el=(t-m[1])/86400;h=m[0];h=ok?Math.min(180,h*(el>=h*0.5?2.2:1.2)):Math.max(0.2,h*0.4)}
   S.mem[key]=[+h.toFixed(2),t]}
 const recall=m=>Math.pow(2,-((nowS()-m[1])/86400)/Math.max(0.05,m[0]));
-function dueKeys(){const kn=learnedSet();return Object.keys(S.mem).filter(k=>Array.isArray(S.mem[k])&&recall(S.mem[k])<0.5&&(k[0]==='#'?kn.has(k.slice(1)):(WORDS.find(w=>w.a===k)&&readable(WORDS.find(w=>w.a===k),kn)))).sort((a,b)=>recall(S.mem[a])-recall(S.mem[b]))}
+let _wordBy=null;
+const wordBy=a=>{if(!_wordBy||_wordBy.size!==WORDS.length){_wordBy=new Map();WORDS.forEach(w=>_wordBy.set(w.a,w))}return _wordBy.get(a)};
+function dueKeys(){const kn=learnedSet();return Object.keys(S.mem).filter(k=>{const m=S.mem[k];if(!Array.isArray(m)||!(recall(m)<0.5))return false;if(k[0]==='#')return kn.has(k.slice(1));const w=wordBy(k);return !!w&&readable(w,kn)}).sort((a,b)=>recall(S.mem[a])-recall(S.mem[b]))}
 function learnedSet(){return new Set(LETTERS.filter(letterLearned).map(l=>l.k))}
 function reviewEx(key){const kn=learnedSet(),lp=LETTERS.filter(x=>kn.has(x.k));
   if(key[0]==='#'){const l=BY[key.slice(1)];if(!l)return null;const st=lp.length>=4;const r=Math.random();return caseable(l)&&r<.25?qCase(l,st?lp:LETTERS):r<.62?qS2L(l,st?lp:LETTERS,st):qL2S(l,st?lp:LETTERS,st)}

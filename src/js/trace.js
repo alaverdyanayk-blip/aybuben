@@ -35,16 +35,18 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
     <div class="tr-btns"><button class="btn plain sm" data-tr="show">Показать</button><button class="btn plain sm" data-tr="again">Заново</button></div></div></div>`;
   const cv=box.querySelector('canvas'),ctx=cv.getContext('2d'),msg=box.querySelector('.tr-msg');
   let cur=0,mist=0,drawn=[],raw=null,anim=0,done=false,k=1,ox=0,oy=0;
-  const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let COL={},W=0,H=0,dead=false;
+  const readCol=()=>{const cs=getComputedStyle(document.documentElement);['--line','--sunk','--brand','--apri','--apri-deep','--good','--ink'].forEach(n=>COL[n]=cs.getPropertyValue(n).trim())};
+  const css=n=>COL[n];
   const P=([x,y])=>[ox+x*k,oy+(y-TR_TOP)*k];
-  function fit(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);
+  function fit(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;W=r.width;H=r.height;readCol();cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);
     k=Math.min(r.height/(TR_BOT-TR_TOP),r.width/(w+24));ox=(r.width-w*k)/2;oy=(r.height-(TR_BOT-TR_TOP)*k)/2}
   function path(pts,upto=1){const n=Math.max(2,Math.round(pts.length*upto));ctx.beginPath();pts.slice(0,n).forEach((p,i)=>{const [x,y]=P(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y)})}
   function arrow(st,col){const a=st.pts[0],b=st.pts[Math.min(5,st.pts.length-1)],[x,y]=P(a),[x2,y2]=P(b),ang=Math.atan2(y2-y,x2-x);
     ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 11px Golos Text, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(strokes.indexOf(st)+1),x,y+.5);
     const m=st.pts[Math.min(9,st.pts.length-1)],[mx,my]=P(m),m2=st.pts[Math.min(11,st.pts.length-1)],[mx2,my2]=P(m2),aa=Math.atan2(my2-my,mx2-mx);
     ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(mx2-Math.cos(aa-0.5)*8,my2-Math.sin(aa-0.5)*8);ctx.lineTo(mx2,my2);ctx.lineTo(mx2-Math.cos(aa+0.5)*8,my2-Math.sin(aa+0.5)*8);ctx.stroke()}
-  function draw(prog){const r=cv.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);
+  function draw(prog){if(dead||!W)return;const r={width:W,height:H};ctx.clearRect(0,0,W,H);
     /* линейки прописи */
     const line=(y,dash,a)=>{const [,yy]=P([0,y]);ctx.strokeStyle=css('--line');ctx.globalAlpha=a;ctx.lineWidth=1.5;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(8,yy);ctx.lineTo(r.width-8,yy);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1};
     line(15,[4,6],.8);line(35,[4,6],.9);line(75,[],1);line(92,[4,6],.8);
@@ -60,7 +62,7 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
     else if(!done&&strokes[cur])arrow(strokes[cur],css('--good'));
     /* что рисует человек */
     if(raw&&raw.length){ctx.strokeStyle=css('--ink');ctx.globalAlpha=.75;ctx.lineWidth=Math.max(5,k*3.2);ctx.beginPath();raw.forEach((p,i)=>{const [x,y]=P(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.globalAlpha=1}}
-  function show(from=0,to=strokes.length,after){cancelAnimationFrame(anim);const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(from=0,to=strokes.length,after){if(dead)return;cancelAnimationFrame(anim);readCol();const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(reduce){draw();after&&after();return}
     const t0=performance.now(),per=650;const step=now=>{const t=from+Math.max(0,now-t0)/per;if(t>=to){draw();after&&after();return}draw({t});anim=requestAnimationFrame(step)};anim=requestAnimationFrame(step)}
   const inv=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left-ox)/k,(e.clientY-r.top-oy)/k+TR_TOP]};
@@ -79,5 +81,5 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
   box.querySelector('[data-tr="show"]').onclick=()=>show(0,strokes.length);
   box.querySelector('[data-tr="again"]').onclick=()=>{cancelAnimationFrame(anim);cur=0;mist=0;done=false;box.querySelector('.tracer').classList.remove('ok');msg.textContent=`Штрих 1 из ${strokes.length}: начните с точки`;draw()};
   const ro=new ResizeObserver(()=>{fit();draw()});ro.observe(cv);
-  fit();draw();if(opts.demo!==false)setTimeout(()=>show(0,strokes.length),350);
-  return {destroy(){ro.disconnect();cancelAnimationFrame(anim)}}}
+  fit();draw();const demoT=opts.demo!==false?setTimeout(()=>show(0,strokes.length),350):0;
+  return {destroy(){dead=true;ro.disconnect();cancelAnimationFrame(anim);clearTimeout(demoT);cv.onpointerdown=cv.onpointermove=cv.onpointerup=cv.onpointercancel=null}}}

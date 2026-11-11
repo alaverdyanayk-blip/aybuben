@@ -26,7 +26,7 @@ function phGen2(P){
 function phLesson(P,n){return {id:`ph-${P.id}-${n}`,t:`${P.t} · ${n===1?'фразы':'диалог'}`,ph:{id:P.id,n},gen:()=>n===1?phGen1(P):phGen2(P)}}
 function phStart(P,n){if(hearts()<=0){const s=sheet(`<div class="row">${mascot('sleep')}<h3 style="flex:1">Сердца закончились. Сердечко восстанавливается за 30 минут — или потренируйтесь на пройденном.</h3></div><div class="row"><button class="btn" id="phpr">Тренировка</button><button class="btn plain" data-close>Позже</button></div>`);s.el.querySelector('#phpr').onclick=()=>{s.close();startPractice()};return}
   startLesson(phLesson(P,n),false)}
-function phCard(P){const st=phStars(P),c=COSTUMES.find(x=>x.ph===P.id);
+function phCard(P){const st=phStars(P.id),c=COSTUMES.find(x=>x.ph===P.id);
   return `<button class="phc" data-ph="${P.id}" style="--pc:${P.c}"><span class="phc-art">${mascot(P.mood,'',P.o)}</span><span class="phc-tx"><b>${esc(P.t)}</b><span class="arm hy">${esc(P.hy)}</span><span class="d">${P.ph.length} фраз · ${P.dl.length} диалога</span><span class="phc-st">${[0,1].map(i=>`<i class="${i<st?'on':''}"></i>`).join('')}${phDone(P.id)?`<em>костюм: ${esc(c.t.toLowerCase())}</em>`:''}</span></span></button>`}
 function renderPhrases(sub){const P=PHR.find(p=>p.id===sub);
   if(!P){const n=PHR.filter(p=>phDone(p.id)).length;
