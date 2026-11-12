@@ -64,3 +64,9 @@ db.prepare('UPDATE events SET ts=?').run(now+60000);
 const G=await W.gather(env);
 ok(G.remOn===2&&G.rem.length===2&&G.ask.nt_ask===1&&G.ask.nt_yes===1&&G.ask.remind===1,'статистика: '+JSON.stringify({on:G.remOn,rem:G.rem,ask:G.ask}));
 ok(W.statsPage(G).includes('Напоминания за 30 дней'),'страница статистики собирается');
+// шутки не повторяются, пока не показаны все
+{const seen=[];let row={...base,first:null,last_day:D(-40),streak:0,used:''};
+ for(let i=0;i<W.MSG.joke.length;i++){const q=W.plan({...row,last_day:loc(now+(i-1)*864e5-864e5*0)},now+i*864e5);if(!q||q.type!=='joke'){ok(false,'шутка '+i+': '+JSON.stringify(q));break}seen.push(q.id);row.used=q.used}
+ ok(new Set(seen).size===W.MSG.joke.length&&W.MSG.joke.length===25,'25 шуток подряд без повторов: '+new Set(seen).size);
+ ok(Object.values(W.MSG).flat().every(m=>m[2].length<=200&&['cheer','think','wink','sad','wow','happy'].includes(m[1])),'все тексты короткие, картинки существуют');
+ const ids=Object.values(W.MSG).flat().map(m=>m[0]);ok(new Set(ids).size===ids.length,'метки текстов не повторяются')}
