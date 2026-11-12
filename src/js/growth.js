@@ -32,7 +32,7 @@ const CHANNEL='https://t.me/aybubenciro';
 let NEWS_NOW=false,NEWS_CLOSED=false;
 function whatsNew(){if(NEWS_CLOSED)return '';if(S.newsSeen===NEWS_ID&&!NEWS_NOW)return '';if(!Object.keys(S.done).length&&!(S.xp>0)){S.newsSeen=NEWS_ID;return ''}
   if(!NEWS_NOW){NEWS_NOW=true;S.newsSeen=NEWS_ID;save()}
-  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle')}<div class="bubble"><p><b>У меня теперь свой канал!</b> Подписывайтесь — там новости Айбубена и всё интересное про армянский.</p>
+  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle')}<div class="bubble"><p><b>У меня теперь свой канал!</b> Подписывайтесь — там первыми узнаете про обновления, новые уроки и функции.</p>
    <div class="btns"><a class="btn" href="${CHANNEL}" target="_blank" rel="noopener" data-news-ch>Подписаться</a></div></div></div></section>`}
 function wireNews(){const done=()=>{NEWS_CLOSED=true;const c=$('.news-card');c&&c.remove()};
   const x=$('[data-news-x]');if(x)x.onclick=done;
