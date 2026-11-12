@@ -39,10 +39,15 @@ function wireNews(){const done=()=>{NEWS_CLOSED=true;const c=$('.news-card');c&&
   const nt=$('[data-news-nt]');if(nt)nt.onclick=()=>enableNotif(ok=>{const b=$('.news-card .bubble');if(b)b.innerHTML=ok?'<p>Договорились! 🍑 Не чаще раза в день. Выключить можно в профиле.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>';S.newsSeen=NEWS_ID;save();setTimeout(done,2500)});
   document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()})}
 /* напоминания */
-function askNotif(){if(!TGW||!TGW.requestWriteAccess||S.notif)return '';
-  return `<div class="bubble" id="ask-nt" style="text-align:left"><p>Можно я буду иногда напоминать о себе в Телеграме? Обещаю без спама — не чаще раза в день.</p><div class="btns two"><button class="btn" data-nt="1">Да</button><button class="btn plain" data-nt="0">Не надо</button></div></div>`}
+/* Циро спрашивает после урока. Первый раз — пока человек не ответил. Второй и последний — когда серия дошла до 3 дней
+   и есть что терять; только тем, кто отказался в первый раз, а не выключил напоминания сам (off). */
+function askNotif(){if(!TGW||!TGW.requestWriteAccess)return '';const n=S.notif,st=streakNow();let k=0,text='';
+  if(!n){k=1;text='Можно я буду иногда напоминать о себе в Телеграме? Обещаю без спама — не чаще раза в день.'}
+  else if(!n.on&&!n.off&&!n.ask2&&st>=3){k=2;n.ask2=today();save();text=`Серия уже ${st} ${plural(st,'день','дня','дней')} 🔥 Обидно будет её потерять. Давай я напомню в Телеграме, если забудешь? Не чаще раза в день.`}
+  if(!k)return '';track('nt_ask',k);
+  return `<div class="bubble" id="ask-nt" data-ask="${k}" style="text-align:left"><p>${text}</p><div class="btns two"><button class="btn" data-nt="1">${k===2?'Да, напомни':'Да'}</button><button class="btn plain" data-nt="0">Не надо</button></div></div>`}
 function enableNotif(done){if(!TGW||!TGW.requestWriteAccess){done&&done(false);return}
-  try{TGW.requestWriteAccess(ok=>{S.notif=Object.assign({hour:null,freq:1},S.notif||{},{on:!!ok});save();syncU(true,true);done&&done(!!ok)})}catch(e){done&&done(false)}}
+  try{TGW.requestWriteAccess(ok=>{S.notif=Object.assign({hour:null,freq:1},S.notif||{},{on:!!ok});if(ok)delete S.notif.off;save();syncU(true,true);done&&done(!!ok)})}catch(e){done&&done(false)}}
 const NT_HOURS=[null,9,12,15,18,19,20,21];
 function notifRow(){const n=S.notif||{},on=!!(TGW&&n.on),can=!!(TGW&&TGW.requestWriteAccess);
   return `<div class="toggle"><span>Напоминания в Телеграме<br><span class="note">${can?'Не чаще раза в день и только если вы ещё не занимались':'Работают, когда приложение открыто в Телеграме'}</span></span><button class="switch" role="switch" id="sw-nt" aria-checked="${on}" aria-label="Напоминания" ${can?'':'disabled'}></button></div>
@@ -50,25 +55,34 @@ function notifRow(){const n=S.notif||{},on=!!(TGW&&n.on),can=!!(TGW&&TGW.request
    <div class="label">Как часто</div><div class="chips" style="justify-content:flex-start">${[[1,'Каждый день'],[3,'Раз в 3 дня']].map(([v,t])=>`<button class="chip2" data-nf="${v}" aria-pressed="${(n.freq||1)===v}">${t}</button>`).join('')}</div></div>`:''}`}
 function wireGrowth(){
   document.querySelectorAll('[data-invite]').forEach(b=>b.onclick=()=>invite(b));
-  document.querySelectorAll('[data-nt]').forEach(b=>b.onclick=()=>{const box=$('#ask-nt');
-    if(b.dataset.nt==='1')enableNotif(ok=>{if(box)box.innerHTML=ok?'<p>Договорились! 🍑 Выключить можно в профиле или кнопкой под сообщением.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'});
-    else{S.notif={on:false,freq:1,hour:null};save();syncU(true,true);if(box)box.innerHTML='<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'}});
-  const sw=$('#sw-nt');if(sw)sw.onclick=()=>{if(S.notif&&S.notif.on){S.notif.on=false;save();syncU(true,true);renderProfile()}else enableNotif(()=>renderProfile())};
+  document.querySelectorAll('[data-nt]').forEach(b=>b.onclick=()=>{const box=$('#ask-nt'),k=box?box.dataset.ask:'1';
+    if(b.dataset.nt==='1')enableNotif(ok=>{track(ok?'nt_yes':'nt_no',k);if(box)box.innerHTML=ok?'<p>Договорились! 🍑 Выключить можно в профиле или кнопкой под сообщением.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'});
+    else{track('nt_no',k);S.notif=Object.assign({freq:1,hour:null},S.notif||{},{on:false});save();syncU(true,true);if(box)box.innerHTML='<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'}});
+  /* выключил сам — больше не предлагаем */
+  const sw=$('#sw-nt');if(sw)sw.onclick=()=>{if(S.notif&&S.notif.on){S.notif.on=false;S.notif.off=1;save();syncU(true,true);renderProfile()}else enableNotif(()=>renderProfile())};
   document.querySelectorAll('[data-nh]').forEach(b=>b.onclick=()=>{S.notif.hour=b.dataset.nh===''?null:+b.dataset.nh;save();syncU(true,true);renderProfile()});
   document.querySelectorAll('[data-nf]').forEach(b=>b.onclick=()=>{S.notif.freq=+b.dataset.nf;save();syncU(true,true);renderProfile()});
 }
-function prefHour(){const h=S.hrs||{},ks=Object.keys(h);if(ks.reduce((a,k)=>a+h[k],0)<3)return null;return +ks.sort((a,b)=>h[b]-h[a])[0]}
+/* Обычный час занятий. Хватает и одного урока: новичку напоминание придёт в то же время, когда он занимался в первый раз. */
+function prefHour(){const h=S.hrs||{},ks=Object.keys(h).filter(k=>h[k]>0&&+k>=0&&+k<24);if(!ks.length)return null;return +ks.sort((a,b)=>h[b]-h[a])[0]}
+/* Краткий прогресс для содержательных напоминаний: сколько букв и уроков, следующий урок, сколько пора повторить */
+function progressInfo(){try{const nx=LESSONS.find((l,i)=>unlocked(i)&&!S.done[l.id]);
+  return {l:learnedSet().size,d:Object.keys(S.done).length,nx:nx?nx.t:'',due:dueKeys().length}}catch(e){return null}}
 /* explicit=true — человек сам поменял настройки в приложении; иначе сервер главнее (кнопки «Реже» / «Не напоминать» в боте) */
 let syncT,syncX=false;
 function syncU(now,explicit){if(!TGW)return;if(explicit)syncX=true;clearTimeout(syncT);syncT=setTimeout(()=>{const x=syncX;syncX=false;
-  api('/u',Object.assign({streak:streakNow(),day:S.lastDay,tz:-new Date().getTimezoneOffset(),hour:prefHour()},x?{notif:S.notif||{on:false}}:{})).then(j=>{
+  api('/u',Object.assign({streak:streakNow(),day:S.lastDay,tz:-new Date().getTimezoneOffset(),hour:prefHour(),info:progressInfo()},x?{notif:S.notif||{on:false}}:{})).then(j=>{
    if(!j||!j.ok||!S.notif)return;const n=S.notif,ch=n.on!==j.on||(n.freq||1)!==j.freq||(n.hour??null)!==(j.hour??null);
-   if(ch){n.on=j.on;n.freq=j.freq;n.hour=j.hour??null;save();if(location.hash.slice(1)==='profile')renderProfile()}}).catch(()=>{})},now?50:1500)}
+   if(ch){if(n.on&&!j.on)n.off=1;   // выключил кнопкой под сообщением в боте
+    n.on=j.on;n.freq=j.freq;n.hour=j.hour??null;save();if(location.hash.slice(1)==='profile')renderProfile()}}).catch(()=>{})},now?50:1500)}
 /* старт: метка приглашения, «Заниматься 2 минуты» из бота */
 (function(){
   const sp=(TGW&&TGW.initDataUnsafe&&TGW.initDataUnsafe.start_param)||'';
   if(/^r[a-z0-9]{6,16}$/.test(sp)&&!S.refBy&&!Object.keys(S.done).length&&(S.xp||0)<60){S.refBy=sp.slice(1);save()}
   setTimeout(()=>{refMe();syncU(true)},1500);
-  if(location.hash==='#go'||sp==='go'){try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
-    setTimeout(()=>{if(LS)return;const i=LESSONS.findIndex((l,i)=>unlocked(i)&&!S.done[l.id]);if(i<0)startPractice();else if(hearts()>0)startLesson(LESSONS[i],false)},400)}
+  /* Кнопка под напоминанием открывает приложение с меткой ?r=<тип>: считаем, кто пришёл по ней, и сразу начинаем урок */
+  let rem='';try{rem=new URLSearchParams(location.search).get('r')||''}catch(e){}
+  if(!/^[a-z0-9]{1,12}$/.test(rem))rem='';
+  if(location.hash==='#go'||sp==='go'||rem){try{const q=new URLSearchParams(location.search);q.delete('r');const qs=q.toString();history.replaceState(null,'',location.pathname+(qs?'?'+qs:''))}catch(e){}
+    setTimeout(()=>{if(rem)track('remind',rem);if(LS)return;const i=LESSONS.findIndex((l,i)=>unlocked(i)&&!S.done[l.id]);if(i<0)startPractice();else if(hearts()>0)startLesson(LESSONS[i],false)},400)}
 })();

@@ -11,7 +11,9 @@
  * Исключение — напоминания: для тех, кто их разрешил, хранится id чата с ботом (без него бот не может написать).
  * Ещё здесь: приглашения друзей (/r/me, /r/claim), настройки напоминаний (/u), вебхук бота (/tg/…) и расписание (scheduled).
  */
-const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game', 'phrase']);
+// remind — открыли приложение кнопкой под напоминанием (p — тип напоминания);
+// nt_ask / nt_yes / nt_no — Циро предложил напоминания / согласились / отказались (p — какой раз спрашивал)
+const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game', 'phrase', 'remind', 'nt_ask', 'nt_yes', 'nt_no']);
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, ev TEXT NOT NULL, p TEXT, src TEXT);
 CREATE INDEX IF NOT EXISTS ev_day ON events(day, ev);
@@ -21,14 +23,17 @@ CREATE INDEX IF NOT EXISTS users_first ON users(first_day);
 CREATE TABLE IF NOT EXISTS refcodes(code TEXT PRIMARY KEY, uid TEXT UNIQUE NOT NULL, created TEXT);
 CREATE TABLE IF NOT EXISTS refs(friend TEXT PRIMARY KEY, inviter TEXT NOT NULL, day TEXT);
 CREATE INDEX IF NOT EXISTS refs_inv ON refs(inviter);
-CREATE TABLE IF NOT EXISTS notify(uid TEXT PRIMARY KEY, chat_id INTEGER, enabled INTEGER DEFAULT 0, tz INTEGER DEFAULT 180, hour INTEGER, auto_hour INTEGER, freq INTEGER DEFAULT 1, streak INTEGER DEFAULT 0, last_day TEXT, last_sent TEXT, ignored INTEGER DEFAULT 0, used TEXT, news TEXT, upd INTEGER);
+CREATE TABLE IF NOT EXISTS notify(uid TEXT PRIMARY KEY, chat_id INTEGER, enabled INTEGER DEFAULT 0, tz INTEGER DEFAULT 180, hour INTEGER, auto_hour INTEGER, freq INTEGER DEFAULT 1, streak INTEGER DEFAULT 0, last_day TEXT, last_sent TEXT, ignored INTEGER DEFAULT 0, used TEXT, news TEXT, upd INTEGER, first TEXT, info TEXT);
+CREATE TABLE IF NOT EXISTS sent(id INTEGER PRIMARY KEY, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, type TEXT);
+CREATE INDEX IF NOT EXISTS sent_day ON sent(day);
 CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT);
 `;
 let schemaReady = false;
 async function ensureSchema(db) {
   if (schemaReady) return;
   for (const q of SCHEMA.split(';').map(s => s.trim()).filter(Boolean)) await db.prepare(q).run();
-  try { await db.prepare('ALTER TABLE notify ADD COLUMN news TEXT').run(); } catch (e) { } // для баз, созданных до новостей
+  // для баз, созданных раньше: news — новости, first — день знакомства (по своему времени человека), info — краткий прогресс из приложения
+  for (const col of ['news TEXT', 'first TEXT', 'info TEXT']) { try { await db.prepare('ALTER TABLE notify ADD COLUMN ' + col).run(); } catch (e) { } }
   schemaReady = true;
 }
 
@@ -135,6 +140,8 @@ async function notifyInviter(env, inviter, n) {
 }
 
 /* ---------- напоминания: настройки из приложения ---------- */
+/** Название урока из приложения попадает в текст сообщения — оставляем только буквы, цифры и простые знаки. */
+const cleanTitle = v => typeof v === 'string' ? v.replace(/[^\p{L}\p{N} .,!?«»\-—]/gu, '').replace(/\s+/g, ' ').trim().slice(0, 48) : '';
 async function userSync(req, env) {
   const body = await readBody(req); if (!body) return json({ error: 'bad json' }, 400);
   const { uid, tgId, verified } = await who(body, env); if (!uid) return json({ error: 'no id' }, 400);
@@ -142,13 +149,16 @@ async function userSync(req, env) {
   const int = (v, lo, hi) => { v = parseInt(v, 10); return isFinite(v) ? Math.min(hi, Math.max(lo, v)) : null; };
   const tz = int(body.tz, -720, 840) ?? 180, auto = int(body.hour, 0, 23), streak = int(body.streak, 0, 100000) || 0;
   const last = /^\d{4}-\d\d-\d\d$/.test(body.day || '') ? body.day : null, chat = verified && tgId ? tgId : null;
-  await env.DB.prepare('INSERT INTO notify(uid,enabled,tz,upd) VALUES(?,0,?,?) ON CONFLICT(uid) DO NOTHING').bind(uid, tz, Date.now()).run();
+  await env.DB.prepare('INSERT INTO notify(uid,enabled,tz,upd,first) VALUES(?,0,?,?,?) ON CONFLICT(uid) DO NOTHING').bind(uid, tz, Date.now(), today(Date.now() + tz * 6e4)).run();
+  // краткий прогресс для содержательных напоминаний: сколько букв и уроков, как называется следующий урок, сколько пора повторить
+  const bi = body.info && typeof body.info === 'object' ? body.info : null;
+  const info = bi ? JSON.stringify({ l: int(bi.l, 0, 39) || 0, d: int(bi.d, 0, 999) || 0, due: int(bi.due, 0, 999) || 0, nx: cleanTitle(bi.nx) }) : null;
   // ежедневные данные: часовой пояс, обычное время занятий, серия, день последнего занятия
   await env.DB.prepare(`UPDATE notify SET tz=?, auto_hour=COALESCE(?,auto_hour), streak=?,
     ignored=CASE WHEN ? IS NOT NULL AND (last_day IS NULL OR ?>last_day) THEN 0 ELSE ignored END,
     last_day=CASE WHEN last_day IS NULL OR ?>last_day THEN COALESCE(?,last_day) ELSE last_day END,
-    chat_id=CASE WHEN enabled=1 AND ? IS NOT NULL THEN ? ELSE chat_id END, upd=? WHERE uid=?`)
-    .bind(tz, auto, streak, last, last, last, last, chat, chat, Date.now(), uid).run();
+    chat_id=CASE WHEN enabled=1 AND ? IS NOT NULL THEN ? ELSE chat_id END, info=COALESCE(?,info), upd=? WHERE uid=?`)
+    .bind(tz, auto, streak, last, last, last, last, chat, chat, info, Date.now(), uid).run();
   // настройки меняются, только когда человек сам их поменял в приложении (иначе кнопки «Реже» / «Не напоминать» в боте затирались бы)
   if (body.notif && typeof body.notif === 'object') {
     const n = body.notif, on = n.on ? 1 : 0;
@@ -179,14 +189,14 @@ async function ensureWebhook(env, origin, force) {
   if (r.ok) hookOk = true;
   if (r.ok) await env.DB.prepare("INSERT INTO meta(k,v) VALUES('webhook',?) ON CONFLICT(k) DO UPDATE SET v=excluded.v").bind(want).run();
 }
-const KB = env => ({ inline_keyboard: [[{ text: 'Заниматься 2 минуты', web_app: { url: appUrl(env) + '#go' } }], [{ text: 'Реже', callback_data: 'less' }, { text: 'Не напоминать', callback_data: 'off' }]] });
+const KB = (env, type) => ({ inline_keyboard: [[{ text: 'Заниматься 2 минуты', web_app: { url: appUrl(env) + (type ? '?r=' + type : '') + '#go' } }], [{ text: 'Реже', callback_data: 'less' }, { text: 'Не напоминать', callback_data: 'off' }]] });
 async function botHook(req, env, sec) {
   if (!env.BOT_TOKEN || !safeEq(sec, await hookSecret(env)) || !safeEq(req.headers.get('X-Telegram-Bot-Api-Secret-Token') || '', sec)) return new Response('no', { status: 403 });
   const up = await readBody(req); if (!up) return new Response('ok');
   await ensureSchema(env.DB);
   const setRow = async (id, sql, ...b) => {
     const uid = await tgUid(env, id);
-    await env.DB.prepare('INSERT INTO notify(uid,chat_id,enabled,upd) VALUES(?,?,1,?) ON CONFLICT(uid) DO NOTHING').bind(uid, id, Date.now()).run();
+    await env.DB.prepare('INSERT INTO notify(uid,chat_id,enabled,upd,first) VALUES(?,?,1,?,?) ON CONFLICT(uid) DO NOTHING').bind(uid, id, Date.now(), today(Date.now() + 180 * 6e4)).run();
     await env.DB.prepare('UPDATE notify SET ' + sql + ' WHERE uid=?').bind(...b, uid).run();
   };
   if (up.callback_query) {
@@ -239,6 +249,19 @@ const MSG = {
     ['s2', 'think', 'Если серия сгорит, я расскажу маме. Серия: {n} 🔥'],
     ['s3', 'sad', 'Ты {n} держался. Не будь как тот родственник, который «завтра точно позвонит».']
   ],
+  /* Первые три дня после знакомства: вместо общей шутки — конкретика. {l} — сколько букв уже знает, {nx} — следующий урок.
+     Третий элемент — текст, четвёртый — запасной, если приложение ещё не прислало название урока. По одному на день. */
+  new: [
+    ['n1', 'happy', 'У тебя уже {l} из 39. Следующий урок — «{nx}». Это три минуты, я засекал.', 'У тебя уже {l} из 39. Следующий урок — три минуты, я засекал.'],
+    ['n2', 'wink', 'Бабушка спросила, сколько букв ты знаешь. Я сказал: {l}. Давай завтра скажу больше — урок «{nx}» ждёт.', 'Бабушка спросила, сколько букв ты знаешь. Я сказал: {l}. Давай завтра скажу больше.'],
+    ['n3', 'think', 'Третий день — самый трудный. Дядя на третий день бросил зарядку. Не будь как дядя: «{nx}» — и ты снова в деле.', 'Третий день — самый трудный. Дядя на третий день бросил зарядку. Не будь как дядя.']
+  ],
+  /* Нажал «Старт», но первый урок так и не прошёл */
+  new0: [
+    ['z1', 'happy', 'Первый урок — три минуты и четыре буквы. После него ты прочитаешь своё первое слово по-армянски.'],
+    ['z2', 'think', 'Я всё ещё жду у первой буквы. Она называется «айб», и с неё начинается всё.'],
+    ['z3', 'wink', 'Три минуты — и ты прочитаешь первые армянские буквы. Бабушка оценит.']
+  ],
   back: [
     ['b1', 'sad', 'Тебя не было {g}. Бабушка уже накрыла стол «на всякий случай».'],
     ['b2', 'think', 'Я начал забывать твоё лицо. А ты — букву Ժ.'],
@@ -261,14 +284,20 @@ function plan(row, now, news = []) {
   if (ign >= 6) return null;                                               // 3 недели тишины — замолкаем до возвращения
   if (ign >= 3 && since < 7) return null;                                  // игнорирует — не чаще раза в неделю
   if ((row.freq || 1) > 1 && since < row.freq) return null;                // «Реже»
-  const type = gap >= 3 ? 'back' : (gap === 1 && (row.streak || 0) >= 3) ? 'streak' : 'joke';
+  // первые три дня после знакомства — отдельные сообщения; кто ни разу не занимался, тому «тебя не было N дней» не пишем
+  const age = row.first ? ddiff(row.first, day) : 99, fresh = age >= 1 && age <= 3;
+  let info = null; try { info = row.info ? JSON.parse(row.info) : null; } catch (e) { }
+  const began = !!row.last_day || !!(info && info.d > 0);
+  const type = !began ? (fresh ? 'new0' : 'joke') : (gap >= 3 && row.last_day) ? 'back' : (gap === 1 && (row.streak || 0) >= 3) ? 'streak' : (fresh && info && info.l > 0) ? 'new' : 'joke';
   let hour = row.hour ?? row.auto_hour ?? 19;
   if (type === 'streak') hour = Math.max(hour, 19);                        // серия под угрозой — вечером
   hour = Math.min(22, Math.max(9, hour));                                  // тихие часы 23:00–9:00
   if (h !== hour) return null;
   const used = (row.used || '').split(',').filter(Boolean), pool = MSG[type];
-  const pick = pool.find(m => !used.includes(m[0])) || pool[Math.floor(Math.random() * pool.length)];
-  const text = pick[2].replace('{n}', plural(row.streak || 0, 'день', 'дня', 'дней')).replace('{g}', plural(Math.min(gap, 30), 'день', 'дня', 'дней'));
+  const pick = type === 'new' || type === 'new0' ? pool[age - 1] : pool.find(m => !used.includes(m[0])) || pool[Math.floor(Math.random() * pool.length)];
+  const nx = info && info.nx ? cleanTitle(info.nx) : '';
+  const text = (nx || !pick[3] ? pick[2] : pick[3]).replace('{nx}', nx).replace('{l}', plural((info && info.l) || 0, 'буква', 'буквы', 'букв'))
+    .replace('{n}', plural(row.streak || 0, 'день', 'дня', 'дней')).replace('{g}', plural(Math.min(gap, 30), 'день', 'дня', 'дней'));
   return { type, id: pick[0], mood: pick[1], text, day, ignoredNow: row.last_sent && (!row.last_day || row.last_day < row.last_sent) ? ign + 1 : ign, used: [pick[0], ...used.filter(x => x !== pick[0])].slice(0, 10).join(',') };
 }
 async function runReminders(env, now = Date.now()) {
@@ -280,8 +309,11 @@ async function runReminders(env, now = Date.now()) {
   let sent = 0;
   for (const row of rows) {
     const p = plan(row, now, news); if (!p) continue;
-    const r = await tg(env, 'sendPhoto', { chat_id: row.chat_id, photo: art(env, p.mood), caption: p.text, reply_markup: p.type === 'news' ? { inline_keyboard: [[{ text: 'Открыть Айбубен', web_app: { url: appUrl(env) } }], [{ text: 'Не напоминать', callback_data: 'off' }]] } : KB(env) });
-    if (r.ok) { sent++; await env.DB.prepare('UPDATE notify SET last_sent=?, ignored=?, used=?, news=COALESCE(?,news) WHERE uid=?').bind(p.day, p.ignoredNow, p.used, p.news || null, row.uid).run(); }
+    const r = await tg(env, 'sendPhoto', { chat_id: row.chat_id, photo: art(env, p.mood), caption: p.text, reply_markup: p.type === 'news' ? { inline_keyboard: [[{ text: 'Открыть Айбубен', web_app: { url: appUrl(env) } }], [{ text: 'Не напоминать', callback_data: 'off' }]] } : KB(env, p.type) });
+    if (r.ok) {
+      sent++; await env.DB.prepare('UPDATE notify SET last_sent=?, ignored=?, used=?, news=COALESCE(?,news) WHERE uid=?').bind(p.day, p.ignoredNow, p.used, p.news || null, row.uid).run();
+      try { await env.DB.prepare('INSERT INTO sent(ts,day,uid,type) VALUES(?,?,?,?)').bind(now, today(now), row.uid, p.type).run(); } catch (e) { } // журнал для статистики
+    }
     else if (r.error_code === 403 || r.error_code === 400) await env.DB.prepare('UPDATE notify SET enabled=0, chat_id=NULL WHERE uid=?').bind(row.uid).run(); // заблокировал бота
   }
   return { sent };
@@ -295,7 +327,7 @@ async function authed(req, env) { const c = cookie(req, 'ays'); return !!(c && e
 async function gather(env) {
   await ensureSchema(env.DB);
   const t = today(), d7 = dayShift(t, -6), d30 = dayShift(t, -29), q = (s, ...b) => env.DB.prepare(s).bind(...b);
-  const [k1, k2, k3, k4, k5, k6, daily, newDaily, lessonsDaily, funnel, fails, games, src, ret, phr] = await env.DB.batch([
+  const [k1, k2, k3, k4, k5, k6, daily, newDaily, lessonsDaily, funnel, fails, games, src, ret, phr, remOn, rem, ask] = await env.DB.batch([
     q('SELECT COUNT(DISTINCT uid) n FROM events WHERE day=?', t),
     q('SELECT COUNT(DISTINCT uid) n FROM events WHERE day>=?', d7),
     q('SELECT COUNT(DISTINCT uid) n FROM events WHERE day>=?', d30),
@@ -311,7 +343,14 @@ async function gather(env) {
     q('SELECT src, COUNT(*) n FROM users GROUP BY src'),
     q(`SELECT COUNT(*) total, SUM(CASE WHEN EXISTS(SELECT 1 FROM events e WHERE e.uid=u.uid AND e.day=date(u.first_day,'+1 day')) THEN 1 ELSE 0 END) back
        FROM users u WHERE u.first_day>=? AND u.first_day<?`, dayShift(t, -30), dayShift(t, -1)),
-    q("SELECT p, COUNT(*) n, COUNT(DISTINCT uid) u FROM events WHERE ev='phrase' AND day>=? GROUP BY p ORDER BY n DESC", d30)
+    q("SELECT p, COUNT(*) n, COUNT(DISTINCT uid) u FROM events WHERE ev='phrase' AND day>=? GROUP BY p ORDER BY n DESC", d30),
+    q('SELECT COUNT(*) n FROM notify WHERE enabled=1 AND chat_id IS NOT NULL'),
+    // напоминания: сколько отправлено и что было в следующие сутки — открыл ли человек приложение, прошёл ли урок
+    q(`SELECT type, COUNT(*) n,
+        SUM(CASE WHEN EXISTS(SELECT 1 FROM events e WHERE e.uid=s.uid AND e.ts>=s.ts AND e.ts<s.ts+86400000) THEN 1 ELSE 0 END) opened,
+        SUM(CASE WHEN EXISTS(SELECT 1 FROM events e WHERE e.uid=s.uid AND e.ev IN ('lesson','practice','phrase') AND e.ts>=s.ts AND e.ts<s.ts+86400000) THEN 1 ELSE 0 END) studied
+       FROM sent s WHERE day>=? GROUP BY type ORDER BY n DESC`, d30),
+    q("SELECT ev, COUNT(DISTINCT uid) n FROM events WHERE ev IN ('nt_ask','nt_yes','nt_no','remind') AND day>=? GROUP BY ev", d30)
   ]);
   const one = r => (r.results[0] || {}).n || 0;
   const series = (rows) => { const m = Object.fromEntries(rows.results.map(r => [r.day, r.n])); return Array.from({ length: 30 }, (_, i) => { const d = dayShift(t, i - 29); return [d, m[d] || 0]; }); };
@@ -319,7 +358,8 @@ async function gather(env) {
     today: t, dau: one(k1), wau: one(k2), mau: one(k3), total: one(k4), newToday: one(k5), lessonsToday: one(k6),
     daily: series(daily), newDaily: series(newDaily), lessonsDaily: series(lessonsDaily),
     funnel: funnel.results, fails: fails.results, games: games.results, src: src.results,
-    retention: ret.results[0] || { total: 0, back: 0 }, phr: phr.results
+    retention: ret.results[0] || { total: 0, back: 0 }, phr: phr.results,
+    remOn: one(remOn), rem: rem.results, ask: Object.fromEntries(ask.results.map(r => [r.ev, r.n]))
   };
 }
 
@@ -335,7 +375,7 @@ h1{margin:0;font-size:26px}h1 span{color:var(--accent)}h2{margin:0 0 10px;font-s
 .card{padding:16px}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
 svg{display:block;width:100%;height:auto}.lg{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px}.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-td.n{text-align:right;width:70px}.barc{position:relative}.barc i{position:absolute;left:0;top:7px;bottom:7px;border-radius:5px;background:color-mix(in srgb,var(--accent) 22%,transparent)}.barc span{position:relative}
+td.n{text-align:right;width:70px;white-space:nowrap}.barc{position:relative}.barc i{position:absolute;left:0;top:7px;bottom:7px;border-radius:5px;background:color-mix(in srgb,var(--accent) 22%,transparent)}.barc span{position:relative}
 .empty{color:var(--muted);font-size:14px}.tw{overflow-x:auto}
 form{display:flex;flex-direction:column;gap:12px;max-width:360px;margin:12vh auto 0;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:22px}
 input{font:inherit;font-size:16px;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
@@ -355,6 +395,8 @@ function statsPage(D) {
 <div class="grid2"><div class="card"><h2>Пройдено уроков и тренировок</h2><div id="ch2"></div></div><div class="card"><h2>Игры за 30 дней</h2><div id="games"></div></div></div>
 <div class="grid2"><div class="card"><h2>Докуда доходят: уроки, пройденные впервые</h2><div class="tw" id="funnel"></div></div><div class="card"><h2>Самые трудные уроки (кончились сердца)</h2><div id="fails"></div></div></div>
 <div class="card"><h2>Фразы: пройденные уроки за 30 дней</h2><div id="phr"></div></div>
+<div class="card"><h2>Напоминания за 30 дней</h2><p class="sub" id="remsum" style="margin:0 0 10px"></p><div class="tw" id="rem"></div>
+<p class="sub">«Открыли» и «Занимались» — в течение суток после сообщения. Считается с момента, когда появился этот блок.</p></div>
 </div>
 <script>const D=${JSON.stringify(D).replace(/</g, '\\u003c')};
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -377,6 +419,12 @@ table($('#fails'),D.fails.map(r=>({n:r.n,t:parseL(r.p).t})),['Урок','Раз'
 const GN={fall:'Буквопад',sprint:'Спринт',echo:'Эхо',memo:'Найди пары',odd:'Лишнее слово',spell:'Слово по буквам'},MN={letters:'буквы',words:'слова',w6:'6 пар',w8:'8 пар'};
 const PN={meet:'Знакомство',airport:'Аэропорт',taxi:'Такси',hotel:'Гостиница',street:'На улице',cafe:'Кафе',market:'Рынок',pharmacy:'Аптека и врач',help:'Экстренное'};
 table($('#phr'),(D.phr||[]).map(r=>{const [id,n]=String(r.p).split('-');return {n:r.n,u:r.u,t:(PN[id]||id)+(n?' · '+(n==='2'?'диалог':'фразы'):'')}}),['Ситуация','Пройдено','Людей'],r=>r.t);
+const RN={joke:'Шутка',streak:'Серия под угрозой',back:'Давно не было',new:'Новичок: первые дни',new0:'Новичок: ещё не начал',news:'Новость'},A=D.ask||{};
+$('#remsum').textContent='Включены у '+D.remOn+' · Циро предложил: '+(A.nt_ask||0)+' · согласились: '+(A.nt_yes||0)+' ('+pct(A.nt_yes||0,A.nt_ask||0)+') · отказались: '+(A.nt_no||0)+' · пришли по кнопке под сообщением: '+(A.remind||0);
+(function(){const r=D.rem||[],el=$('#rem');if(!r.length){el.innerHTML='<p class="empty">Пока ничего не отправлено.</p>';return}
+ const tot=r.reduce((a,x)=>({n:a.n+x.n,opened:a.opened+x.opened,studied:a.studied+x.studied}),{n:0,opened:0,studied:0});
+ const row=(t,x,b)=>'<tr><td>'+(b?'<b>'+t+'</b>':esc(t))+'</td><td class="n">'+x.n+'</td><td class="n">'+x.opened+' · '+pct(x.opened,x.n)+'</td><td class="n">'+x.studied+' · '+pct(x.studied,x.n)+'</td></tr>';
+ el.innerHTML='<table><tr><th>Сообщение</th><th>Отправлено</th><th>Открыли</th><th>Занимались</th></tr>'+r.map(x=>row(RN[x.type]||x.type,x)).join('')+row('Всего',tot,true)+'</table>'})();
 table($('#games'),D.games.map(r=>({n:r.n,u:r.u,t:(GN[String(r.p).split('-')[0]]||r.p)+(String(r.p).includes('-')?' · '+(MN[String(r.p).split('-').slice(1).join('-')]||String(r.p).split('-').slice(1).join('-')):'')})),['Игра','Партий','Игроков'],r=>r.t);
 </script></body></html>`;
 }
