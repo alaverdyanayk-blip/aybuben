@@ -26,18 +26,19 @@ function inviteBox(){const f=S.friends||0,nt=nextTier();
    <button class="btn" data-invite>Пригласить</button></div>`}
 function inviteNudge(){const nt=nextTier();if(!nt)return '';return `<button class="link" data-invite style="font-size:14px">Пригласить друга — костюм «${esc(nt.t)}» для Циро</button>`}
 /* «Что нового» — один раз для тех, кто занимался до обновления */
-const NEWS_ID='growth1';
+const NEWS_ID='channel1';
+const CHANNEL='https://t.me/aybubenciro';
 /* показываем один раз: отметка ставится сразу при показе, до конца этого открытия карточка видна, потом — никогда */
 let NEWS_NOW=false,NEWS_CLOSED=false;
 function whatsNew(){if(NEWS_CLOSED)return '';if(S.newsSeen===NEWS_ID&&!NEWS_NOW)return '';if(!Object.keys(S.done).length&&!(S.xp>0)){S.newsSeen=NEWS_ID;return ''}
   if(!NEWS_NOW){NEWS_NOW=true;S.newsSeen=NEWS_ID;save()}
-  const can=!!(TGW&&TGW.requestWriteAccess&&!(S.notif&&S.notif.on));
-  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle','family')}<div class="bubble"><p><b>Я обновился!</b> Пригласите родственника или друга — получите костюмы для меня. И я теперь могу напоминать о себе в Телеграме${can?'':' — включается в профиле'}.</p>
-   <div class="btns">${can?'<button class="btn" data-news-nt>Включить напоминания</button>':''}<button class="btn plain" data-invite>Пригласить друга</button></div></div></div></section>`}
+  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle')}<div class="bubble"><p><b>У меня теперь свой канал!</b> Подписывайтесь — там новости Айбубена и всё интересное про армянский.</p>
+   <div class="btns"><a class="btn" href="${CHANNEL}" target="_blank" rel="noopener" data-news-ch>Подписаться</a></div></div></div></section>`}
 function wireNews(){const done=()=>{NEWS_CLOSED=true;const c=$('.news-card');c&&c.remove()};
   const x=$('[data-news-x]');if(x)x.onclick=done;
   const nt=$('[data-news-nt]');if(nt)nt.onclick=()=>enableNotif(ok=>{const b=$('.news-card .bubble');if(b)b.innerHTML=ok?'<p>Договорились! 🍑 Не чаще раза в день. Выключить можно в профиле.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>';S.newsSeen=NEWS_ID;save();setTimeout(done,2500)});
-  document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()})}
+  document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()});
+  const ch=$('[data-news-ch]');if(ch)ch.addEventListener('click',()=>{track('channel','news');setTimeout(done,600)})}
 /* напоминания */
 /* Циро спрашивает после урока. Первый раз — пока человек не ответил. Второй и последний — когда серия дошла до 3 дней
    и есть что терять; только тем, кто отказался в первый раз, а не выключил напоминания сам (off). */

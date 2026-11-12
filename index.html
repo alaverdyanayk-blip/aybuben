@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="fba544daaa"</script>
+<script>window.BUILD_ID="e6d9c8a8f9"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -932,6 +932,15 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .tracer.ok .tr-msg{color:var(--good)}
 .tr-btns{display:flex;gap:8px}
 .tr-hint{margin:-6px 0 0;color:var(--muted);font-size:14.5px}
+
+/* Профиль: строка «Канал Циро» */
+a.box.ch-row{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;text-decoration:none;color:var(--ink)}
+.ch-row>span:nth-child(2){min-width:0}
+.ch-row b{display:block;font-size:16px}.ch-row small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.ch-ico{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:21px;background:var(--accent-soft,var(--sunk))}
+.ch-go{margin-left:auto;font-size:26px;color:var(--muted);line-height:1}
+.ch-row:active{transform:scale(.985)}
+.news-card a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -2896,6 +2905,7 @@ function renderProfile(){
    <details class="box fold" data-wr="ach" ${WR_OPEN.ach?'open':''}><summary><h3>Достижения</h3><span>${Object.keys(S.ach).length} из ${ACH.length}</span></summary><div class="agrid2">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?'on':''}"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></details>
    ${inviteBox()}
    ${contactBox()}
+   <a class="box ch-row" href="${CHANNEL}" target="_blank" rel="noopener" data-ch-row><span class="ch-ico" aria-hidden="true">📣</span><span><b>Канал Циро</b><small>Новости приложения и армянский — в Телеграме</small></span><span class="ch-go" aria-hidden="true">›</span></a>
    <div class="box"><h3>Настройки</h3>
     ${notifRow()}
     <div class="toggle theme-row"><span>Тема</span><div class="seg" role="group" aria-label="Тема">${[['auto','Как в системе'],['light','Светлая'],['dark','Тёмная']].map(([v,t])=>`<button data-theme-set="${v}" aria-pressed="${(S.theme||'auto')===v}">${t}</button>`).join('')}</div></div>
@@ -2908,6 +2918,7 @@ function renderProfile(){
   document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.g;save();route()});
   document.querySelectorAll('.wr-item').forEach(b=>b.onclick=()=>{S.outfit=b.dataset.o||null;save();route()});
   document.querySelectorAll('[data-theme-set]').forEach(b=>b.onclick=()=>{S.theme=b.dataset.themeSet;save();applyThemePref();renderProfile()});
+  const chr=$('[data-ch-row]');if(chr)chr.addEventListener('click',()=>track('channel','profile'));
   $('#sw-voice').onclick=()=>{S.voice=S.voice===false;save();renderProfile()};
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
@@ -2943,18 +2954,19 @@ function inviteBox(){const f=S.friends||0,nt=nextTier();
    <button class="btn" data-invite>Пригласить</button></div>`}
 function inviteNudge(){const nt=nextTier();if(!nt)return '';return `<button class="link" data-invite style="font-size:14px">Пригласить друга — костюм «${esc(nt.t)}» для Циро</button>`}
 /* «Что нового» — один раз для тех, кто занимался до обновления */
-const NEWS_ID='growth1';
+const NEWS_ID='channel1';
+const CHANNEL='https://t.me/aybubenciro';
 /* показываем один раз: отметка ставится сразу при показе, до конца этого открытия карточка видна, потом — никогда */
 let NEWS_NOW=false,NEWS_CLOSED=false;
 function whatsNew(){if(NEWS_CLOSED)return '';if(S.newsSeen===NEWS_ID&&!NEWS_NOW)return '';if(!Object.keys(S.done).length&&!(S.xp>0)){S.newsSeen=NEWS_ID;return ''}
   if(!NEWS_NOW){NEWS_NOW=true;S.newsSeen=NEWS_ID;save()}
-  const can=!!(TGW&&TGW.requestWriteAccess&&!(S.notif&&S.notif.on));
-  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle','family')}<div class="bubble"><p><b>Я обновился!</b> Пригласите родственника или друга — получите костюмы для меня. И я теперь могу напоминать о себе в Телеграме${can?'':' — включается в профиле'}.</p>
-   <div class="btns">${can?'<button class="btn" data-news-nt>Включить напоминания</button>':''}<button class="btn plain" data-invite>Пригласить друга</button></div></div></div></section>`}
+  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle')}<div class="bubble"><p><b>У меня теперь свой канал!</b> Подписывайтесь — там новости Айбубена и всё интересное про армянский.</p>
+   <div class="btns"><a class="btn" href="${CHANNEL}" target="_blank" rel="noopener" data-news-ch>Подписаться</a></div></div></div></section>`}
 function wireNews(){const done=()=>{NEWS_CLOSED=true;const c=$('.news-card');c&&c.remove()};
   const x=$('[data-news-x]');if(x)x.onclick=done;
   const nt=$('[data-news-nt]');if(nt)nt.onclick=()=>enableNotif(ok=>{const b=$('.news-card .bubble');if(b)b.innerHTML=ok?'<p>Договорились! 🍑 Не чаще раза в день. Выключить можно в профиле.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>';S.newsSeen=NEWS_ID;save();setTimeout(done,2500)});
-  document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()})}
+  document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()});
+  const ch=$('[data-news-ch]');if(ch)ch.addEventListener('click',()=>{track('channel','news');setTimeout(done,600)})}
 /* напоминания */
 /* Циро спрашивает после урока. Первый раз — пока человек не ответил. Второй и последний — когда серия дошла до 3 дней
    и есть что терять; только тем, кто отказался в первый раз, а не выключил напоминания сам (off). */

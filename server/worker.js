@@ -12,8 +12,9 @@
  * Ещё здесь: приглашения друзей (/r/me, /r/claim), настройки напоминаний (/u), вебхук бота (/tg/…) и расписание (scheduled).
  */
 // remind — открыли приложение кнопкой под напоминанием (p — тип напоминания);
-// nt_ask / nt_yes / nt_no — Циро предложил напоминания / согласились / отказались (p — какой раз спрашивал)
-const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game', 'phrase', 'remind', 'nt_ask', 'nt_yes', 'nt_no']);
+// nt_ask / nt_yes / nt_no — Циро предложил напоминания / согласились / отказались (p — какой раз спрашивал);
+// channel — нажали ссылку на канал (p — откуда: news / profile)
+const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game', 'phrase', 'remind', 'nt_ask', 'nt_yes', 'nt_no', 'channel']);
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, ev TEXT NOT NULL, p TEXT, src TEXT);
 CREATE INDEX IF NOT EXISTS ev_day ON events(day, ev);
@@ -213,7 +214,7 @@ async function botHook(req, env, sec) {
   if (m && m.chat && m.chat.type === 'private' && m.from && typeof m.text === 'string') {
     if (/^\/start/.test(m.text)) {
       await setRow(m.from.id, 'enabled=1, chat_id=?', m.chat.id);
-      await tg(env, 'sendPhoto', { chat_id: m.chat.id, photo: art(env, 'cheer'), caption: 'Барев! Я Циро 🍑\nНаучу читать и писать по-армянски.\n\nИногда буду напоминать о себе — не чаще раза в день. Выключить можно кнопкой под напоминанием или командой /stop.', reply_markup: { inline_keyboard: [[{ text: 'Начать учить', web_app: { url: appUrl(env) } }]] } });
+      await tg(env, 'sendPhoto', { chat_id: m.chat.id, photo: art(env, 'cheer'), caption: 'Барев! Я Циро 🍑\nНаучу читать и писать по-армянски.\n\nИногда буду напоминать о себе — не чаще раза в день. Выключить можно кнопкой под напоминанием или командой /stop.', reply_markup: { inline_keyboard: [[{ text: 'Начать учить', web_app: { url: appUrl(env) } }], [{ text: 'Канал Циро', url: CHANNEL }]] } });
     } else if (/^\/stop/.test(m.text)) {
       await setRow(m.from.id, 'enabled=0, chat_id=NULL');
       await tg(env, 'sendMessage', { chat_id: m.chat.id, text: 'Больше не напоминаю. Включить снова — /start или в профиле приложения.' });
@@ -290,13 +291,17 @@ const MSG = {
 const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return n + ' ' + (m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c); };
 const ddiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 864e5);
 /** Решает, писать ли человеку сейчас. now — время UTC в мс. Возвращает {type, text, mood, id} или null. */
+/** Кнопка-ссылка в новости: только на t.me — чтобы опечатка в news.json не увела людей куда попало. */
+const newsLink = n => typeof n.url === 'string' && /^https:\/\/t\.me\/[A-Za-z0-9_]{4,64}\/?$/.test(n.url) ? { text: (typeof n.btn === 'string' && n.btn.trim().slice(0, 40)) || 'Открыть', url: n.url } : null;
+const CHANNEL = 'https://t.me/aybubenciro';
+
 function plan(row, now, news = []) {
   if (!row.enabled || !row.chat_id) return null;
   const loc = new Date(now + (row.tz ?? 180) * 6e4), day = loc.toISOString().slice(0, 10), h = loc.getUTCHours();
   // новость: один раз каждому, в его обычный час, вместо напоминания этого дня (лимит «одно сообщение в день» сохраняется)
   const seen = (row.news || '').split(',').filter(Boolean), nw = news.find(n => n && n.id && n.text && !seen.includes(n.id) && (!n.until || day <= n.until));
   if (nw && row.last_sent !== day && h === Math.min(22, Math.max(9, row.hour ?? row.auto_hour ?? 19)))
-    return { type: 'news', id: nw.id, mood: nw.mood || 'cheer', text: nw.text, day, ignoredNow: row.ignored || 0, used: row.used || '', news: [nw.id, ...seen].slice(0, 30).join(',') };
+    return { type: 'news', id: nw.id, mood: nw.mood || 'cheer', text: nw.text, link: newsLink(nw), day, ignoredNow: row.ignored || 0, used: row.used || '', news: [nw.id, ...seen].slice(0, 30).join(',') };
   if (row.last_day === day || row.last_sent === day) return null;          // уже занимался сегодня или уже писали
   const gap = row.last_day ? ddiff(row.last_day, day) : 99, since = row.last_sent ? ddiff(row.last_sent, day) : 99;
   const ign = row.ignored || 0;
@@ -328,7 +333,7 @@ async function runReminders(env, now = Date.now()) {
   let sent = 0;
   for (const row of rows) {
     const p = plan(row, now, news); if (!p) continue;
-    const r = await tg(env, 'sendPhoto', { chat_id: row.chat_id, photo: art(env, p.mood), caption: p.text, reply_markup: p.type === 'news' ? { inline_keyboard: [[{ text: 'Открыть Айбубен', web_app: { url: appUrl(env) } }], [{ text: 'Не напоминать', callback_data: 'off' }]] } : KB(env, p.type) });
+    const r = await tg(env, 'sendPhoto', { chat_id: row.chat_id, photo: art(env, p.mood), caption: p.text, reply_markup: p.type === 'news' ? { inline_keyboard: [...(p.link ? [[p.link]] : []), [{ text: 'Открыть Айбубен', web_app: { url: appUrl(env) } }], [{ text: 'Не напоминать', callback_data: 'off' }]] } : KB(env, p.type) });
     if (r.ok) {
       sent++; await env.DB.prepare('UPDATE notify SET last_sent=?, ignored=?, used=?, news=COALESCE(?,news) WHERE uid=?').bind(p.day, p.ignoredNow, p.used, p.news || null, row.uid).run();
       try { await env.DB.prepare('INSERT INTO sent(ts,day,uid,type) VALUES(?,?,?,?)').bind(now, today(now), row.uid, p.type).run(); } catch (e) { } // журнал для статистики
@@ -369,7 +374,7 @@ async function gather(env) {
         SUM(CASE WHEN EXISTS(SELECT 1 FROM events e WHERE e.uid=s.uid AND e.ts>=s.ts AND e.ts<s.ts+86400000) THEN 1 ELSE 0 END) opened,
         SUM(CASE WHEN EXISTS(SELECT 1 FROM events e WHERE e.uid=s.uid AND e.ev IN ('lesson','practice','phrase') AND e.ts>=s.ts AND e.ts<s.ts+86400000) THEN 1 ELSE 0 END) studied
        FROM sent s WHERE day>=? GROUP BY type ORDER BY n DESC`, d30),
-    q("SELECT ev, COUNT(DISTINCT uid) n FROM events WHERE ev IN ('nt_ask','nt_yes','nt_no','remind') AND day>=? GROUP BY ev", d30)
+    q("SELECT ev, COUNT(DISTINCT uid) n FROM events WHERE ev IN ('nt_ask','nt_yes','nt_no','remind','channel') AND day>=? GROUP BY ev", d30)
   ]);
   const one = r => (r.results[0] || {}).n || 0;
   const series = (rows) => { const m = Object.fromEntries(rows.results.map(r => [r.day, r.n])); return Array.from({ length: 30 }, (_, i) => { const d = dayShift(t, i - 29); return [d, m[d] || 0]; }); };
@@ -439,7 +444,7 @@ const GN={fall:'Буквопад',sprint:'Спринт',echo:'Эхо',memo:'На
 const PN={meet:'Знакомство',airport:'Аэропорт',taxi:'Такси',hotel:'Гостиница',street:'На улице',cafe:'Кафе',market:'Рынок',pharmacy:'Аптека и врач',help:'Экстренное'};
 table($('#phr'),(D.phr||[]).map(r=>{const [id,n]=String(r.p).split('-');return {n:r.n,u:r.u,t:(PN[id]||id)+(n?' · '+(n==='2'?'диалог':'фразы'):'')}}),['Ситуация','Пройдено','Людей'],r=>r.t);
 const RN={joke:'Шутка',streak:'Серия под угрозой',back:'Давно не было',new:'Новичок: первые дни',new0:'Новичок: ещё не начал',news:'Новость'},A=D.ask||{};
-$('#remsum').textContent='Включены у '+D.remOn+' · Циро предложил: '+(A.nt_ask||0)+' · согласились: '+(A.nt_yes||0)+' ('+pct(A.nt_yes||0,A.nt_ask||0)+') · отказались: '+(A.nt_no||0)+' · пришли по кнопке под сообщением: '+(A.remind||0);
+$('#remsum').textContent='Включены у '+D.remOn+' · Циро предложил: '+(A.nt_ask||0)+' · согласились: '+(A.nt_yes||0)+' ('+pct(A.nt_yes||0,A.nt_ask||0)+') · отказались: '+(A.nt_no||0)+' · пришли по кнопке под сообщением: '+(A.remind||0)+' · перешли в канал из приложения: '+(A.channel||0);
 (function(){const r=D.rem||[],el=$('#rem');if(!r.length){el.innerHTML='<p class="empty">Пока ничего не отправлено.</p>';return}
  const tot=r.reduce((a,x)=>({n:a.n+x.n,opened:a.opened+x.opened,studied:a.studied+x.studied}),{n:0,opened:0,studied:0});
  const row=(t,x,b)=>'<tr><td>'+(b?'<b>'+t+'</b>':esc(t))+'</td><td class="n">'+x.n+'</td><td class="n">'+x.opened+' · '+pct(x.opened,x.n)+'</td><td class="n">'+x.studied+' · '+pct(x.studied,x.n)+'</td></tr>';

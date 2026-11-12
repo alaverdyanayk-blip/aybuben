@@ -70,3 +70,8 @@ ok(W.statsPage(G).includes('Напоминания за 30 дней'),'стра�
  ok(new Set(seen).size===W.MSG.joke.length&&W.MSG.joke.length===25,'25 шуток подряд без повторов: '+new Set(seen).size);
  ok(Object.values(W.MSG).flat().every(m=>m[2].length<=200&&['cheer','think','wink','sad','wow','happy'].includes(m[1])),'все тексты короткие, картинки существуют');
  const ids=Object.values(W.MSG).flat().map(m=>m[0]);ok(new Set(ids).size===ids.length,'метки текстов не повторяются')}
+// новость с кнопкой-ссылкой на канал
+{const nw=[{id:'ch1',text:'Канал!',mood:'wow',url:'https://t.me/aybubenciro',btn:'Подписаться на канал'}];
+ const q=W.plan({...base,first:D(-10),last_day:D(-1)},now,nw);ok(q&&q.type==='news'&&q.link&&q.link.url==='https://t.me/aybubenciro'&&q.link.text==='Подписаться на канал','новость с кнопкой канала');
+ const q2=W.plan({...base,first:D(-10),last_day:D(-1)},now,[{id:'x',text:'t',url:'https://evil.example/x'}]);ok(q2&&q2.type==='news'&&q2.link===null,'чужая ссылка в новости не превращается в кнопку');
+ const q3=W.plan({...base,first:D(-10),last_day:D(-1),news:'ch1'},now,nw);ok(q3&&q3.type!=='news','новость второй раз не приходит')}

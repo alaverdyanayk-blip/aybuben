@@ -30,6 +30,7 @@ function renderProfile(){
    <details class="box fold" data-wr="ach" ${WR_OPEN.ach?'open':''}><summary><h3>Достижения</h3><span>${Object.keys(S.ach).length} из ${ACH.length}</span></summary><div class="agrid2">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?'on':''}"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></details>
    ${inviteBox()}
    ${contactBox()}
+   <a class="box ch-row" href="${CHANNEL}" target="_blank" rel="noopener" data-ch-row><span class="ch-ico" aria-hidden="true">📣</span><span><b>Канал Циро</b><small>Новости приложения и армянский — в Телеграме</small></span><span class="ch-go" aria-hidden="true">›</span></a>
    <div class="box"><h3>Настройки</h3>
     ${notifRow()}
     <div class="toggle theme-row"><span>Тема</span><div class="seg" role="group" aria-label="Тема">${[['auto','Как в системе'],['light','Светлая'],['dark','Тёмная']].map(([v,t])=>`<button data-theme-set="${v}" aria-pressed="${(S.theme||'auto')===v}">${t}</button>`).join('')}</div></div>
@@ -42,6 +43,7 @@ function renderProfile(){
   document.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.g;save();route()});
   document.querySelectorAll('.wr-item').forEach(b=>b.onclick=()=>{S.outfit=b.dataset.o||null;save();route()});
   document.querySelectorAll('[data-theme-set]').forEach(b=>b.onclick=()=>{S.theme=b.dataset.themeSet;save();applyThemePref();renderProfile()});
+  const chr=$('[data-ch-row]');if(chr)chr.addEventListener('click',()=>track('channel','profile'));
   $('#sw-voice').onclick=()=>{S.voice=S.voice===false;save();renderProfile()};
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};

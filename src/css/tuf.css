@@ -284,3 +284,12 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .tracer.ok .tr-msg{color:var(--good)}
 .tr-btns{display:flex;gap:8px}
 .tr-hint{margin:-6px 0 0;color:var(--muted);font-size:14.5px}
+
+/* Профиль: строка «Канал Циро» */
+a.box.ch-row{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;text-decoration:none;color:var(--ink)}
+.ch-row>span:nth-child(2){min-width:0}
+.ch-row b{display:block;font-size:16px}.ch-row small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.ch-ico{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:21px;background:var(--accent-soft,var(--sunk))}
+.ch-go{margin-left:auto;font-size:26px;color:var(--muted);line-height:1}
+.ch-row:active{transform:scale(.985)}
+.news-card a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
