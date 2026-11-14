@@ -40,12 +40,15 @@ function wireNews(){const done=()=>{NEWS_CLOSED=true;const c=$('.news-card');c&&
   document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()});
   const ch=$('[data-news-ch]');if(ch)ch.addEventListener('click',()=>{track('channel','news');setTimeout(done,600)})}
 /* напоминания */
-/* Циро спрашивает после урока. Первый раз — пока человек не ответил. Второй и последний — когда серия дошла до 3 дней
-   и есть что терять; только тем, кто отказался в первый раз, а не выключил напоминания сам (off). */
-function askNotif(){if(!TGW||!TGW.requestWriteAccess)return '';const n=S.notif,st=streakNow();let k=0,text='';
-  if(!n){k=1;text='Можно я буду иногда напоминать о себе в Телеграме? Обещаю без спама — не чаще раза в день.'}
-  else if(!n.on&&!n.off&&!n.ask2&&st>=3){k=2;n.ask2=today();save();text=`Серия уже ${st} ${plural(st,'день','дня','дней')} 🔥 Обидно будет её потерять. Давай я напомню в Телеграме, если забудешь? Не чаще раза в день.`}
-  if(!k)return '';track('nt_ask',k);
+/* Циро спрашивает после урока. Пока человек не ответил — не больше трёх раз (S.ntAsk), третий раз предупреждает, что последний.
+   Ещё один, последний шанс — когда серия дошла до 3 дней и есть что терять: тем, кто отказался или так и не ответил,
+   но не тем, кто выключил напоминания сам (off). Вопрос и событие считаются один раз за урок, даже если экран итогов перерисовался. */
+function askNotif(){if(!TGW||!TGW.requestWriteAccess)return '';const n=S.notif,st=streakNow(),once=!LS||!LS.ntShown;let k=0,text='';
+  if(!n&&(S.ntAsk||0)<3){k=1;if(once){S.ntAsk=(S.ntAsk||0)+1;save()}
+    text='Можно я буду иногда напоминать о себе в Телеграме? Обещаю без спама — не чаще раза в день.'+(S.ntAsk>=3?' Больше спрашивать не буду 🙂':'')}
+  else if((!n||(!n.on&&!n.off))&&!(n&&n.ask2)&&st>=3){k=2;if(once){S.notif=Object.assign({on:false,freq:1,hour:null},n||{},{ask2:today()});save()}
+    text=`Серия уже ${st} ${plural(st,'день','дня','дней')} 🔥 Обидно будет её потерять. Давай я напомню в Телеграме, если забудешь? Не чаще раза в день.`}
+  if(!k)return '';if(once){track('nt_ask',k);if(LS)LS.ntShown=1}
   return `<div class="bubble" id="ask-nt" data-ask="${k}" style="text-align:left"><p>${text}</p><div class="btns two"><button class="btn" data-nt="1">${k===2?'Да, напомни':'Да'}</button><button class="btn plain" data-nt="0">Не надо</button></div></div>`}
 function enableNotif(done){if(!TGW||!TGW.requestWriteAccess){done&&done(false);return}
   try{TGW.requestWriteAccess(ok=>{S.notif=Object.assign({hour:null,freq:1},S.notif||{},{on:!!ok});if(ok)delete S.notif.off;save();syncU(true,true);done&&done(!!ok)})}catch(e){done&&done(false)}}

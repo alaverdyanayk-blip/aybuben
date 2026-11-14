@@ -47,6 +47,13 @@ test('«Да» не отменяется медленным старым отв�
   await p.evaluate(()=>{startLesson(LESSONS[0],false);return __solveAll()});await p.waitForTimeout(150);
   await p.evaluate(()=>document.querySelector('[data-nt="1"]').click());await p.waitForTimeout(3200);   // старый ответ «выключено» пришёл после «Да»
   const n=await p.evaluate(()=>S.notif);if(!n||!n.on)out.push('напоминания выключились: '+JSON.stringify(n));if(n&&n.off)out.push('помечено «выключил сам»');return out.concat(p.errs)});
+test('не ответил — спрашивает не больше трёх раз, третий раз предупреждает; потом один шанс при серии 3 дня',async b=>{const out=[],p=await page(b);
+  const res=await p.evaluate(()=>{const r=[];for(let i=0;i<5;i++){startLesson(LESSONS[i],false);__solveAll();const x=document.getElementById('ask-nt');r.push(x?x.dataset.ask+(/Больше спрашивать не буду/.test(x.textContent)?'!':''):'-');
+      if(i===0){/* экран итогов перерисовался — счёт не должен удвоиться */document.getElementById('ex').insertAdjacentHTML('beforeend',askNotif())}closeLesson()}return {r:r.join(','),n:S.ntAsk}});
+  if(res.r!=='1,1,1!,-,-')out.push('показы: '+res.r+' (ждали 1,1,1!,-,-)');if(res.n!==3)out.push('счётчик '+res.n);
+  if(ev(p,'nt_ask').length!==3)out.push('событий nt_ask: '+ev(p,'nt_ask').length);
+  const k2=await p.evaluate(()=>{S.streak=2;S.lastDay=(()=>{const x=new Date();x.setDate(x.getDate()-1);return dstr(x)})();save();const r=[];for(let i=5;i<7;i++){startLesson(LESSONS[i],false);__solveAll();const x=document.getElementById('ask-nt');r.push(x?x.dataset.ask:'-');closeLesson()}return r.join(',')});
+  if(k2!=='2,-')out.push('при серии 3 дня: '+k2+' (ждали 2,-)');return out.concat(p.errs)});
 test('отказался → при серии 3 дня спрашивает ещё раз, потом больше никогда',async b=>{const out=[],p=await page(b,{st:{v:3,xp:100,done:{ab1a:1},streak:2,best:2,lastDay:d(-1),notif:{on:false,freq:1,hour:null}}});
   await p.evaluate(()=>{startLesson(LESSONS[1],false);return __solveAll()});await p.waitForTimeout(200);
   const a=await p.evaluate(()=>{const x=document.getElementById('ask-nt');return x&&x.dataset.ask});if(a!=='2')out.push('второго вопроса нет: '+a);

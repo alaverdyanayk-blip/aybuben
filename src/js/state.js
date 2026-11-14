@@ -52,7 +52,7 @@ function mergeState(a,b){
   const m=Object.assign({},o,n);
   m.done=each(n.done,o.done,num);
   m.daily=each(n.daily,o.daily,num);
-  m.xp=num(n.xp,o.xp);m.read=num(n.read,o.read);m.perfect=num(n.perfect,o.perfect);m.best=num(n.best,o.best);m.friends=num(n.friends,o.friends);
+  m.xp=num(n.xp,o.xp);if(n.ntAsk||o.ntAsk)m.ntAsk=num(n.ntAsk,o.ntAsk);m.read=num(n.read,o.read);m.perfect=num(n.perfect,o.perfect);m.best=num(n.best,o.best);m.friends=num(n.friends,o.friends);
   const late=(n.lastDay||'')>=(o.lastDay||'')?n:o;m.lastDay=late.lastDay;m.streak=n.lastDay===o.lastDay?num(n.streak,o.streak):late.streak;
   m.ach=each(n.ach,o.ach,(x,y)=>x&&y?(x<y?x:y):x||y);
   m.miles=each(n.miles,o.miles,(x,y)=>x&&y?(x<y?x:y):x||y);
