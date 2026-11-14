@@ -293,3 +293,11 @@ a.box.ch-row{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;te
 .ch-go{margin-left:auto;font-size:26px;color:var(--muted);line-height:1}
 .ch-row:active{transform:scale(.985)}
 .news-card a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+
+/* Пропись: сколько штрихов и как вести */
+.tr-how{margin:0 0 8px;display:flex;align-items:center;gap:8px;font-size:14px;line-height:1.35;color:var(--muted)}
+.tr-how.multi{color:var(--ink);background:var(--accent-soft);border-radius:12px;padding:8px 12px}
+.tr-how b{flex:none;display:grid;place-items:center;min-width:26px;height:26px;border-radius:9px;background:var(--accent);color:#fff;font-size:15px}
+.tr-how.pulse{animation:trpulse .9s ease-out 1}
+@keyframes trpulse{0%{transform:scale(1)}20%{transform:scale(1.04)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.tr-how.pulse{animation:none}}

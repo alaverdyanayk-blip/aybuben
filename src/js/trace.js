@@ -30,7 +30,8 @@ function trJudge(user,exp,tol){const u=trResample(user),e=exp.pts,f=trMean(u,e),
 function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
   const w=G.w||70,strokes=G.s.map(d=>({d,...trSample(d)}));
   const ys=strokes.flatMap(s=>s.pts.map(p=>p[1])),TR_TOP=Math.min(...ys,15)-8,TR_BOT=Math.max(...ys,92)+8;
-  box.innerHTML=`<div class="tracer"><canvas aria-label="Поле для прописи: обведите букву ${esc(key)} пальцем"></canvas>
+  const N=strokes.length,howTxt=N>1?`В этой букве ${N} ${plural(N,'штрих','штриха','штрихов')}: после каждого отрывайте палец`:'Один штрих: ведите, не отрывая пальца';
+  box.innerHTML=`<div class="tracer"><p class="tr-how${N>1?' multi':''}">${N>1?'<b>'+N+'</b> ':''}${N>1?howTxt.replace(/^В этой букве \d+ /,''):howTxt}</p><canvas aria-label="Поле для прописи: обведите букву ${esc(key)} пальцем"></canvas>
     <div class="tr-bar"><span class="tr-msg" role="status" aria-live="polite">Штрих 1 из ${strokes.length}: начните с точки</span>
     <div class="tr-btns"><button class="btn plain sm" data-tr="show">Показать</button><button class="btn plain sm" data-tr="again">Заново</button></div></div></div>`;
   const cv=box.querySelector('canvas'),ctx=cv.getContext('2d'),msg=box.querySelector('.tr-msg');
@@ -74,6 +75,19 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
       if(cur>=strokes.length){done=true;draw();msg.textContent=mist?`Готово! Подсказок: ${mist}`:'Отлично, без единой ошибки!';box.querySelector('.tracer').classList.add('ok');opts.onDone&&opts.onDone(mist);return}
       msg.textContent=`Штрих ${cur+1} из ${strokes.length}`;draw();return}
     mist++;haptic&&haptic('bad');
+    /* Обвёл несколько штрихов одним движением: начал там, где надо, линия сильно длиннее штриха и ложится на следующие штрихи */
+    const rest=strokes.slice(cur),restPts=rest.flatMap(s=>s.pts),near=(p,arr)=>Math.min(...arr.map(q=>Math.hypot(p[0]-q[0],p[1]-q[1])));
+    const uu=trResample(u,64),ul=trLen(uu),s0=strokes[cur].pts[0],e0=strokes[cur].pts[TR_N-1];
+    const startOk=Math.min(Math.hypot(uu[0][0]-s0[0],uu[0][1]-s0[1]),Math.hypot(uu[0][0]-e0[0],uu[0][1]-e0[1]))<tol*1.8;
+    const restLen=rest.reduce((a,s,i)=>a+s.len+(i?Math.hypot(s.pts[0][0]-rest[i-1].pts[TR_N-1][0],s.pts[0][1]-rest[i-1].pts[TR_N-1][1]):0),0);
+    const onGlyph=uu.filter(p=>near(p,restPts)<tol*1.2).length/uu.length;            // линия лежит на штрихах (переходы между ними — нет)
+    const cov=st=>st.pts.filter(q=>near(q,uu)<tol*1.1).length/st.pts.length;           // какую часть штриха прошла линия
+    const oneGo=rest.length>1&&startOk&&ul>strokes[cur].len*1.06+strokes[cur+1].len*.5&&ul<restLen*1.6&&onGlyph>=.65&&cov(strokes[cur])>=.7&&cov(strokes[cur+1])>=.6;
+    if(oneGo){const left=strokes.length-cur;
+      msg.textContent=cur===0?`Вы обвели всю букву сразу. В ней ${strokes.length} ${plural(strokes.length,'штрих','штриха','штрихов')} — доведите первый до конца и оторвите палец`:`Это несколько штрихов сразу. Осталось ${left} — по одному, отрывая палец`;
+      box.querySelector('.tracer').classList.remove('shake');void cv.offsetWidth;box.querySelector('.tracer').classList.add('shake');
+      const how=box.querySelector('.tr-how');if(how){how.classList.remove('pulse');void how.offsetWidth;how.classList.add('pulse')}
+      show(cur,cur+1);return}
     const later=strokes.slice(cur+1).findIndex(s=>trJudge(u,s,tol)!=='miss');
     msg.textContent=res==='dir'?'В другую сторону — начните с зелёной точки':later>=0?`Этот штрих позже — сначала штрих ${cur+1}`:'Почти — посмотрите, как он идёт';
     box.querySelector('.tracer').classList.remove('shake');void cv.offsetWidth;box.querySelector('.tracer').classList.add('shake');

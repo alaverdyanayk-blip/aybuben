@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="b7520901f1"</script>
+<script>window.BUILD_ID="7bb91c7123"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -941,6 +941,14 @@ a.box.ch-row{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;te
 .ch-go{margin-left:auto;font-size:26px;color:var(--muted);line-height:1}
 .ch-row:active{transform:scale(.985)}
 .news-card a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+
+/* Пропись: сколько штрихов и как вести */
+.tr-how{margin:0 0 8px;display:flex;align-items:center;gap:8px;font-size:14px;line-height:1.35;color:var(--muted)}
+.tr-how.multi{color:var(--ink);background:var(--accent-soft);border-radius:12px;padding:8px 12px}
+.tr-how b{flex:none;display:grid;place-items:center;min-width:26px;height:26px;border-radius:9px;background:var(--accent);color:#fff;font-size:15px}
+.tr-how.pulse{animation:trpulse .9s ease-out 1}
+@keyframes trpulse{0%{transform:scale(1)}20%{transform:scale(1.04)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.tr-how.pulse{animation:none}}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -1740,7 +1748,8 @@ function trJudge(user,exp,tol){const u=trResample(user),e=exp.pts,f=trMean(u,e),
 function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
   const w=G.w||70,strokes=G.s.map(d=>({d,...trSample(d)}));
   const ys=strokes.flatMap(s=>s.pts.map(p=>p[1])),TR_TOP=Math.min(...ys,15)-8,TR_BOT=Math.max(...ys,92)+8;
-  box.innerHTML=`<div class="tracer"><canvas aria-label="Поле для прописи: обведите букву ${esc(key)} пальцем"></canvas>
+  const N=strokes.length,howTxt=N>1?`В этой букве ${N} ${plural(N,'штрих','штриха','штрихов')}: после каждого отрывайте палец`:'Один штрих: ведите, не отрывая пальца';
+  box.innerHTML=`<div class="tracer"><p class="tr-how${N>1?' multi':''}">${N>1?'<b>'+N+'</b> ':''}${N>1?howTxt.replace(/^В этой букве \d+ /,''):howTxt}</p><canvas aria-label="Поле для прописи: обведите букву ${esc(key)} пальцем"></canvas>
     <div class="tr-bar"><span class="tr-msg" role="status" aria-live="polite">Штрих 1 из ${strokes.length}: начните с точки</span>
     <div class="tr-btns"><button class="btn plain sm" data-tr="show">Показать</button><button class="btn plain sm" data-tr="again">Заново</button></div></div></div>`;
   const cv=box.querySelector('canvas'),ctx=cv.getContext('2d'),msg=box.querySelector('.tr-msg');
@@ -1784,6 +1793,19 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
       if(cur>=strokes.length){done=true;draw();msg.textContent=mist?`Готово! Подсказок: ${mist}`:'Отлично, без единой ошибки!';box.querySelector('.tracer').classList.add('ok');opts.onDone&&opts.onDone(mist);return}
       msg.textContent=`Штрих ${cur+1} из ${strokes.length}`;draw();return}
     mist++;haptic&&haptic('bad');
+    /* Обвёл несколько штрихов одним движением: начал там, где надо, линия сильно длиннее штриха и ложится на следующие штрихи */
+    const rest=strokes.slice(cur),restPts=rest.flatMap(s=>s.pts),near=(p,arr)=>Math.min(...arr.map(q=>Math.hypot(p[0]-q[0],p[1]-q[1])));
+    const uu=trResample(u,64),ul=trLen(uu),s0=strokes[cur].pts[0],e0=strokes[cur].pts[TR_N-1];
+    const startOk=Math.min(Math.hypot(uu[0][0]-s0[0],uu[0][1]-s0[1]),Math.hypot(uu[0][0]-e0[0],uu[0][1]-e0[1]))<tol*1.8;
+    const restLen=rest.reduce((a,s,i)=>a+s.len+(i?Math.hypot(s.pts[0][0]-rest[i-1].pts[TR_N-1][0],s.pts[0][1]-rest[i-1].pts[TR_N-1][1]):0),0);
+    const onGlyph=uu.filter(p=>near(p,restPts)<tol*1.2).length/uu.length;            // линия лежит на штрихах (переходы между ними — нет)
+    const cov=st=>st.pts.filter(q=>near(q,uu)<tol*1.1).length/st.pts.length;           // какую часть штриха прошла линия
+    const oneGo=rest.length>1&&startOk&&ul>strokes[cur].len*1.06+strokes[cur+1].len*.5&&ul<restLen*1.6&&onGlyph>=.65&&cov(strokes[cur])>=.7&&cov(strokes[cur+1])>=.6;
+    if(oneGo){const left=strokes.length-cur;
+      msg.textContent=cur===0?`Вы обвели всю букву сразу. В ней ${strokes.length} ${plural(strokes.length,'штрих','штриха','штрихов')} — доведите первый до конца и оторвите палец`:`Это несколько штрихов сразу. Осталось ${left} — по одному, отрывая палец`;
+      box.querySelector('.tracer').classList.remove('shake');void cv.offsetWidth;box.querySelector('.tracer').classList.add('shake');
+      const how=box.querySelector('.tr-how');if(how){how.classList.remove('pulse');void how.offsetWidth;how.classList.add('pulse')}
+      show(cur,cur+1);return}
     const later=strokes.slice(cur+1).findIndex(s=>trJudge(u,s,tol)!=='miss');
     msg.textContent=res==='dir'?'В другую сторону — начните с зелёной точки':later>=0?`Этот штрих позже — сначала штрих ${cur+1}`:'Почти — посмотрите, как он идёт';
     box.querySelector('.tracer').classList.remove('shake');void cv.offsetWidth;box.querySelector('.tracer').classList.add('shake');
@@ -2476,7 +2498,7 @@ function tapNext(b,fn){const t0=performance.now();b.onclick=e=>{if(e&&e.isTruste
 function footCheck(enabled){foot(`<span></span><button class="btn" id="chk" ${enabled?'':'disabled'}>Проверить</button>`);$('#chk').onclick=check}
 function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);tapNext($('#nxt'),()=>next());$('#nxt').focus();LS.state='info'}
 /* Пропись в уроке: ошибки не отнимают сердца, можно пропустить */
-function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напишите букву <span class="arm">${esc(ex.key)}</span></h2><p class="tr-hint">Обведите пальцем по порядку штрихов. Зелёная точка — начало.</p><div id="tr-box"></div>`);
+function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напишите букву <span class="arm">${esc(ex.key)}</span></h2><p class="tr-hint">Обведите пальцем по порядку. Зелёная точка — где начать штрих.</p><div id="tr-box"></div>`);
   foot(`<button class="link" id="tr-skip">Пропустить</button><button class="btn" id="nxt" disabled>Дальше</button>`);LS.state='info';
   $('#nxt').onclick=()=>next();$('#tr-skip').onclick=()=>next();
   LS.tr=tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}

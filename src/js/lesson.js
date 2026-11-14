@@ -48,7 +48,7 @@ function tapNext(b,fn){const t0=performance.now();b.onclick=e=>{if(e&&e.isTruste
 function footCheck(enabled){foot(`<span></span><button class="btn" id="chk" ${enabled?'':'disabled'}>Проверить</button>`);$('#chk').onclick=check}
 function footNext(label='Дальше'){foot(`<span></span><button class="btn" id="nxt">${label}</button>`);tapNext($('#nxt'),()=>next());$('#nxt').focus();LS.state='info'}
 /* Пропись в уроке: ошибки не отнимают сердца, можно пропустить */
-function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напишите букву <span class="arm">${esc(ex.key)}</span></h2><p class="tr-hint">Обведите пальцем по порядку штрихов. Зелёная точка — начало.</p><div id="tr-box"></div>`);
+function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напишите букву <span class="arm">${esc(ex.key)}</span></h2><p class="tr-hint">Обведите пальцем по порядку. Зелёная точка — где начать штрих.</p><div id="tr-box"></div>`);
   foot(`<button class="link" id="tr-skip">Пропустить</button><button class="btn" id="nxt" disabled>Дальше</button>`);LS.state='info';
   $('#nxt').onclick=()=>next();$('#tr-skip').onclick=()=>next();
   LS.tr=tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}
