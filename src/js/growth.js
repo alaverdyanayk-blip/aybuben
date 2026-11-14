@@ -70,10 +70,12 @@ function prefHour(){const h=S.hrs||{},ks=Object.keys(h).filter(k=>h[k]>0&&+k>=0&
 function progressInfo(){try{const nx=LESSONS.find((l,i)=>unlocked(i)&&!S.done[l.id]);
   return {l:learnedSet().size,d:Object.keys(S.done).length,nx:nx?nx.t:'',due:dueKeys().length}}catch(e){return null}}
 /* explicit=true — человек сам поменял настройки в приложении; иначе сервер главнее (кнопки «Реже» / «Не напоминать» в боте) */
-let syncT,syncX=false;
-function syncU(now,explicit){if(!TGW)return;if(explicit)syncX=true;clearTimeout(syncT);syncT=setTimeout(()=>{const x=syncX;syncX=false;
+/* NT_EDIT — когда человек последний раз сам менял напоминания. Ответ на запрос, отправленный раньше, его выбор не перекрывает
+   (иначе «Да» в первые секунды после открытия отменялось старым ответом сервера). */
+let syncT,syncX=false,NT_EDIT=0;
+function syncU(now,explicit){if(!TGW)return;if(explicit){syncX=true;NT_EDIT=Date.now()}clearTimeout(syncT);syncT=setTimeout(()=>{const x=syncX;syncX=false;const sent=Date.now();
   api('/u',Object.assign({streak:streakNow(),day:S.lastDay,tz:-new Date().getTimezoneOffset(),hour:prefHour(),info:progressInfo()},x?{notif:S.notif||{on:false}}:{})).then(j=>{
-   if(!j||!j.ok||!S.notif)return;const n=S.notif,ch=n.on!==j.on||(n.freq||1)!==j.freq||(n.hour??null)!==(j.hour??null);
+   if(!j||!j.ok||!S.notif)return;if(!x&&NT_EDIT>=sent-1)return;const n=S.notif,ch=n.on!==j.on||(n.freq||1)!==j.freq||(n.hour??null)!==(j.hour??null);
    if(ch){if(n.on&&!j.on)n.off=1;   // выключил кнопкой под сообщением в боте
     n.on=j.on;n.freq=j.freq;n.hour=j.hour??null;save();if(location.hash.slice(1)==='profile')renderProfile()}}).catch(()=>{})},now?50:1500)}
 /* старт: метка приглашения, «Заниматься 2 минуты» из бота */
