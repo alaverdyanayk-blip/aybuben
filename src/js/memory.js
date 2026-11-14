@@ -23,5 +23,5 @@ function seedMem(){/* идемпотентно: только добавляет 
   LESSONS.forEach(l=>{if(l.abc&&S.done[l.id]&&!/w$/.test(l.id))l.abc.forEach(k=>kn.add(k))});
   kn.forEach(k=>{S.mem['#'+k]=S.mem['#'+k]||[+(2+Math.random()*5).toFixed(2),t-86400*(1+Math.random()*3)|0]});
   const ws=new Set();LESSONS.forEach(l=>{if(!S.done[l.id])return;if(l.abc&&/w$/.test(l.id))WORDS.filter(w=>readable(w,kn)).forEach(w=>ws.add(w));if(l.th)l.th.words.forEach(w=>ws.add(w))});
-  ws.forEach(w=>{if(readable(w,kn))S.mem[w.a]=S.mem[w.a]||[+(1.5+Math.random()*6).toFixed(2),t-86400*(1+Math.random()*3)|0]});S.memV=1}
+  ws.forEach(w=>{if(readable(w,kn))S.mem[w.a]=S.mem[w.a]||[+(1.5+Math.random()*6).toFixed(2),t-86400*(1+Math.random()*3)|0]})}
 try{seedMem()}catch(e){}

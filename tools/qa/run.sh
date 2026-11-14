@@ -9,6 +9,7 @@ fail=0
 run(){ echo; echo "=== $1"; shift; "$@" || fail=$((fail+1)); }
 run "Приложение"             node tools/qa/app.test.js
 run "Режим Телеграма"        node tools/qa/tg.test.js
+run "Читаемость (axe)"       node tools/qa/a11y.test.js
 run "Сервер: напоминания"    node --no-warnings tools/qa/server-reminders.mjs
 run "Слияние прогресса"      bash -c 'out=$(node tools/qa/merge.js); echo "$out"; ! echo "$out" | grep -q "^FAIL"'
 [ -n "$STARTED" ] && kill $STARTED

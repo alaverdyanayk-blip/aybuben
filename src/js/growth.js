@@ -36,8 +36,6 @@ function whatsNew(){if(NEWS_CLOSED)return '';if(S.newsSeen===NEWS_ID&&!NEWS_NOW)
    <div class="btns"><a class="btn" href="${CHANNEL}" target="_blank" rel="noopener" data-news-ch>Подписаться</a></div></div></div></section>`}
 function wireNews(){const done=()=>{NEWS_CLOSED=true;const c=$('.news-card');c&&c.remove()};
   const x=$('[data-news-x]');if(x)x.onclick=done;
-  const nt=$('[data-news-nt]');if(nt)nt.onclick=()=>enableNotif(ok=>{const b=$('.news-card .bubble');if(b)b.innerHTML=ok?'<p>Договорились! 🍑 Не чаще раза в день. Выключить можно в профиле.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>';S.newsSeen=NEWS_ID;save();setTimeout(done,2500)});
-  document.querySelectorAll('.news-card [data-invite]').forEach(b=>b.onclick=()=>{invite(b);S.newsSeen=NEWS_ID;save()});
   const ch=$('[data-news-ch]');if(ch)ch.addEventListener('click',()=>{track('channel','news');setTimeout(done,600)})}
 /* напоминания */
 /* Циро спрашивает после урока. Пока человек не ответил — не больше трёх раз (S.ntAsk), третий раз предупреждает, что последний.

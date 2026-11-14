@@ -74,6 +74,14 @@ test('прописи: обводка всей буквы одним движен
 test('прописи: каракули не принимаются ни за букву, ни за «обвели сразу»',()=>{const out=[];for(const k of Object.keys(STROKES)){const t=__tracer(k),w=STROKES[k].w||70,sc=[];for(let i=0;i<60;i++)sc.push([5+(i*7)%w,20+((i*13)%70)]);t.draw(sc);if(/сразу|несколько|Штрих 2|Готово/.test(t.msg()))out.push(k+': '+t.msg());t.end()}return out});
 test('прописи: подсказка о числе штрихов',()=>{const out=[];for(const k of Object.keys(STROKES)){const n=STROKES[k].s.length,t=__tracer(k),h=t.how();if(n>1?!h.includes(n+' штрих'):!/Один штрих/.test(h))out.push(k+': '+h);t.end()}return out});
 
+test('карточка буквы: у каждой буквы пропись, переключатель заглавная/строчная работает',()=>{const out=[];__fresh();location.hash='alphabet';route();
+  for(const l of LETTERS){letterSheet(l.k);const sc=[...document.querySelectorAll('.scrim')].pop();if(!sc){out.push(l.k+': карточка не открылась');continue}
+    if(!sc.querySelector('#cv-tr .tracer canvas'))out.push(l.k+': нет прописи');
+    const bs=sc.querySelectorAll('[data-c]');if(bs.length){bs[1].click();const h1=sc.querySelector('.tr-how').textContent;if(!sc.querySelector('#cv-tr .tracer canvas'))out.push(l.k+': пропись пропала после переключения');bs[0].click();if(!sc.querySelector('[data-c="U"][aria-pressed="true"]'))out.push(l.k+': переключатель не отметился')}
+    else if(l.U!==l.k&&l.U!=='Ու')out.push(l.k+': нет переключателя');
+    (sc.querySelector('[data-close]')||sc).click();document.querySelectorAll('.scrim').forEach(x=>x.remove())}
+  return out});
+
 /* ================= Сохранение и прогресс ================= */
 test('серия: вчера +1, пропуск — заново, часы назад — не трогаем',()=>{const out=[],chk=(o,want,what)=>{Object.assign(S,o);addXP(5);if(S.streak!==want)out.push(what+': '+S.streak+' вместо '+want)};__fresh();
   chk({streak:3,lastDay:__d(-1)},4,'вчера');chk({streak:5,lastDay:__d(-3)},1,'пропуск');chk({streak:2,lastDay:today()},2,'сегодня');chk({streak:7,lastDay:__d(1)},7,'часы назад');chk({streak:0,lastDay:null},1,'первый раз');return out});
@@ -91,6 +99,17 @@ test('испорченные сохранения не ломают прилож
     document.querySelectorAll('.scrim,#game').forEach(x=>x.remove())}
   return Object.keys(fails).map(k=>k+' ×'+fails[k])});
 test('upgrade чинит цель 0 и отрицательную серию',()=>{const s=upgrade({goal:0,streak:-3,xp:10,done:{}});return s.goal>0&&s.streak===0?[]:['goal='+s.goal+' streak='+s.streak]});
+
+test('сердца восстанавливаются по одному за 30 минут и не больше пяти',()=>{const out=[];__fresh();const M=60000;
+  S.hearts=2;S.heartsTs=Date.now()-65*M;if(hearts()!==4)out.push('65 минут: '+S.hearts+' вместо 4');
+  S.hearts=0;S.heartsTs=Date.now()-10*M;if(hearts()!==0)out.push('10 минут: '+S.hearts+' вместо 0');
+  S.hearts=3;S.heartsTs=Date.now()-600*M;if(hearts()!==5)out.push('10 часов: '+S.hearts+' вместо 5');
+  S.hearts=4;S.heartsTs=Date.now()+90*M;if(hearts()!==4)out.push('часы назад: '+S.hearts+' вместо 4');return out});
+test('итог игры: «уже очки» не пишется при нуле; рекорд обновляется',()=>{const out=[];__fresh();LESSONS.forEach(l=>S.done[l.id]=1);
+  openGame('odd');gameOver(0,0,'Верно 0 из 10');let t=document.getElementById('game').textContent;if(/уже очки/.test(t))out.push('0 очков: «уже очки»');closeGame();
+  openGame('odd');gameOver(4,4,'Верно 4 из 10');t=document.getElementById('game').textContent;if(!/Новый рекорд/.test(t))out.push('4 после 0: нет «Новый рекорд»');closeGame();
+  openGame('odd');gameOver(2,2,'Верно 2 из 10');t=document.getElementById('game').textContent;if(!/Рекорд — 4/.test(t))out.push('2 после 4: '+t.slice(0,80));closeGame();
+  if(S.games.odd.best!==4||S.games.odd.plays!==3)out.push('запись: '+JSON.stringify(S.games.odd));return out});
 
 /* ================= Игры ================= */
 test('все игры открываются и играются без ошибок',async()=>{const out=[];__fresh();LESSONS.forEach(l=>S.done[l.id]=1);

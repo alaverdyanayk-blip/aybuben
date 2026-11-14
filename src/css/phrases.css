@@ -4,13 +4,15 @@
 .ph-prog{display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:10px 16px;text-align:center}
 .ph-prog b{font-size:22px}.ph-prog span{font-size:12px;color:var(--muted)}
 .phc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+/* --pc — цвет ситуации (полоса, значок, фон); --pct — он же для текста: подмешан цвет текста темы, чтобы читалось и на светлом, и на тёмном */
+.phc,.phx{--pct:color-mix(in srgb,var(--pc) 45%,var(--ink))}
 .phc{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-left:6px solid var(--pc);border-radius:20px;padding:10px 14px 10px 8px;box-shadow:0 3px 0 var(--line);font:inherit;color:inherit;cursor:pointer;min-width:0}
 .phc:hover{border-color:var(--pc)}
 .phc:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
 .phc-art{flex:none;width:84px;height:84px;border-radius:16px;background:color-mix(in srgb,var(--pc) 16%,transparent);display:flex;align-items:center;justify-content:center}
 .phc-art .mascot{width:80px;height:80px}
 .phc-tx{display:flex;flex-direction:column;gap:1px;min-width:0}
-.phc-tx b{font-size:17px}.phc-tx .hy{font-size:15px;color:var(--pc);font-weight:600}
+.phc-tx b{font-size:17px}.phc-tx .hy{font-size:15px;color:var(--pct);font-weight:600}
 .phc-tx .d{font-size:12.5px;color:var(--muted)}
 .phc-st{display:flex;align-items:center;gap:5px;margin-top:4px}
 .phc-st i{width:22px;height:6px;border-radius:99px;background:var(--line)}.phc-st i.on{background:var(--good)}
@@ -19,15 +21,15 @@
 .ph-back:hover{color:var(--accent)}
 .ph-head{display:flex;align-items:center;gap:16px;border-radius:24px;padding:16px;background:color-mix(in srgb,var(--pc) 15%,var(--surface));border:1.5px solid color-mix(in srgb,var(--pc) 40%,var(--line))}
 .ph-art{flex:none;width:130px;height:130px;cursor:pointer}.ph-art .mascot{width:130px;height:130px}
-.ph-ht{min-width:0}.ph-ht .k{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--pc)}
-.ph-ht h2{margin:2px 0 0;font-size:26px}.ph-ht .hy{font-size:18px;color:var(--pc);font-weight:600}.ph-ht p{margin:6px 0 0;color:var(--muted)}
+.ph-ht{min-width:0}.ph-ht .k{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--pct)}
+.ph-ht h2{margin:2px 0 0;font-size:26px}.ph-ht .hy{font-size:18px;color:var(--pct);font-weight:600}.ph-ht p{margin:6px 0 0;color:var(--muted)}
 .ph-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
 .ph-step{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 14px;box-shadow:0 3px 0 var(--line);font:inherit;color:inherit;cursor:pointer}
 .ph-step .num{flex:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--pc);color:#fff;font-weight:800;font-size:18px;box-shadow:0 3px 0 color-mix(in srgb,var(--pc) 65%,#000)}
 .ph-step .num svg{width:22px;height:22px}
 .ph-step.done .num{background:var(--good);box-shadow:0 3px 0 color-mix(in srgb,var(--good) 65%,#000)}
 .ph-step .tx{display:flex;flex-direction:column;flex:1;min-width:0}.ph-step .tx span{font-size:13px;color:var(--muted)}
-.ph-step .go{font-weight:800;font-size:13px;color:var(--pc);text-transform:uppercase;letter-spacing:.04em}
+.ph-step .go{font-weight:800;font-size:13px;color:var(--pct);text-transform:uppercase;letter-spacing:.04em}
 .ph-step:disabled{cursor:default;opacity:.6}.ph-step:disabled .num{background:var(--line);color:var(--muted);box-shadow:none}
 .ph-step:not(:disabled):active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
 .ph-cos{flex-direction:row;align-items:center;gap:12px}
@@ -38,13 +40,13 @@
 .ph-a{display:flex;align-items:center;gap:8px;font-size:19px;font-weight:500;min-width:0}.ph-a .arm{overflow-wrap:anywhere}
 .ph-r{grid-column:1;color:var(--muted);font-size:13.5px}
 .ph-m{grid-column:2;grid-row:1/span 2;align-self:center;font-weight:600}
-.ph-n{grid-column:1/-1;font-size:12.5px;color:var(--pc);font-weight:600}
+.ph-n{grid-column:1/-1;font-size:12.5px;color:var(--pct);font-weight:600}
 @media (max-width:520px){.ph-intro{grid-template-columns:1fr}.ph-prog{flex-direction:row;gap:8px;justify-content:center}.ph-head{gap:10px;padding:12px}.ph-art,.ph-art .mascot{width:96px;height:96px}.ph-ht h2{font-size:22px}
  .ph-row{grid-template-columns:1fr}.ph-m{grid-column:1;grid-row:auto}}
-.tile2.phr{cursor:pointer;font:inherit;color:inherit}
-.tile2.phr .mascot{width:62px;height:62px;flex:none}
-.tile2.phr .pt{font-size:16px;font-weight:700}.tile2.phr .m{color:var(--muted);font-size:13.5px}
-.tile2.phr:hover{border-color:var(--accent)}
+
+
+
+
 /* диалог в уроке */
 .dlg{display:flex;align-items:flex-start;gap:12px}
 .dlg .mascot{flex:none;width:92px;height:92px}
@@ -54,7 +56,7 @@
 .dlg .dr{color:var(--muted);font-size:13.5px}.dlg .dm{font-weight:600;font-size:14.5px}
 .opt .or{display:block;margin-top:3px;font-family:var(--f-body);font-size:12.5px;font-weight:500;color:var(--muted);line-height:1.3}
 .opts.one{grid-template-columns:1fr;gap:8px}.opts.one .opt{font-size:20px;text-align:left;padding:12px 14px 11px 34px;min-height:0}.opts.one .opt .k{top:50%;left:12px;margin-top:-8px;font-size:12px}
-.wr-sub{margin:10px 0 6px;font-size:14px}
+
 .wr-col{display:flex;flex-direction:column;gap:8px;min-width:0}
 .wr-cat{border:1.5px solid var(--line);border-radius:16px;background:var(--bg)}
 .wr-cat summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:15px}
@@ -73,7 +75,7 @@
 .path-sub{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;max-width:330px;background:var(--bg);padding:10px 14px;border-radius:18px;border:1.5px dashed color-mix(in srgb,var(--band) 55%,var(--line))}
 .path-sub .ps-k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--band)}
 .path-sub b{font-size:17px}.path-sub .ps-l{font-size:15px;color:var(--muted);letter-spacing:.06em}
-.path-sub .ps-d{font-size:12.5px;color:var(--muted);line-height:1.4}.path-sub .ps-d b{font-size:inherit;color:var(--ink)}
+
 .teach .rp{color:var(--ink);font-size:15px}
 .rc{display:flex;flex-direction:column;gap:7px;border-left:4px solid var(--accent);padding:2px 0 2px 12px}
 .rc h5{margin:0;font-family:var(--f-body);font-size:15.5px;font-weight:800;line-height:1.35}

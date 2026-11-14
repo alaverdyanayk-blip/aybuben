@@ -6,7 +6,7 @@
   --brand:#9C1F35;--brand-hi:#B02A42;--brand-deep:#6E1424;--brand-soft:#FBE6E9;--on-brand:#fff;
   --apri:#F0A23B;--apri-hi:#FFC15A;--apri-deep:#C2761A;--apri-ink:#3A1D08;--apri-soft:#FCE9CC;
   --stone:#DCC2B8;--stone-deep:#BFA096;--carve:#B79488;--carve-hi:#F7EAE5;--carve-lo:#9B7A70;
-  --accent:#B85A12;--accent-deep:#8A430C;--accent-soft:#FCE9CC;
+  --accent:#8F4409;--accent-deep:#6F3507;--accent-soft:#FCE9CC;
   --gold:#F0A23B;--gold-deep:#C2761A;
   --good:#2F6B4F;--good-deep:#1F4A36;--good-soft:#E4F1E9;
   --b0:#9C1F35;--b1:#B3541E;--b2:#2F6B4F;--b3:#3F5A8A;
@@ -48,7 +48,7 @@ button:focus-visible{outline-color:var(--brand)}
 
 /* шапка */
 .top{border-bottom:0}
-.brand b span{color:var(--brand)}
+.brand b span{color:var(--b0)}
 .pill{border:0;border-radius:99px;padding:6px 12px;box-shadow:0 1px 0 var(--line),0 8px 14px -10px rgb(110 20 36/.4)}
 .pill.flame{color:var(--accent)}
 
@@ -63,7 +63,7 @@ button:focus-visible{outline-color:var(--brand)}
   .tabs button[aria-selected="true"]{flex:1 1 auto;padding:0 14px}
   .tabs button[aria-selected="true"] span:last-child{position:static;width:auto;height:auto;clip-path:none}
   body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-  .jump{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+  
 }
 
 /* главная: гранатовая карточка */
@@ -194,7 +194,7 @@ button.qc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
 .seg button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
 
 /* остальные экраны: те же каменные карточки, без рамок и без капса */
-.dcard,.rule,.gcard,.phc,.ph-step,.ph-prog,.review,.lvl{border:0;box-shadow:0 4px 0 var(--line)}
+.dcard,.rule,.gcard,.phc,.ph-step,.ph-prog,.review{border:0;box-shadow:0 4px 0 var(--line)}
 .review>b,.ph-step .go,.dlg .who,.rv-tag,.label,.eq,.ph-ht .k{text-transform:none;letter-spacing:0}
 .thchips button,.chip2{border:0;background:var(--surface);box-shadow:0 2px 0 var(--line)}
 .thchips button[aria-pressed="true"],.chip2[aria-pressed="true"]{background:var(--brand);color:var(--on-brand);box-shadow:0 2px 0 var(--brand-deep)}

@@ -78,6 +78,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .btn.good{background:var(--good);box-shadow:0 4px 0 var(--good-deep);color:var(--on-good)}
 .btn.bad{background:var(--bad);box-shadow:0 4px 0 var(--bad-deep);color:var(--on-bad)}
 .btn.plain{background:var(--surface);color:var(--ink);box-shadow:0 4px 0 var(--line);border:1.5px solid var(--line)}
-.btn.wide{width:100%}
+
 .link{border:0;background:none;color:var(--accent);font-weight:700;padding:6px}
 

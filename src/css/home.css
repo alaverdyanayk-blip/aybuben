@@ -27,15 +27,15 @@
 .hero-ciro .mascot{width:120px;height:120px}
 .hero .bubble{grid-area:b}.hero .goal{grid-area:g}.hero .cta{grid-area:a}
 .goal{display:flex;flex-direction:column;gap:6px}
-.goal-top{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:700;color:var(--muted)}
-.goal-top b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+
 .bar{height:14px;border-radius:99px;background:var(--sunk);overflow:hidden}
 .bar i{position:relative;display:block;height:100%;min-width:14px;background:var(--gold);border-radius:99px;transition:width .5s}
 .bar i::after{content:"";position:absolute;left:6px;right:6px;top:3px;height:3px;border-radius:99px;background:#fff;opacity:.35}
 .bar.good i{background:var(--good)}
 .cta{display:flex;align-items:center;justify-content:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:560px){.hero{grid-template-columns:84px minmax(0,1fr);grid-template-areas:"c b" "g g" "a a";padding:16px}.hero-ciro .mascot{width:84px;height:84px}}
-.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+
 .tile2{display:flex;align-items:center;gap:14px;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:14px 16px;box-shadow:0 3px 0 var(--line);text-align:left;min-width:0}
 .tile2 .lbl{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--accent)}
 .tile2 .tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
@@ -87,15 +87,15 @@
 .uline{height:6px;border-radius:9px;background:rgb(0 0 0/.18);overflow:hidden;margin-top:10px;max-width:260px}
 .uline i{display:block;height:100%;background:#fff;border-radius:9px;opacity:.9}
 /* кнопка «к уроку» */
-.jump{position:fixed;z-index:22;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:6px;border:0;border-radius:99px;padding:11px 16px 11px 13px;background:var(--ink);color:var(--surface);font-weight:800;font-size:14px;box-shadow:0 6px 18px rgb(0 0 0/.25);animation:rise .25s ease both}
-.jump svg{width:18px;height:18px}.jump.up svg{transform:rotate(180deg)}
-@media (max-width:640px){.jump{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}
+
+
+@media (max-width:640px){}
 /* тренировка на главной */
-.prac{cursor:pointer;font:inherit;color:inherit}
-.prac .pic{flex:none;width:52px;height:52px;border-radius:16px;background:var(--b3);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 color-mix(in srgb,var(--b3) 65%,#000)}
-.prac .pic svg{width:26px;height:26px}
-.prac .pt{font-size:16px;font-weight:700}.prac .m{color:var(--muted);font-size:13.5px}
-.prac:hover{border-color:var(--b3)}
+
+
+
+
+
 /* алфавит: изученные */
 .abc-head{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:0 3px 0 var(--line)}
 .ah-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}.ah-top b{font-size:17px}.ah-top>span{color:var(--muted);font-size:13px}

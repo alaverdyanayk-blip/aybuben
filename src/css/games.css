@@ -34,7 +34,7 @@
 .contact .mascot{width:76px;height:76px}
 .c-tx{display:flex;flex-direction:column;gap:8px;min-width:0}
 .c-tx p{margin:0;color:var(--muted);font-size:14px}
-.btn.tg{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:fit-content;text-decoration:none;background:#2AABEE;box-shadow:0 4px 0 #1C86BE;color:#fff;text-transform:none;letter-spacing:0;font-size:15px}
+.btn.tg{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:fit-content;text-decoration:none;background:#1479BA;box-shadow:0 4px 0 #0F5E93;color:#fff;text-transform:none;letter-spacing:0;font-size:15px}
 .btn.tg svg{width:20px;height:20px}
 .homefoot{text-align:center;color:var(--muted);font-size:13.5px;margin:34px 0 0}
 .homefoot a{color:var(--accent);font-weight:700;text-decoration:none}

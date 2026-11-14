@@ -70,7 +70,7 @@ function gameOver(score,xp,title,o={}){gStop();track('game',G.g.id+(G.mode?'-'+G
   const lvBefore=level();if(xp>0)addXP(xp);const newA=checkAch();save();
   if(xp>0)sWin();if(rec&&st.plays>1)confetti();
   gstat('');
-  const line=rec&&st.plays>1?'Новый рекорд! <b class="arm">Կեցցե՛ս!</b>':st.plays===1?'Первая игра — и уже очки! Сыграем ещё?':xp>0?'Неплохо! Рекорд — '+st.best+'. Догонишь?':'Ничего, в следующий раз получится. Попробуем ещё?';
+  const line=rec&&st.plays>1?'Новый рекорд! <b class="arm">Կեցցե՛ս!</b>':st.plays===1&&score>0&&xp>0?'Первая игра — и уже очки! Сыграем ещё?':xp>0?'Неплохо! Рекорд — '+st.best+'. Догонишь?':'Ничего, в следующий раз получится. Попробуем ещё?';
   $('#gbody').innerHTML=`<div class="end"><span id="go-ciro">${mascot(xp>0?(rec&&st.plays>1?'cheer':'happy'):'sad',xp>0?'m-jump':'m-shake')}</span><h2 style="color:var(--c)">${title||'Игра окончена'}</h2>${o.stars?starsHtml(o.stars):''}<div class="bubble">${line}${o.note?`<p style="margin-top:6px">${o.note}</p>`:''}</div>${levelUps(lvBefore)}
    <div class="tiles3"><div class="stat"><div class="h">Счёт</div><div class="v">${score}</div></div><div class="stat" style="--c:var(--b3)"><div class="h">Рекорд</div><div class="v">${st.best}</div></div><div class="stat" style="--c:var(--gold-deep)"><div class="h">XP</div><div class="v">+${xp}</div></div></div>
    ${reviewHtml()}

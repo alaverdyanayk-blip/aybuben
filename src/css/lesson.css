@@ -74,7 +74,7 @@
 .fb .d{font-size:14.5px}
 .fb .d .a{font-family:var(--f-arm);font-weight:600;font-size:17px}
 .fb .mascot{width:66px;height:66px;flex:none}
-.fb .t .tr{font-size:14px;font-weight:600;opacity:.85;margin-left:4px}
+.fb .t .tr{font-size:14px;font-weight:600;margin-left:4px}
 .ciro-line{font-size:13.5px;color:var(--muted);margin-bottom:2px}
 .foot-in .btn{min-width:170px}
 
@@ -84,7 +84,7 @@
 .end .mascot{width:150px;height:150px}
 .tiles3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
 .stat{border:2px solid var(--c);border-radius:14px;overflow:hidden;background:var(--surface)}
-.stat .h{background:var(--c);color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px}
+.stat .h{background:color-mix(in srgb,var(--c) 60%,#000);color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px}
 .stat .v{font-size:22px;font-weight:800;padding:10px 4px;font-variant-numeric:tabular-nums;color:var(--c)}
 .achv-new{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 
