@@ -130,8 +130,12 @@ test('истории: закрыты до конца алфавита; карт�
   __fresh();location.hash='stories';route();e(/Истории откроются/.test($('#view').textContent),'раздел открыт без алфавита');
   for(const st of STORIES){e(HISTC.some(c=>c.st===st.id),st.id+': нет костюма');e(st.quiz.every(q=>!q.w.includes(q.a)&&new Set([q.a,...q.w]).size===4),st.id+': варианты в вопросах');
     st.cards.forEach((c,i)=>{e(c.s.length>=2,st.id+' '+i+': мало предложений');c.s.forEach(x=>{e(/[\u0531-\u0587]/.test(x[0])&&/[а-яё]/i.test(x[1]),st.id+' '+i+': пара предложение/перевод');e(/։$/.test(x[0]),st.id+' '+i+': нет армянской точки: '+x[0])})})}
-  __fresh({done:Object.fromEntries(LESSONS.filter(l=>UNITS[l.unit].alpha).map(l=>[l.id,1]))});location.hash='learn';route();e(/Первая история/.test($('#stories').textContent),'плитка на главной');
-  location.hash='stories/nzhdeh';STC={id:null};route();const b=document.querySelector('.st-s');b.click();e(b.classList.contains('open'),'перевод не открывается');
+  __fresh({done:Object.fromEntries(LESSONS.filter(l=>UNITS[l.unit].alpha).map(l=>[l.id,1]))});e(document.querySelector('.tabs [data-view="stories"]'),'нет вкладки «Истории»');location.hash='stories';route();e(document.querySelector('.st-card[data-st="nzhdeh"]'),'нет карточки истории');
+  document.querySelector('.st-kinds [data-k="event"]').click();e(/Скоро/.test($('#view').textContent),'события: нет «Скоро»');ST_KIND='person';
+  location.hash='stories/nzhdeh';STC={id:null};route();e(/Главные даты/.test($('#view').textContent)&&document.querySelector('.st-cover'),'нет рассказа');
+  document.querySelector('.st-steps [data-s="quiz"]').click();e(!LS&&/дочитаете/.test($('#view').textContent),'вопросы открылись до чтения');
+  $('#st-to').click();e(document.querySelectorAll('.st-w').length===STORIES[0].words.length,'нет слов');$('#st-to').click();
+  const b=document.querySelector('.st-s');b.click();e(b.classList.contains('open'),'перевод не открывается');
   const n=STORIES[0].cards.length;for(let i=1;i<n;i++)$('#st-next').click();e(stRead('nzhdeh')===n,'прочитано '+stRead('nzhdeh'));
   $('#st-next').click();e(LS&&LS.lesson.story==='nzhdeh','вопросы не начались');let g=0;
   while(LS&&LS.state!=='end'&&g++<40){if(g===2){selectOpt(LS.opts.findIndex(o=>o!==LS.cur.correct));check();next();continue}selectOpt(LS.opts.indexOf(LS.cur.correct));check();if(LS.state!=='end')next()}

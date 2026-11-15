@@ -13,7 +13,7 @@ function streakSheet(){const st=streakNow(),fz=frzLeft(),fd=new Set(S.frzDays||[
 const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases,stories:renderStories};
 /* Тема: S.theme = 'light' | 'dark' | 'auto' (или пусто) — как в системе / Телеграме. */
 function applyThemePref(){if(window.__applyTheme)return window.__applyTheme();const t=S.theme,el=document.documentElement;if(t==='light'||t==='dark')el.setAttribute('data-theme',t);else el.removeAttribute('data-theme')}
-function route(){applyThemePref();const [hb,hs]=location.hash.slice(1).split('/'),v=VIEWS[hb]?hb:'learn';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));$('#logo').innerHTML=mascot('happy');drawHud();VIEWS[v](hs)}
+function route(){applyThemePref();const [hb,hs]=location.hash.slice(1).split('/'),v=VIEWS[hb]?hb:'learn';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v||(b.dataset.view==='alphabet'&&v==='rules')));$('#logo').innerHTML=mascot('happy');drawHud();VIEWS[v](hs)}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{location.hash=b.dataset.view});
 window.addEventListener('hashchange',()=>{route();window.scrollTo(0,0)});
 setInterval(drawHud,60000);
