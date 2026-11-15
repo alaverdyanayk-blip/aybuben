@@ -141,7 +141,7 @@ test('истории: закрыты до конца алфавита; карт�
   while(LS&&LS.state!=='end'&&g++<40){if(g===2){selectOpt(LS.opts.findIndex(o=>o!==LS.cur.correct));check();next();continue}selectOpt(LS.opts.indexOf(LS.cur.correct));check();if(LS.state!=='end')next()}
   e(stDone('nzhdeh')&&S.hearts===MAXH,'костюм/сердца: '+stDone('nzhdeh')+' '+S.hearts);const xp=S.xp;document.querySelector('[data-wear]').click();e(S.outfit==='nzhdeh','костюм не надевается');closeLesson();
   storyQuiz(STORIES[0]);g=0;while(LS&&LS.state!=='end'&&g++<40){selectOpt(LS.opts.indexOf(LS.cur.correct));check();if(LS.state!=='end')next()}closeLesson();e(S.xp===xp,'повтор снова дал XP');
-  location.hash='profile';route();e(!document.querySelector('.wr-item[data-o="nzhdeh"]').disabled,'костюма нет в гардеробе');
+  location.hash='profile';route();$('#pf-go-wr').click();e(!document.querySelector('.sheet .wr-item[data-o="nzhdeh"]').disabled,'костюма нет в гардеробе');document.querySelectorAll('.sheet [data-close]').forEach(x=>x.click());
   const m=mergeState({v:3,ts:1,stR:{nzhdeh:3}},{v:3,ts:2,stR:{nzhdeh:1},stQ:{nzhdeh:1}});e(m.stR.nzhdeh===3&&m.stQ.nzhdeh===1,'слияние историй');
   location.hash='learn';return out});
 test('задания дня: урок, слова на слух, игра; сундучок один раз; новый день — новые задания; итог урока; профиль; витрина; карта',async()=>{const out=[],e=(c,w)=>{if(!c)out.push(w)};
@@ -155,7 +155,7 @@ test('задания дня: урок, слова на слух, игра; су�
   S.dq.d='2000-01-01';e(dq().l===0&&!dq().c,'новый день не сбросил задания');
   const m=mergeState({v:3,ts:1,dq:{d:'2026-11-15',l:1,h:3,g:0,c:0}},{v:3,ts:2,dq:{d:'2026-11-15',l:0,h:7,g:1,c:0}});e(m.dq.l===1&&m.dq.h===7&&m.dq.g===1,'слияние заданий');
   location.hash='profile';route();e(document.querySelector('.pf-head'),'нет шапки профиля');e(!document.querySelector('#view .wr-item'),'гардероб остался на странице');$('#pf-go-wr').click();const wi=document.querySelector('.sheet .wr-item[data-o="glasses"]');e(wi,'гардероб не открылся в шторке');
-  if(wi){S.xp=Math.max(S.xp,150);document.querySelector('[data-close]').click();route();$('#pf-go-wr').click();document.querySelector('.sheet .wr-item[data-o="glasses"]').click();e(S.outfit==='glasses'&&document.querySelector('.sheet .wr-item[data-o="glasses"]').classList.contains('on'),'костюм из шторки не надевается')}
+  if(wi){S.xp=Math.max(S.xp,150);document.querySelectorAll('.sheet [data-close]').forEach(x=>x.click());route();$('#pf-go-wr').click();document.querySelector('.sheet .wr-item[data-o="glasses"]').click();e(S.outfit==='glasses'&&document.querySelector('.sheet .wr-item[data-o="glasses"]').classList.contains('on'),'костюм из шторки не надевается')}
   document.querySelectorAll('[data-close]').forEach(x=>x.click());
   __fresh({xp:50,done:{ab1a:1}});location.hash='stories';route();e(document.querySelector('.st-lock .st-ring')&&document.querySelectorAll('.st-tc').length>=2,'нет витрины историй');
   location.hash='alphabet';route();e(document.querySelectorAll('.abc-map .at').length===LETTERS.length,'на карте не 39 букв');document.querySelector('.abc-map .at').click();e(document.querySelector('.sheet #cv-tr'),'буква на карте не открывается');document.querySelector('[data-close]').click();

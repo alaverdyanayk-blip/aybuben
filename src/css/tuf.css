@@ -474,7 +474,9 @@ button.ach:active{transform:translateY(2px)}
 .abc-map-h>div{display:flex;flex-direction:column;gap:6px;min-width:0}.abc-map-h b{font-size:16px}
 .st-ring.sm{width:68px;height:68px}.st-ring.sm circle{stroke-width:8}.st-ring.sm .n{font-size:16px}
 .abc-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--muted)}.abc-leg span{display:flex;align-items:center;gap:5px}.abc-leg i{width:10px;height:10px;border-radius:3px}
-.abc-leg i.s3,.at.map.s3{background:var(--good)}.abc-leg i.s2,.at.map.s2{background:color-mix(in srgb,var(--good) 45%,var(--surface))}.abc-leg i.s1,.at.map.s1{background:var(--apri)}
+.abc-leg i.s3,.at.map.s3{background:var(--good)}.abc-leg i.s2,.at.map.s2{background:color-mix(in srgb,var(--good) 45%,var(--surface))}
+:root[data-theme="dark"] .at.map.s2,:root[data-theme="dark"] .abc-leg i.s2{background:color-mix(in srgb,var(--good) 28%,var(--surface))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .at.map.s2,:root:not([data-theme="light"]) .abc-leg i.s2{background:color-mix(in srgb,var(--good) 28%,var(--surface))}}.abc-leg i.s1,.at.map.s1{background:var(--apri)}
 .abc-map{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
 .at.map{aspect-ratio:1;padding:0;border:0;border-radius:12px;justify-content:center;gap:0;background:var(--sunk);box-shadow:0 3px 0 var(--line)}
 .at.map .gl{font-size:22px;line-height:1.1}.at.map .sd{font-size:11px}
