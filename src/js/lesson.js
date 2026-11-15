@@ -12,7 +12,7 @@ function startLesson(lesson,practice){
   const items=lesson.gen();
   if(!practice&&LESSONS.includes(lesson)){const rv=dueKeys().filter(k=>!items.some(x=>x.item===k)).slice(0,2).map(reviewEx).filter(Boolean).map(x=>({...x,review:true}));
     if(rv.length)items.splice(Math.max(1,items.length-1),0,...rv)}
-  LS={lesson,practice,queue:items.slice(),total:items.filter(x=>x.type!=='teach'&&x.type!=='letter'&&x.type!=='trace').length,done:0,mistakes:0,combo:0,best:0,start:Date.now(),cur:null,state:'answer'};
+  LS={lesson,practice,all:items.slice(),wrong:new Set(),queue:items.slice(),total:items.filter(x=>x.type!=='teach'&&x.type!=='letter'&&x.type!=='trace').length,done:0,mistakes:0,combo:0,best:0,start:Date.now(),cur:null,state:'answer'};
   const el=document.createElement('div');el.className='lesson';el.id='lesson';
   el.innerHTML=`<div class="l-top"><button class="x" id="lquit" aria-label="Выйти из урока">✕</button><div class="prog"><i id="lprog" style="width:0"></i></div><span class="pill heart" id="lhearts"></span></div><div class="l-body"><div class="ex" id="ex"></div></div><div class="l-foot" id="lfoot"></div>`;
   $('#layer').appendChild(el);document.body.classList.add('locked');
@@ -114,6 +114,7 @@ function check(){
   else if(ex.type==='build'){if(!LS.built.length)return;const got=LS.built.map(i=>ex.tiles[i]).join('|');ok=ex.answers.some(a=>a.join('|')===got)}
   LS.state='checked';
   if(ex.item)memUpdate(ex.item,ok);
+  if(ok&&ex.listen)dqAdd('h');if(!ok&&ex.item)LS.wrong.add(ex.item);
   if(LS.lesson.place){placeAnswer(ex,ok);ok?LS.combo++:(LS.combo=0)}
   else if(ok){LS.done++;LS.combo++;LS.best=Math.max(LS.best,LS.combo);if(ex.tag==='read')S.read++}
   else{LS.mistakes++;LS.combo=0;if(!LS.practice){S.hearts=Math.max(0,hearts()-1);if(S.hearts===MAXH-1)S.heartsTs=Date.now()}save();LS.queue.push(ex)}
@@ -134,7 +135,7 @@ function feedback(ok,detail){
   tapNext($('#nxt'),()=>next());$('#nxt').focus();
 }
 function finishLesson(){
-  LS.state='end';const prac=LS.practice,perfect=LS.mistakes===0;
+  LS.state='end';const prac=LS.practice,perfect=LS.mistakes===0;dqAdd('l');
   const xp=prac?5:10+(perfect?5:0);
   const PL=LS.lesson.ph;let phFirst=false;
   if(prac)track('practice');else if(PL)track('phrase',PL.id+'-'+PL.n);else{track('lesson',lref(LS.lesson));if(!S.done[LS.lesson.id])track('lesson_first',lref(LS.lesson))}
@@ -150,10 +151,20 @@ function finishLesson(){
    <div class="bubble">${line}${goalNow?`<p style="margin-top:6px;font-weight:700">Цель дня выполнена! Огонёк: ${streakNow()} ${plural(streakNow(),'день','дня','дней')}.</p>`:''}</div>
    ${mile}${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}
    <div class="tiles3"><div class="stat" style="--c:var(--gold-deep)"><div class="h">XP</div><div class="v">+${xp}</div></div><div class="stat" style="--c:var(--good)"><div class="h">Точность</div><div class="v">${acc}%</div></div><div class="stat" style="--c:var(--b3)"><div class="h">Время</div><div class="v">${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</div></div></div>
+   ${learnedHtml(prac)}
    ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<button class="chip ach-sh" data-ach="${a.id}">${IC[a.ic]} ${esc(a.t)} <u>Поделиться</u></button>`).join('')}</div></div>`:''}${!prac?askNotif():''}${!prac&&!PL?inviteNudge():''}</div>`;
   $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);tapNext($('#nxt'),closeLesson);$('#nxt').focus();
   wireWear('#end-ciro');wireGrowth();document.querySelectorAll('.ach-sh').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));sWin();confetti();
 }
+/* Итог урока: какие буквы и слова встретились (со звуком) и сколько ошибок вернётся в повторение */
+function learnedHtml(prac){const lets=[...new Set(LS.all.filter(x=>x.type==='letter').map(x=>x.l))],seen=new Set(),ws=[];
+  LS.all.forEach(x=>{const k=x.item;if(!k||k[0]==='#'||seen.has(k))return;const w=WORDS.find(v=>v.a===k);if(w){seen.add(k);ws.push(w)}});
+  const wr=LS.wrong.size,show=ws.slice(0,6);if(!lets.length&&!show.length)return '';
+  const cnt=[lets.length?`${lets.length} ${plural(lets.length,'буква','буквы','букв')}`:'',show.length?`${show.length} ${plural(show.length,'слово','слова','слов')}`:''].filter(Boolean).join(' · ');
+  return `<section class="learned"><div class="ln-h"><b>${prac?'Повторили':lets.length?'Вы научились читать':'Слова урока'}</b><span>${cnt}</span></div>
+   ${lets.length?`<div class="ln-l">${lets.map(l=>`<span class="arm">${l.U}</span>`).join('')}</div>`:''}
+   ${show.map(w=>`<div class="ln-w"><div><span class="arm">${esc(w.a)}</span><span>«${esc(w.r)}» — ${esc(w.m)}</span></div>${spk(w.a,'sm')}</div>`).join('')}</section>
+   ${wr?`<div class="ln-next"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Где были ошибки (${wr}), повторим в ближайших уроках и тренировке.</span></div>`:''}`}
 function failLesson(){LS.state='end';if(LS.lesson.id!=='practice')track('fail',lref(LS.lesson));
   $('#ex').innerHTML=`<div class="end">${mascot('sleep','m-idle')}<h2 style="color:var(--bad)">Сердца закончились</h2><div class="bubble">Сердечко восстанавливается за 30 минут. Или давай потренируемся на пройденном — сразу получишь одно.</div></div>`;
   $('#lfoot').className='l-foot';foot(`<button class="btn plain" id="out">Выйти</button><button class="btn" id="pr">Тренировка</button>`);

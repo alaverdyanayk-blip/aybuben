@@ -6,15 +6,13 @@ const storiesOpen=()=>S.unlockAll||LETTERS.every(letterLearned);
 const stRead=id=>Math.max(0,S.stR[id]|0);
 const stDone=id=>!!S.stQ[id];
 const ST_KINDS=[['person','Люди'],['event','События']];
-const ST_SOON={event:['Создание алфавита · 405','Аварайрская битва · 451','Сардарапатская битва · 1918','Первая Республика · 1918']};
+const ST_SOON={person:['Месроп Маштоц','Комитас','Андраник Озанян'],event:['Создание алфавита · 405','Аварайрская битва · 451','Сардарапатская битва · 1918','Первая Республика · 1918']};
 const ST_STEPS=[['about','Рассказ'],['words','Слова'],['read','Читаем'],['quiz','Вопросы']];
 let STC={id:null,i:0,all:false,step:'about'},ST_KIND='person';
 const stNote=t=>{let e=$('#st-msg');if(!e){e=document.createElement('p');e.id='st-msg';e.className='note st-msg';e.setAttribute('role','status');$('.st-steps').after(e)}e.textContent=t};
 const stCos=st=>HISTC.find(x=>x.st===st.id)||{};
 function renderStories(sub){const ST=STORIES.find(x=>x.id===sub);
-  if(!storiesOpen()){const kn=LETTERS.filter(letterLearned).length;
-    $('#view').innerHTML=`<div class="stx">${ciroSay('think',`<p><b>Истории откроются, когда вы выучите все буквы.</b></p><p>Здесь — рассказы о людях и событиях армянской истории: сначала коротко по-русски, потом читаем по-армянски с переводом по нажатию. Сейчас выучено ${kn} из ${LETTERS.length} букв.</p>`)}<button class="btn" id="st-go">К урокам</button></div>`;
-    $('#st-go').onclick=()=>{location.hash='learn'};return}
+  if(!storiesOpen())return storyTeaser();
   if(!ST)return storyList();
   if(STC.id!==ST.id)STC={id:ST.id,i:Math.min(stRead(ST.id),ST.cards.length-1),all:false,step:stRead(ST.id)?'read':'about'};
   const n=ST.cards.length,step=STC.step;
@@ -28,6 +26,15 @@ function renderStories(sub){const ST=STORIES.find(x=>x.id===sub);
     STC.step=k;renderStories(ST.id);scrollTo(0,0)});
   const nx=$('#st-to');if(nx)nx.onclick=()=>{STC.step=nx.dataset.s;renderStories(ST.id);scrollTo(0,0)};
   if(step==='read')wireRead(ST)}
+/* Вкладка закрыта: кольцо прогресса букв, обложки историй под замком и что будет дальше */
+function storyTeaser(){const kn=LETTERS.filter(letterLearned).length,N=LETTERS.length,left=N-kn,C=2*Math.PI*44,les=LESSONS.filter(l=>l.abc&&!/w$/.test(l.id)&&!S.done[l.id]).length;
+  $('#view').innerHTML=`<div class="stx">
+   <section class="st-lock"><svg class="st-ring" viewBox="0 0 104 104" role="img" aria-label="Выучено ${kn} из ${N} букв"><circle cx="52" cy="52" r="44" class="bg"/><circle cx="52" cy="52" r="44" class="fg" stroke-dasharray="${(C*kn/N).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 52 52)"/><text x="52" y="52" class="n">${kn}</text><text x="52" y="69" class="d">из ${N}</text></svg>
+    <div><h2>Истории откроются через ${left} ${plural(left,'букву','буквы','букв')}</h2><p>${les?`Это примерно ${les} ${plural(les,'урок','урока','уроков')}. `:''}Читаем по-армянски о героях и событиях армянской истории.</p></div></section>
+   <div class="st-tgrid">${STORIES.filter(s=>(s.kind||'person')==='person').map(s=>`<div class="st-tc on"><span class="st-lk" aria-hidden="true">${IC.lock||'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>'}</span>${mascot('happy','',stCos(s).id)}<b>${esc(s.t)}</b><span class="arm">${esc(s.hy)}</span><em>+ костюм для Циро</em></div>`).join('')}
+    ${ST_SOON.person.map(t=>`<div class="st-tc"><span class="st-q">${mascot('think','',null)}</span><b>${esc(t)}</b><em>скоро</em></div>`).join('')}</div>
+   <button class="btn" id="st-go">Учить буквы дальше</button></div>`;
+  $('#st-go').onclick=()=>{location.hash='learn'}}
 function storyList(){const kind=ST_KIND,list=STORIES.filter(s=>(s.kind||'person')===kind);
   $('#view').innerHTML=`<div class="stx">
     <div class="st-intro">${ciroSay('happy',`<p><b>Истории.</b> Люди и события армянской истории. Сначала коротко по-русски, потом читаем по-армянски — нажмите на предложение, и появится перевод.</p><p>Дочитайте историю и ответьте на вопросы — Циро получит костюм героя.</p>`)}</div>

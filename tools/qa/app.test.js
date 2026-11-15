@@ -144,6 +144,20 @@ test('истории: закрыты до конца алфавита; карт�
   location.hash='profile';route();e(!document.querySelector('.wr-item[data-o="nzhdeh"]').disabled,'костюма нет в гардеробе');
   const m=mergeState({v:3,ts:1,stR:{nzhdeh:3}},{v:3,ts:2,stR:{nzhdeh:1},stQ:{nzhdeh:1}});e(m.stR.nzhdeh===3&&m.stQ.nzhdeh===1,'слияние историй');
   location.hash='learn';return out});
+test('задания дня: урок, слова на слух, игра; сундучок один раз; новый день — новые задания; итог урока; профиль; витрина; карта',async()=>{const out=[],e=(c,w)=>{if(!c)out.push(w)};
+  __fresh({xp:50,done:{ab1a:1}});location.hash='learn';route();e(document.querySelector('.dq')&&document.querySelector('.abc-strip'),'нет заданий или полоски алфавита');
+  e(document.querySelectorAll('.abc-strip .as-g i').length===LETTERS.length,'в полоске не 39 букв');
+  startLesson(LESSONS[1],false);let g=0;while(LS&&LS.state!=='end'&&g++<300){const ex=LS.cur;if(['teach','letter','trace'].includes(ex.type)){next();continue}
+    if(ex.type==='choice'){selectOpt(LS.opts.indexOf(ex.correct));check()}else if(ex.type==='build'){LS.built=[];const used=new Set();ex.answers[0].forEach(t=>{const i=ex.tiles.findIndex((x,j)=>x===t&&!used.has(j));used.add(i);LS.built.push(i)});check()}else if(ex.type==='match'){LS.state='checked';LS.done++}if(LS.state!=='end')next()}
+  e(dq().l===1,'урок не засчитан');e(document.querySelector('.learned'),'нет блока «что выучено»');closeLesson();
+  for(let i=0;i<12;i++)dqAdd('h');e(dq().h===10,'слова на слух не упираются в 10: '+dq().h);
+  e(!dqClaim(),'сундучок открылся раньше времени');dqAdd('g');const x=S.xp;e(dqClaim()&&S.xp===x+DQ_XP,'сундучок не дал XP');e(!dqClaim()&&S.xp===x+DQ_XP,'сундучок открылся дважды');
+  S.dq.d='2000-01-01';e(dq().l===0&&!dq().c,'новый день не сбросил задания');
+  const m=mergeState({v:3,ts:1,dq:{d:'2026-11-15',l:1,h:3,g:0,c:0}},{v:3,ts:2,dq:{d:'2026-11-15',l:0,h:7,g:1,c:0}});e(m.dq.l===1&&m.dq.h===7&&m.dq.g===1,'слияние заданий');
+  location.hash='profile';route();e(document.querySelector('.pf-head'),'нет шапки профиля');const d=$('#pf-wr');e(d&&!d.open,'гардероб открыт сразу');$('#pf-go-wr').click();e(d.open,'кнопка «Гардероб» не открывает');
+  __fresh({xp:50,done:{ab1a:1}});location.hash='stories';route();e(document.querySelector('.st-lock .st-ring')&&document.querySelectorAll('.st-tc').length>=2,'нет витрины историй');
+  location.hash='alphabet';route();e(document.querySelectorAll('.abc-map .at').length===LETTERS.length,'на карте не 39 букв');document.querySelector('.abc-map .at').click();e(document.querySelector('.sheet #cv-tr'),'буква на карте не открывается');document.querySelector('[data-close]').click();
+  location.hash='learn';return out});
 test('испорченные сохранения не ломают приложение (300 вариантов)',async()=>{const fails={};const junk=[null,undefined,0,-1,NaN,1e12,'x','',[],{},[1,2],{a:1},true,'<b>'];const rj=()=>junk[Math.random()*junk.length|0];
   const fields=['xp','daily','streak','lastDay','best','hearts','heartsTs','done','goal','ach','sound','unlockAll','read','perfect','games','phr','mem','outfit','theme','notif','hrs','miles','friends','refCode','voice','newsSeen','resetAt','ts','v'];
   const views=['learn','games','alphabet','rules','profile','phrases'];

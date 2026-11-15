@@ -30,7 +30,7 @@ function renderLearn(){
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
     <div class="goal"><div class="bar ${pct>=100?'good':''}" role="img" aria-label="Цель дня: ${tx} из ${S.goal} XP"><i style="width:${pct}%"></i></div><b>Цель дня · ${tx} из ${S.goal}</b></div>
     <button class="btn cta" id="cta" aria-label="${esc(ctaLabel)}">${ctaHtml}</button></section>`;
-  let html=`<div class="home">${whatsNew()}${heroHtml}
+  let html=`<div class="home">${whatsNew()}${heroHtml}${S.xp?dqCard()+abcStrip():''}
    <div class="quick">
     ${wod?`<div class="qc wod" id="wod" role="button" tabindex="0" aria-label="Слово дня: послушать"><span class="qtx"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></span><span class="spk" data-say="${esc(wod.a)}" aria-hidden="true">${SPK_SVG}</span></div>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">появится после первых букв</span></div>`}
     ${Object.keys(S.done).length?`<button class="qc" id="prac"><span class="lbl">Тренировка</span><span class="w">${due>30?'30+ слов':due?`${due} ${plural(due,'слово','слова','слов')}`:'10 заданий'}</span><span class="m">${due?'пора повторить':'+5 XP и сердце'}</span></button>`:''}
@@ -56,6 +56,7 @@ function renderLearn(){
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>guideSheet(+b.dataset.guide));
   $('#ciro').onclick=()=>{bounce($('#ciro .mascot'));say(g.hy)};
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
+  wireDq();
   const pb=$('#place');if(pb)pb.onclick=startPlacement;
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   document.querySelectorAll('[data-wg]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.wg;save();document.querySelectorAll('[data-wg]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawHud()});

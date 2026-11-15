@@ -64,7 +64,7 @@ function missLetter(l){if(l&&!G.miss.some(x=>x.k===l.k))G.miss.push(l)}
 function reviewHtml(){const m=G.miss.slice(0,10);if(!m.length)return '';
   return `<div class="review"><b>Повторим</b>${m.map(x=>x.U?`<div class="rv"><span class="rv-a gl">${x.U}${x.U!==x.k?' '+x.k:''}</span><span class="rv-m">«${esc(x.s)}»</span></div>`:`<div class="rv">${spk(x.a,'sm')}<span class="rv-a">${esc(x.a)}</span><span class="rv-m"><b>${esc(x.m)}</b> · «${esc(x.r)}»</span></div>`).join('')}</div>`}
 function starsHtml(n){return `<div class="stars" aria-label="${n} из 3 звёзд">${[1,2,3].map(i=>`<span class="${i<=n?'on':''}">${IC.star}</span>`).join('')}</div>`}
-function gameOver(score,xp,title,o={}){gStop();track('game',G.g.id+(G.mode?'-'+G.mode:''));const g=G.g,rk=recKey(g.id,G.mode),st=S.games[rk]||{best:null,plays:0};
+function gameOver(score,xp,title,o={}){gStop();dqAdd('g');track('game',G.g.id+(G.mode?'-'+G.mode:''));const g=G.g,rk=recKey(g.id,G.mode),st=S.games[rk]||{best:null,plays:0};
   const rec=st.best==null||(g.low?score<st.best:score>st.best);if(rec)st.best=score;st.plays++;S.games[rk]=st;
   if(o.stars===3)S.memo3=true;
   const lvBefore=level();if(xp>0)addXP(xp);const newA=checkAch();save();

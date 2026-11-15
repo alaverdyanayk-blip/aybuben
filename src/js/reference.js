@@ -11,13 +11,13 @@ function startWeak(){const ws=weakLetters().slice(0,8),kn=learnedSet(),lp=LETTER
 /* «Справка» — одна вкладка: буквы, словарь и правила */
 function refTabs(cur){return `<div class="seg reftabs" role="group" aria-label="Раздел справки">${[['abc','Буквы'],['words',`Словарь · ${WORDS.length}`],['rules','Правила']].map(([k,t])=>`<button data-t="${k}" aria-pressed="${k===cur}">${t}</button>`).join('')}</div>`}
 function wireRefTabs(){document.querySelectorAll('.reftabs button').forEach(b=>b.onclick=()=>{const t=b.dataset.t;if(t==='abc'){location.hash='alphabet';return}REF.tab=t;if(location.hash==='#rules')renderRules();else location.hash='rules'})}
-function renderAlphabet(){const nL=LETTERS.filter(letterLearned).length,st=LETTERS.map(letterStrength),cnt=[0,1,2,3].map(v=>st.filter(x=>x===v).length),weak=weakLetters();
-  $('#view').innerHTML=`<div style="display:flex;flex-direction:column;gap:22px">${refTabs('abc')}
-  <div class="abc-head"><div class="ah-top"><b>Изучено ${nL} из ${LETTERS.length}</b><span>${nL===LETTERS.length?'Весь алфавит! <span class="arm">Կեցցե՛ս!</span>':'буквы отмечаются после урока'}</span></div><div class="bar ${nL===LETTERS.length?'good':''}"><i style="width:${Math.round(nL/LETTERS.length*100)}%"></i></div>
-   ${nL?`<div class="mem-sum"><span class="ms s3"><b>${cnt[3]}</b>помню крепко</span><span class="ms s2"><b>${cnt[2]}</b>помню</span><span class="ms s1"><b>${cnt[1]}</b>пора повторить</span></div>
-   ${weak.length?`<div class="weak"><span class="arm">${weak.slice(0,10).map(l=>l.U).join(' ')}${weak.length>10?' …':''}</span><button class="btn" id="weak-go">Повторить слабые буквы</button></div>`:`<p class="mem-ok">Слабых букв нет — Циро доволен.</p>`}`:''}</div>
-  <p class="intro">Все 39 букв восточноармянского алфавита в реформированной орфографии. Нажмите на букву, чтобы увидеть подсказку и прописать её. Полоска под буквой — насколько крепко вы её помните.</p>
-  ${GROUPS.map((g,i)=>{const ls=LETTERS.filter(l=>l.L===i+1),k=ls.filter(letterLearned).length;return `<div class="grp"><h3>${i+1}. ${g} <span>· ${k===ls.length?'все изучены':`${k} из ${ls.length}`}</span></h3><div class="agrid">${ls.map(l=>{const v=letterStrength(l);return `<button class="at ${v?'learned':''} s${v}" data-k="${l.k}" aria-label="${l.U}, ${esc(l.s)}: ${STR_T[v]}"><span class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</span><span class="sd">${esc(l.s)}</span><span class="str" aria-hidden="true"><i></i><i></i><i></i></span></button>`}).join('')}</div></div>`}).join('')}</div>`;
+function renderAlphabet(){const nL=LETTERS.filter(letterLearned).length,N=LETTERS.length,st=LETTERS.map(letterStrength),weak=weakLetters(),C=2*Math.PI*28;
+  $('#view').innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">${refTabs('abc')}
+  <section class="abc-map-h"><svg class="st-ring sm" viewBox="0 0 68 68" role="img" aria-label="Изучено ${nL} из ${N}"><circle cx="34" cy="34" r="28" class="bg"/><circle cx="34" cy="34" r="28" class="fg" stroke-dasharray="${(C*nL/N).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 34 34)"/><text x="34" y="40" class="n">${nL}</text></svg>
+   <div><b>${nL===N?'Весь алфавит! <span class="arm">Կեցցե՛ս!</span>':`Изучено ${nL} из ${N}`}</b><div class="abc-leg"><span><i class="s3"></i>помню крепко</span><span><i class="s2"></i>помню</span><span><i class="s1"></i>пора повторить</span></div></div></section>
+  <div class="abc-map">${LETTERS.map((l,i)=>{const v=st[i];return `<button class="at map s${v}" data-k="${l.k}" aria-label="${l.U}, ${esc(l.s)}: ${STR_T[v]}"><span class="gl">${l.U}</span><span class="sd">${esc(l.s)}</span></button>`}).join('')}</div>
+  ${weak.length?`<button class="btn" id="weak-go">Повторить ${weak.length} ${plural(weak.length,'слабую букву','слабые буквы','слабых букв')}</button>`:nL?`<p class="mem-ok">Слабых букв нет — Циро доволен.</p>`:''}
+  <p class="intro">Все 39 букв восточноармянского алфавита в порядке уроков. Нажмите на букву — подсказка, звук и пропись.</p></div>`;
   document.querySelectorAll('.at').forEach(b=>b.onclick=()=>letterSheet(b.dataset.k));
   const wg=$('#weak-go');if(wg)wg.onclick=startWeak;wireRefTabs();
 }

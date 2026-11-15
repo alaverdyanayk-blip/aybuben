@@ -28,7 +28,7 @@ JS = [
     'js/icons', 'js/ciro', 'js/alphabet','js/trace', 'js/exercises',
     'data/course',  # курс собирается из генераторов упражнений, поэтому идёт после них
     'js/state', 'js/sound', 'js/phrases', 'js/memory', 'js/app', 'js/path', 'js/lesson', 'js/games',
-    'js/reference', 'js/profile', 'js/growth', 'js/share', 'js/placement', 'js/stories',
+    'js/reference', 'js/profile', 'js/growth', 'js/share', 'js/placement', 'js/stories', 'js/daily',
     'js/main',
 ]
 
