@@ -12,7 +12,7 @@
   Адаптер сверяет `version.json` и перезагружает Mini App, если Телеграм показал старую версию из кэша.
 - Контент (`src/data/`): `letters.js` (буквы в порядке изучения, `L` — шаг), `words.js` (базовые слова), `themes.js` (13 тем, ~345 слов, [слово, как звучит, перевод]),
   `phrases.js` (9 ситуаций), `rules.js` (карточки правил `RC/RX/RN/RP/SIGNS`), `course.js` (разделы и уроки; id уроков менять нельзя), `ciro-lines.js` (реплики Циро),
-  `outfits.js`, `achievements.js`, `audio-keys.js`. В начале каждого файла описан формат.
+  `outfits.js`, `achievements.js`, `audio-keys.js`, `stories.js` (вкладка «Истории»: люди и события, шаги рассказ → слова → чтение → вопросы; костюмы `HISTC`). В начале каждого файла описан формат.
 - Логика (`src/js/`): `state.js` (прогресс), `exercises.js`, `lesson.js`, `path.js` (главная), `games.js`, `reference.js` (буквы, словарь, правила), `phrases.js`, `profile.js`, `growth.js` (друзья, напоминания), `memory.js` (повторения), `sound.js`, `ciro.js`.
 - Тема: `S.theme` (`light`/`dark`/`auto`), переключатель в профиле; `applyThemePref()` в `js/app.js`, в Телеграме — `__applyTheme` в адаптере. Облик — `src/css/tuf.css` (идёт последним, цвета только через переменные).
 - Прогресс (`js/state.js`): один объект `S`, ключ localStorage `aybuben-v2`, поле `S.v` — версия схемы (`SCHEMA`). При изменении формата: поднять `SCHEMA` и добавить шаг в `MIGRATIONS` (только добавлять данные, ничего не удалять).
@@ -45,5 +45,7 @@
 1. Изменить файлы в `src/` (контент — в `src/data/`). Превью-артефакт публикуется из `build/aybuben.html` после сборки.
 2. `python3 src/build.py`
 3. `git add -A && git commit -m "…" && git push` — GitHub Pages обновится за ~1 минуту, бот подхватит сам.
+
+После выкладки и важных решений обновить документы проекта на claude.ai: `claude/aybuben-context.md` (сводка) и при работе с «Историями» — `claude/stories-research-brief.md` (задание исследователю, формат `src/data/stories.js`).
 
 Новые фразы для озвучки нужно сгенерировать (скрипт ElevenLabs запускается на компьютере пользователя, ключ вводит только пользователь) и положить в `audio/`, добавив ключи в `AUDIO_KEYS`.
