@@ -20,11 +20,10 @@ function renderProfile(){
     ${wrGroup('fr','За друзей',REFC.map(refOwned),REFC.some(c=>c.id===S.outfit),`${REFC.map(c=>{const op=refOwned(c),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:c.n?`${c.n} ${plural(c.n,'друг','друга','друзей')} пройдут первый урок`:'Если пришёл по приглашению'}</span></button>`}).join('')}`)}</div>
    </div></div>
    <div class="cards">
-    <div class="card st-card"><span class="ic" style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд</div><div class="l">рекорд ${S.best||0}</div></div>
-     <span class="ic fz" style="color:var(--b3)">${IC.frost}</span><div class="l nw" title="Заморозка серии: пропущенный день не гасит огонёк">заморозки: ${frzLeft()} из ${FRZ_MAX}</div></div>
-    <div class="card"><span style="color:var(--gold-deep)">${IC.bolt}</span><div><div class="v">${S.xp}</div><div class="l">всего XP</div></div></div>
-    <div class="card"><span style="color:var(--b1)">${IC.crown}</span><div><div class="v">${level()} <small>уровень</small></div><div class="l nw">до следующего ${100-S.xp%100} XP</div></div></div>
-    <div class="card"><span style="color:var(--b2)">${IC.book}</span><div><div class="v">${doneL}/${LESSONS.length}</div><div class="l">уроков пройдено</div></div></div>
+    <div class="card ctop"><div class="c-top"><span class="ic fl" style="color:var(--accent)">${IC.flame}</span><span class="c-fz" title="Заморозка серии: пропущенный день не гасит огонёк" aria-label="Заморозки: ${frzLeft()} из ${FRZ_MAX}">${IC.frost}${frzLeft()}/${FRZ_MAX}</span></div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div></div>
+    <div class="card ctop"><div class="c-top"><span class="ic" style="color:var(--gold-deep)">${IC.bolt}</span></div><div class="v">${S.xp}</div><div class="l">всего XP</div></div>
+    <div class="card ctop"><div class="c-top"><span class="ic" style="color:var(--b1)">${IC.crown}</span></div><div class="v">${level()} <small>уровень</small></div><div class="l">до следующего ${100-S.xp%100} XP</div></div>
+    <div class="card ctop"><div class="c-top"><span class="ic" style="color:var(--b2)">${IC.book}</span></div><div class="v">${doneL}/${LESSONS.length}</div><div class="l">уроков пройдено</div></div>
    </div>
    <div class="box week"><h3>Неделя</h3>${chart}</div>
    <div class="box"><h3>Цель дня</h3><div class="goals">${[[10,'Лёгкая','1 урок'],[20,'Обычная','2 урока'],[30,'Серьёзная','3 урока'],[50,'Интенсив','5 уроков']].map(([v,t,d])=>`<button data-g="${v}" aria-pressed="${S.goal===v}"><b>${t} · ${v} XP</b><span>около ${d} в день</span></button>`).join('')}</div></div>

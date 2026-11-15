@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="378b060ad5"</script>
+<script>window.BUILD_ID="b28028d73f"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1011,6 +1011,18 @@ button.ach:active{transform:translateY(2px)}
 .st-card .ic{display:flex;justify-content:center;width:22px}.st-card .ic .i{width:22px;height:22px}
 .st-card .l.nw{white-space:normal}
 .card .v small{font-size:15px;font-weight:700;color:var(--muted)}
+/* Карточки профиля: значок сверху, ниже число и подпись — у всех одинаково */
+.cards{align-items:stretch}
+.card.ctop{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:2px;padding:14px 16px}
+.c-top{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:6px}
+.card.ctop .ic{display:flex;width:30px;height:30px;align-items:center;justify-content:center}
+.card.ctop .ic .i{width:30px;height:30px}
+.c-fz{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--b3);background:color-mix(in srgb,var(--b3) 14%,var(--surface));border-radius:99px;padding:3px 9px 3px 6px}
+.c-fz .i{width:16px;height:16px}
+.card.ctop .v{font-size:24px}
+.card.ctop .l{line-height:1.35}
+.card.ctop .ic.fl .i{width:34px;height:34px}
+.c-fz{color:color-mix(in srgb,var(--b3) 55%,var(--ink))}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -3015,11 +3027,10 @@ function renderProfile(){
     ${wrGroup('fr','За друзей',REFC.map(refOwned),REFC.some(c=>c.id===S.outfit),`${REFC.map(c=>{const op=refOwned(c),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:c.n?`${c.n} ${plural(c.n,'друг','друга','друзей')} пройдут первый урок`:'Если пришёл по приглашению'}</span></button>`}).join('')}`)}</div>
    </div></div>
    <div class="cards">
-    <div class="card st-card"><span class="ic" style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд</div><div class="l">рекорд ${S.best||0}</div></div>
-     <span class="ic fz" style="color:var(--b3)">${IC.frost}</span><div class="l nw" title="Заморозка серии: пропущенный день не гасит огонёк">заморозки: ${frzLeft()} из ${FRZ_MAX}</div></div>
-    <div class="card"><span style="color:var(--gold-deep)">${IC.bolt}</span><div><div class="v">${S.xp}</div><div class="l">всего XP</div></div></div>
-    <div class="card"><span style="color:var(--b1)">${IC.crown}</span><div><div class="v">${level()} <small>уровень</small></div><div class="l nw">до следующего ${100-S.xp%100} XP</div></div></div>
-    <div class="card"><span style="color:var(--b2)">${IC.book}</span><div><div class="v">${doneL}/${LESSONS.length}</div><div class="l">уроков пройдено</div></div></div>
+    <div class="card ctop"><div class="c-top"><span class="ic fl" style="color:var(--accent)">${IC.flame}</span><span class="c-fz" title="Заморозка серии: пропущенный день не гасит огонёк" aria-label="Заморозки: ${frzLeft()} из ${FRZ_MAX}">${IC.frost}${frzLeft()}/${FRZ_MAX}</span></div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div></div>
+    <div class="card ctop"><div class="c-top"><span class="ic" style="color:var(--gold-deep)">${IC.bolt}</span></div><div class="v">${S.xp}</div><div class="l">всего XP</div></div>
+    <div class="card ctop"><div class="c-top"><span class="ic" style="color:var(--b1)">${IC.crown}</span></div><div class="v">${level()} <small>уровень</small></div><div class="l">до следующего ${100-S.xp%100} XP</div></div>
+    <div class="card ctop"><div class="c-top"><span class="ic" style="color:var(--b2)">${IC.book}</span></div><div class="v">${doneL}/${LESSONS.length}</div><div class="l">уроков пройдено</div></div>
    </div>
    <div class="box week"><h3>Неделя</h3>${chart}</div>
    <div class="box"><h3>Цель дня</h3><div class="goals">${[[10,'Лёгкая','1 урок'],[20,'Обычная','2 урока'],[30,'Серьёзная','3 урока'],[50,'Интенсив','5 уроков']].map(([v,t,d])=>`<button data-g="${v}" aria-pressed="${S.goal===v}"><b>${t} · ${v} XP</b><span>около ${d} в день</span></button>`).join('')}</div></div>

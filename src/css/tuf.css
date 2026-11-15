@@ -362,3 +362,15 @@ button.ach:active{transform:translateY(2px)}
 .st-card .ic{display:flex;justify-content:center;width:22px}.st-card .ic .i{width:22px;height:22px}
 .st-card .l.nw{white-space:normal}
 .card .v small{font-size:15px;font-weight:700;color:var(--muted)}
+/* Карточки профиля: значок сверху, ниже число и подпись — у всех одинаково */
+.cards{align-items:stretch}
+.card.ctop{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:2px;padding:14px 16px}
+.c-top{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:6px}
+.card.ctop .ic{display:flex;width:30px;height:30px;align-items:center;justify-content:center}
+.card.ctop .ic .i{width:30px;height:30px}
+.c-fz{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--b3);background:color-mix(in srgb,var(--b3) 14%,var(--surface));border-radius:99px;padding:3px 9px 3px 6px}
+.c-fz .i{width:16px;height:16px}
+.card.ctop .v{font-size:24px}
+.card.ctop .l{line-height:1.35}
+.card.ctop .ic.fl .i{width:34px;height:34px}
+.c-fz{color:color-mix(in srgb,var(--b3) 55%,var(--ink))}
