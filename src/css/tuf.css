@@ -357,3 +357,8 @@ button.ach:active{transform:translateY(2px)}
 /* Второстепенная кнопка: своя подложка и рамка, чтобы не сливалась с карточкой ни в светлой, ни в тёмной теме */
 .btn.plain{background:color-mix(in srgb,var(--accent) 12%,var(--surface));color:var(--ink);border:1.5px solid color-mix(in srgb,var(--accent) 40%,var(--line));box-shadow:0 var(--edge) 0 color-mix(in srgb,var(--accent) 40%,var(--line))}
 .btn.plain:active:not(:disabled){box-shadow:0 1px 0 color-mix(in srgb,var(--accent) 40%,var(--line))}
+/* Карточка серии: огонёк и снежинка одного размера, друг под другом */
+.card.st-card{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;row-gap:8px;align-items:center}
+.st-card .ic{display:flex;justify-content:center;width:22px}.st-card .ic .i{width:22px;height:22px}
+.st-card .l.nw{white-space:normal}
+.card .v small{font-size:15px;font-weight:700;color:var(--muted)}
