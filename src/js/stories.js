@@ -1,5 +1,5 @@
 /* Вкладка «Истории»: личности и события армянской истории.
-   История идёт по шагам: «Рассказ» (по-русски, с лентой дат) → «Слова» (главные слова истории) →
+   История идёт по шагам: «Рассказ» (по-русски с лентой дат или целиком по-армянски) → «Слова» (главные слова истории) →
    «Читаем» (карточки на армянском, перевод по нажатию) → «Вопросы» (за них Циро получает костюм).
    Открыта, когда выучены все буквы (или включено «Открыть все уроки»). */
 const storiesOpen=()=>S.unlockAll||LETTERS.every(letterLearned);
@@ -8,7 +8,7 @@ const stDone=id=>!!S.stQ[id];
 const ST_KINDS=[['person','Люди'],['event','События']];
 const ST_SOON={person:['Месроп Маштоц','Комитас','Андраник Озанян'],event:['Создание алфавита · 405','Аварайрская битва · 451','Сардарапатская битва · 1918','Первая Республика · 1918']};
 const ST_STEPS=[['about','Рассказ'],['words','Слова'],['read','Читаем'],['quiz','Вопросы']];
-let STC={id:null,i:0,all:false,step:'about'},ST_KIND='person';
+let STC={id:null,i:0,all:false,step:'about'},ST_KIND='person',ST_LANG='ru',ST_HYALL=false;
 const stNote=t=>{let e=$('#st-msg');if(!e){e=document.createElement('p');e.id='st-msg';e.className='note st-msg';e.setAttribute('role','status');$('.st-steps').after(e)}e.textContent=t};
 const stCos=st=>HISTC.find(x=>x.st===st.id)||{};
 function renderStories(sub){const ST=STORIES.find(x=>x.id===sub);
@@ -25,7 +25,8 @@ function renderStories(sub){const ST=STORIES.find(x=>x.id===sub);
     if(k==='quiz'){if(stRead(ST.id)<n&&!stDone(ST.id)){stNote('Вопросы откроются, когда дочитаете карточки — осталось '+(n-stRead(ST.id))+'.');return}return storyQuiz(ST)}
     STC.step=k;renderStories(ST.id);scrollTo(0,0)});
   const nx=$('#st-to');if(nx)nx.onclick=()=>{STC.step=nx.dataset.s;renderStories(ST.id);scrollTo(0,0)};
-  if(step==='read')wireRead(ST)}
+  if(step==='read')wireRead(ST);
+  if(step==='about')wireAbout(ST)}
 /* Вкладка закрыта: кольцо прогресса букв, обложки историй под замком и что будет дальше */
 function storyTeaser(){const kn=LETTERS.filter(letterLearned).length,N=LETTERS.length,left=N-kn,C=2*Math.PI*44,les=LESSONS.filter(l=>l.abc&&!/w$/.test(l.id)&&!S.done[l.id]).length;
   $('#view').innerHTML=`<div class="stx">
@@ -45,11 +46,22 @@ function storyList(){const kind=ST_KIND,list=STORIES.filter(s=>(s.kind||'person'
   document.querySelectorAll('.st-kinds button').forEach(b=>b.onclick=()=>{ST_KIND=b.dataset.k;storyList()});
   document.querySelectorAll('.st-card').forEach(b=>b.onclick=()=>{location.hash='stories/'+b.dataset.st})}
 /* Шаг 1: рассказ по-русски — обложка, абзацы, лента дат */
-function stAbout(ST){return `<section class="st-cover"><span class="st-cov-art">${mascot('happy','m-idle',stCos(ST).id)}</span><div><span class="k">${ST.kind==='event'?'Событие':'Личность'} · ${esc(ST.years)}</span><h2>${esc(ST.t)}</h2><span class="arm hy">${esc(ST.hy)}</span><p>${esc(ST.d)}</p></div></section>
-   <section class="box st-about">${(ST.about||[]).map(p=>`<p>${esc(p)}</p>`).join('')}</section>
-   ${ST.time?`<section class="box"><h3>Главные даты</h3><ol class="st-time">${ST.time.map(([y,t])=>`<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ol></section>`:''}
-   <p class="note st-src">Источники: ${ST.src.map(esc).join('; ')}.</p>
+function stAbout(ST){const hy=ST_LANG==='hy';
+  return `<section class="st-cover"><span class="st-cov-art">${mascot('happy','m-idle',stCos(ST).id)}</span><div><span class="k">${ST.kind==='event'?'Событие':'Личность'} · ${esc(ST.years)}</span><h2>${esc(ST.t)}</h2><span class="arm hy">${esc(ST.hy)}</span><p>${esc(ST.d)}</p></div></section>
+   <div class="st-lang" role="group" aria-label="Язык рассказа"><button data-l="ru" aria-pressed="${!hy}">По-русски</button><button data-l="hy" aria-pressed="${hy}"><span class="arm">Հայերեն</span></button></div>
+   ${hy?stAboutHy(ST):`<section class="box st-about">${(ST.about||[]).map(p=>`<p>${esc(p)}</p>`).join('')}</section>
+   ${ST.time?`<section class="box"><h3>Главные даты</h3><ol class="st-time">${ST.time.map(([y,t])=>`<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ol></section>`:''}`}
    <button class="btn st-next1" id="st-to" data-s="words">Дальше: слова истории</button>`}
+/* Рассказ целиком по-армянски: тот же текст, что в карточках, сплошным чтением; перевод — по нажатию на предложение */
+function stAboutHy(ST){return `<section class="box st-hytext">
+   <p class="note" style="margin:0">Нажмите на предложение — появится перевод.</p>
+   ${ST.cards.map(c=>`<h3 class="arm">${esc(c.hy)} <small>${esc(c.ru)}</small></h3><p>${c.s.map(x=>`<span class="st-hs ${ST_HYALL?'open':''}" role="button" tabindex="0" aria-expanded="${ST_HYALL}"><span class="arm hy">${esc(x[0])}</span><span class="ru">${esc(x[1])}</span></span>`).join(' ')}</p>`).join('')}
+   <button class="link st-all" id="st-hyall">${ST_HYALL?'Скрыть перевод':'Показать весь перевод'}</button></section>`}
+function wireAbout(ST){
+  document.querySelectorAll('.st-lang button').forEach(b=>b.onclick=()=>{if(ST_LANG===b.dataset.l)return;ST_LANG=b.dataset.l;renderStories(ST.id)});
+  document.querySelectorAll('.st-hs').forEach(b=>{const t=()=>{const o=!b.classList.contains('open');b.classList.toggle('open',o);b.setAttribute('aria-expanded',o)};
+    b.onclick=t;b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();t()}}});
+  const a=$('#st-hyall');if(a)a.onclick=()=>{ST_HYALL=!ST_HYALL;renderStories(ST.id)}}
 /* Шаг 2: главные слова — чтобы потом легче читалось */
 function stWords(ST){return `<section class="box"><h3>Слова этой истории</h3><p class="note" style="margin:0">Они встретятся в карточках. Прочитайте каждое вслух.</p>
    <div class="st-words">${(ST.words||[]).map(w=>`<div class="st-w"><span class="arm">${esc(w[0])}</span>${spk2(w[0])}<span class="r">«${esc(w[1])}»</span><span class="m">${esc(w[2])}</span></div>`).join('')}</div></section>

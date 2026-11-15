@@ -398,7 +398,6 @@ button.ach:active{transform:translateY(2px)}
 .st-s.open{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}.st-s.open .ru{display:block}
 .st-all{align-self:flex-start;padding:4px 0}
 .st-nav{display:grid;grid-template-columns:1fr 2fr;gap:10px}
-.st-src{font-size:12px}
 /* Истории: шаги, обложка, лента дат, слова */
 .st-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--sunk);padding:4px;border-radius:16px}
 .st-steps button{display:flex;flex-direction:column;align-items:center;gap:1px;border:0;border-radius:12px;padding:7px 2px;background:transparent;font-size:12.5px;font-weight:700;color:var(--muted)}
@@ -484,3 +483,15 @@ button.ach:active{transform:translateY(2px)}
 .at.map.s2{color:var(--ink);box-shadow:0 3px 0 color-mix(in srgb,var(--good) 60%,var(--line))}.at.map.s2 .sd{color:var(--ink)}
 .at.map.s1{color:var(--apri-ink);box-shadow:0 3px 0 var(--apri-deep)}.at.map.s1 .sd{color:var(--apri-ink)}
 .at.map.s0 .gl{color:var(--muted);opacity:1}.at.map::after{display:none}
+
+/* Истории: рассказ по-армянски */
+.st-lang{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:14px;width:fit-content}
+.st-lang button{border:0;border-radius:11px;padding:7px 16px;background:transparent;font:inherit;font-weight:700;color:var(--muted);cursor:pointer}
+.st-lang button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgb(0 0 0/.12)}
+.st-hytext h3{margin:14px 0 6px;font-size:19px}.st-hytext h3 small{font-family:var(--f-body);font-size:13px;font-weight:600;color:var(--muted)}
+.st-hytext p:not(.note){margin:0;font-size:19px;line-height:1.7}
+.st-hs{cursor:pointer}.st-hs .hy{border-radius:6px;transition:background .15s}
+.st-hs:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.st-hs .ru{display:none}
+.st-hs.open .hy{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.st-hs.open .ru{display:block;margin:2px 0 8px;font-size:14.5px;line-height:1.4;color:var(--muted);font-family:var(--f-body)}

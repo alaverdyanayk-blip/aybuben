@@ -133,6 +133,9 @@ test('истории: закрыты до конца алфавита; карт�
   __fresh({done:Object.fromEntries(LESSONS.filter(l=>UNITS[l.unit].alpha).map(l=>[l.id,1]))});e(document.querySelector('.tabs [data-view="stories"]'),'нет вкладки «Истории»');location.hash='stories';route();e(document.querySelector('.st-card[data-st="nzhdeh"]'),'нет карточки истории');
   document.querySelector('.st-kinds [data-k="event"]').click();e(/Скоро/.test($('#view').textContent),'события: нет «Скоро»');ST_KIND='person';
   location.hash='stories/nzhdeh';STC={id:null};route();e(/Главные даты/.test($('#view').textContent)&&document.querySelector('.st-cover'),'нет рассказа');
+  e(!/Источники/.test($('#view').textContent),'источники видны');
+  document.querySelector('.st-lang [data-l="hy"]').click();{const hs=document.querySelectorAll('.st-hs');e(hs.length===STORIES[0].cards.reduce((k,c)=>k+c.s.length,0),'рассказ по-армянски: '+hs.length);hs[0].click();e(hs[0].classList.contains('open')||document.querySelector('.st-hs.open'),'перевод в армянском рассказе');}
+  document.querySelector('.st-lang [data-l="ru"]').click();e(/Главные даты/.test($('#view').textContent),'не вернулся русский рассказ');
   document.querySelector('.st-steps [data-s="quiz"]').click();e(!LS&&/дочитаете/.test($('#view').textContent),'вопросы открылись до чтения');
   $('#st-to').click();e(document.querySelectorAll('.st-w').length===STORIES[0].words.length,'нет слов');$('#st-to').click();
   const b=document.querySelector('.st-s');b.click();e(b.classList.contains('open'),'перевод не открывается');
