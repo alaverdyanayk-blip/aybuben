@@ -333,3 +333,6 @@ button.pill{font:inherit;font-weight:800;cursor:pointer}
 .st-frz{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--b3) 12%,var(--surface));border-radius:16px;padding:12px 14px}
 .st-frz .fzi{color:var(--b3)}.st-frz .fzi .i{width:28px;height:28px}.st-frz p{margin:4px 0 0;font-size:14px;line-height:1.4}
 .unlock.frz b{display:flex;align-items:center;gap:6px}.unlock.frz .i{color:var(--b3);width:20px;height:20px}
+/* Пара кнопок «послушать / 0,7×» */
+.spk2{display:inline-flex;align-items:center;gap:12px;flex:none}
+.spk.slow.sm{width:auto;height:32px;min-width:44px;padding:0 9px;flex-direction:row;font-size:13px;font-weight:800;border-radius:99px;line-height:1}

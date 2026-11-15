@@ -24,6 +24,8 @@ const SPK_SVG='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColo
 function spk(t,cls=''){return hasAudio(t)?`<button class="spk ${cls}" data-say="${esc(t)}" aria-label="Послушать">${SPK_SVG}</button>`:''}
 function spkSlow(t){return hasAudio(t)?`<button class="spk slow" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно"><b>0,7×</b><span>медленно</span></button>`:''}
 document.addEventListener('click',e=>{const b=e.target.closest('.spk');if(!b)return;e.stopPropagation();say(b.dataset.say,+(b.dataset.rate||1))},true);
+/* Обычная и медленная кнопки рядом — для словаря, карточки буквы и разговорника */
+function spk2(t){return hasAudio(t)?`<span class="spk2">${spk(t,'sm')}<button class="spk slow sm" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно">0,7×</button></span>`:''}
 const autoSay=(t,ms=120)=>{if(S.voice!==false)setTimeout(()=>say(t),ms)};
 const haptic=t=>{if(window.__haptic)window.__haptic(t)};
 const sGood=()=>{tone([[660,.12],[990,.2]]);haptic('ok')},sBad=()=>{tone([[220,.18],[180,.25]]);haptic('bad')},sWin=()=>tone([[523,.14],[659,.14],[784,.14],[1046,.35]]);

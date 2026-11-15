@@ -41,7 +41,7 @@ function renderPhrases(sub){const P=PHR.find(p=>p.id===sub);
     <section class="ph-head"><div class="ph-art" id="ph-art">${mascot(P.mood,'m-idle',P.o)}</div><div class="ph-ht"><span class="k">Фразы · ситуация</span><h2>${esc(P.t)}</h2><span class="arm hy">${esc(P.hy)}</span><p>${esc(P.d)}</p></div></section>
     <div class="ph-steps">${step(1,'Урок 1 · Фразы','Перевод, пары и сборка фраз',true,r.l1)}${step(2,'Урок 2 · Диалог',esc(P.who)+' говорит — вы отвечаете',open2,r.l2)}</div>
     <div class="box ph-cos"><span class="cos-art">${mascot('cheer','',c.id)}</span><div><b>Костюм «${esc(c.t)}»</b><p class="note" style="margin:2px 0 0">${phDone(P.id)?esc(c.d):'Откроется, когда пройдёте диалог.'}</p></div>${phDone(P.id)?`<button class="btn ${worn?'plain':''} sm" id="ph-wear" ${worn?'disabled':''}>${worn?'Надето':'Надеть'}</button>`:''}</div>
-    <section class="box ph-list"><h3>Разговорник</h3>${P.ph.map(x=>`<div class="ph-row"><div class="ph-a"><span class="arm">${esc(x[0])}</span>${spk(x[0],'sm')}</div><div class="ph-r">«${esc(x[1])}»</div><div class="ph-m">${esc(x[2])}</div>${x[3]?`<div class="ph-n">${esc(x[3])}</div>`:''}</div>`).join('')}</section>
+    <section class="box ph-list"><h3>Разговорник</h3>${P.ph.map(x=>`<div class="ph-row"><div class="ph-a"><span class="arm">${esc(x[0])}</span>${spk2(x[0])}</div><div class="ph-r">«${esc(x[1])}»</div><div class="ph-m">${esc(x[2])}</div>${x[3]?`<div class="ph-n">${esc(x[3])}</div>`:''}</div>`).join('')}</section>
   </div>`;
   document.querySelectorAll('.ph-step').forEach(b=>b.onclick=()=>phStart(P,+b.dataset.n));
   const w=$('#ph-wear');if(w)w.onclick=()=>{S.outfit=c.id;save();renderPhrases(P.id)};

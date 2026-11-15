@@ -54,7 +54,7 @@ function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напиш�
   LS.tr=tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}
 function renderTeach(ex,box){box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.title)}</h2><div class="ciro-say stack">${mascot('happy','m-idle',ex.outfit)}<div class="bubble teach">${ex.html}</div></div>`);footNext('Понятно')}
 function exWord(l,ex){const a=ex?ex.a:l.w,m=ex?ex.m:l.m,w=ex||WORDS.find(x=>x.a===l.w);
-  return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(a,l.k)}</span>${spk(a,'sm')}</div><div class="ew-mean"><b>${esc(m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(a,l.k)}</div>`}
+  return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(a,l.k)}</span>${spk2(a)}</div><div class="ew-mean"><b>${esc(m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(a,l.k)}</div>`}
 function exSyl(l,syl){const rd=t=>units(t).map(u=>(BY[u]||{}).s||u).join('').replace(/ \/ .*/,'');
   if(!syl.length)return `<div class="ex-word"><span class="lbl">Первая буква</span><div class="ew-mean"><span>С неё начинается армянский алфавит. По названиям первых двух букв, «айб» и «бен», он и называется «Айбубен». Слоги и слова начнутся со следующей буквы.</span></div></div>`;
   return `<div class="ex-word"><span class="lbl">Читаем слоги</span><div class="syls">${syl.map(t=>`<span class="syl"><b class="arm">${t}</b><small>${esc(units(t).map(u=>((BY[u]||{}).s||u).split(' / ')[0]).join(''))}</small></span>`).join('')}</div><div class="ew-mean"><span>Первые слова откроются, когда выучите ещё пару букв.</span></div></div>`}

@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="8b2184ac71"</script>
+<script>window.BUILD_ID="5ce3cdbaaf"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -982,6 +982,9 @@ button.pill{font:inherit;font-weight:800;cursor:pointer}
 .st-frz{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--b3) 12%,var(--surface));border-radius:16px;padding:12px 14px}
 .st-frz .fzi{color:var(--b3)}.st-frz .fzi .i{width:28px;height:28px}.st-frz p{margin:4px 0 0;font-size:14px;line-height:1.4}
 .unlock.frz b{display:flex;align-items:center;gap:6px}.unlock.frz .i{color:var(--b3);width:20px;height:20px}
+/* Пара кнопок «послушать / 0,7×» */
+.spk2{display:inline-flex;align-items:center;gap:12px;flex:none}
+.spk.slow.sm{width:auto;height:32px;min-width:44px;padding:0 9px;flex-direction:row;font-size:13px;font-weight:800;border-radius:99px;line-height:1}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -2306,6 +2309,8 @@ const SPK_SVG='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColo
 function spk(t,cls=''){return hasAudio(t)?`<button class="spk ${cls}" data-say="${esc(t)}" aria-label="Послушать">${SPK_SVG}</button>`:''}
 function spkSlow(t){return hasAudio(t)?`<button class="spk slow" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно"><b>0,7×</b><span>медленно</span></button>`:''}
 document.addEventListener('click',e=>{const b=e.target.closest('.spk');if(!b)return;e.stopPropagation();say(b.dataset.say,+(b.dataset.rate||1))},true);
+/* Обычная и медленная кнопки рядом — для словаря, карточки буквы и разговорника */
+function spk2(t){return hasAudio(t)?`<span class="spk2">${spk(t,'sm')}<button class="spk slow sm" data-say="${esc(t)}" data-rate="0.7" aria-label="Послушать медленно">0,7×</button></span>`:''}
 const autoSay=(t,ms=120)=>{if(S.voice!==false)setTimeout(()=>say(t),ms)};
 const haptic=t=>{if(window.__haptic)window.__haptic(t)};
 const sGood=()=>{tone([[660,.12],[990,.2]]);haptic('ok')},sBad=()=>{tone([[220,.18],[180,.25]]);haptic('bad')},sWin=()=>tone([[523,.14],[659,.14],[784,.14],[1046,.35]]);
@@ -2352,7 +2357,7 @@ function renderPhrases(sub){const P=PHR.find(p=>p.id===sub);
     <section class="ph-head"><div class="ph-art" id="ph-art">${mascot(P.mood,'m-idle',P.o)}</div><div class="ph-ht"><span class="k">Фразы · ситуация</span><h2>${esc(P.t)}</h2><span class="arm hy">${esc(P.hy)}</span><p>${esc(P.d)}</p></div></section>
     <div class="ph-steps">${step(1,'Урок 1 · Фразы','Перевод, пары и сборка фраз',true,r.l1)}${step(2,'Урок 2 · Диалог',esc(P.who)+' говорит — вы отвечаете',open2,r.l2)}</div>
     <div class="box ph-cos"><span class="cos-art">${mascot('cheer','',c.id)}</span><div><b>Костюм «${esc(c.t)}»</b><p class="note" style="margin:2px 0 0">${phDone(P.id)?esc(c.d):'Откроется, когда пройдёте диалог.'}</p></div>${phDone(P.id)?`<button class="btn ${worn?'plain':''} sm" id="ph-wear" ${worn?'disabled':''}>${worn?'Надето':'Надеть'}</button>`:''}</div>
-    <section class="box ph-list"><h3>Разговорник</h3>${P.ph.map(x=>`<div class="ph-row"><div class="ph-a"><span class="arm">${esc(x[0])}</span>${spk(x[0],'sm')}</div><div class="ph-r">«${esc(x[1])}»</div><div class="ph-m">${esc(x[2])}</div>${x[3]?`<div class="ph-n">${esc(x[3])}</div>`:''}</div>`).join('')}</section>
+    <section class="box ph-list"><h3>Разговорник</h3>${P.ph.map(x=>`<div class="ph-row"><div class="ph-a"><span class="arm">${esc(x[0])}</span>${spk2(x[0])}</div><div class="ph-r">«${esc(x[1])}»</div><div class="ph-m">${esc(x[2])}</div>${x[3]?`<div class="ph-n">${esc(x[3])}</div>`:''}</div>`).join('')}</section>
   </div>`;
   document.querySelectorAll('.ph-step').forEach(b=>b.onclick=()=>phStart(P,+b.dataset.n));
   const w=$('#ph-wear');if(w)w.onclick=()=>{S.outfit=c.id;save();renderPhrases(P.id)};
@@ -2560,7 +2565,7 @@ function renderTrace(ex,box){box.insertAdjacentHTML('beforeend',`<h2>Напиш�
   LS.tr=tracer($('#tr-box'),ex.key,{onDone:m=>{$('#nxt').disabled=false;$('#tr-skip').hidden=true;if(!m)sGood();$('#nxt').focus()}})}
 function renderTeach(ex,box){box.insertAdjacentHTML('beforeend',`<h2>${esc(ex.title)}</h2><div class="ciro-say stack">${mascot('happy','m-idle',ex.outfit)}<div class="bubble teach">${ex.html}</div></div>`);footNext('Понятно')}
 function exWord(l,ex){const a=ex?ex.a:l.w,m=ex?ex.m:l.m,w=ex||WORDS.find(x=>x.a===l.w);
-  return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(a,l.k)}</span>${spk(a,'sm')}</div><div class="ew-mean"><b>${esc(m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(a,l.k)}</div>`}
+  return `<div class="ex-word"><span class="lbl">Пример</span><div class="ew-top"><span class="w">${hl(a,l.k)}</span>${spk2(a)}</div><div class="ew-mean"><b>${esc(m)}</b>${w?`<span>звучит «${esc(w.r)}»</span>`:''}</div>${bd(a,l.k)}</div>`}
 function exSyl(l,syl){const rd=t=>units(t).map(u=>(BY[u]||{}).s||u).join('').replace(/ \/ .*/,'');
   if(!syl.length)return `<div class="ex-word"><span class="lbl">Первая буква</span><div class="ew-mean"><span>С неё начинается армянский алфавит. По названиям первых двух букв, «айб» и «бен», он и называется «Айбубен». Слоги и слова начнутся со следующей буквы.</span></div></div>`;
   return `<div class="ex-word"><span class="lbl">Читаем слоги</span><div class="syls">${syl.map(t=>`<span class="syl"><b class="arm">${t}</b><small>${esc(units(t).map(u=>((BY[u]||{}).s||u).split(' / ')[0]).join(''))}</small></span>`).join('')}</div><div class="ew-mean"><span>Первые слова откроются, когда выучите ещё пару букв.</span></div></div>`}
@@ -2912,7 +2917,7 @@ function renderAlphabet(){const nL=LETTERS.filter(letterLearned).length,st=LETTE
 let traceCase='U';
 function letterSheet(k){const l=BY[k];
   const s=sheet(`<div class="sheet-top"><span class="chip">${GROUPS[l.L-1]}</span><button class="x" data-close aria-label="Закрыть">✕</button></div>
-   <div class="lc-hero" style="border:0;padding:0"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="snd-row"><span class="chip lg">${esc(l.s)}</span>${spk(letterSnd(l))}</span><span class="nm-row">Название: «${esc(l.nm)}» <span class="arm">${esc(l.hn)}</span>${spk(l.hn,'sm')}</span></div></div>
+   <div class="lc-hero" style="border:0;padding:0"><div class="gl">${l.U}${l.U!==l.k?`<small>${l.k}</small>`:''}</div><div class="info"><span class="snd-row"><span class="chip lg">${esc(l.s)}</span>${spk(letterSnd(l))}</span><span class="nm-row">Название: «${esc(l.nm)}» <span class="arm">${esc(l.hn)}</span>${spk2(l.hn)}</span></div></div>
    <p style="margin:0">${esc(tipOf(l))}</p>${exWord(l)}
    <div class="row" style="justify-content:space-between"><b>Пропишите букву</b>${l.U!==l.k&&l.U!=='Ու'?`<div class="seg"><button data-c="U" aria-pressed="${traceCase==='U'}" class="arm">${l.U}</button><button data-c="l" aria-pressed="${traceCase==='l'}" class="arm">${l.k}</button></div>`:''}</div>
    <div id="cv-tr"></div>`,()=>{if(_tr){_tr.destroy();_tr=null}});
@@ -2935,7 +2940,7 @@ function renderRules(){
   const draw=()=>{const q=REF.q.trim().toLowerCase();
     let ws=REF.th?THEMES.find(t=>t.id===REF.th).words:WORDS;
     if(q)ws=ws.filter(w=>w.a.toLowerCase().includes(q)||w.m.toLowerCase().includes(q)||w.r.toLowerCase().replace(/ʰ/g,'').includes(q.replace(/ʰ/g,'')));
-    $('#dlist').innerHTML=ws.length?`<p class="note">${ws.length} ${plural(ws.length,'слово','слова','слов')}${hasAudio?`, со звуком — ${ws.filter(w=>hasAudio(w.a)).length}`:''}</p><div class="dgrid">${ws.map(w=>`<div class="dcard"><div class="dtx"><span class="dw">${esc(w.a)}</span><span class="dr">«${esc(w.r)}»</span><span class="dm">${esc(w.m)}</span></div>${spk(w.a,'sm')}</div>`).join('')}</div>`:`<p class="note">Ничего не нашлось. Попробуйте другое слово.</p>`};
+    $('#dlist').innerHTML=ws.length?`<p class="note">${ws.length} ${plural(ws.length,'слово','слова','слов')}${hasAudio?`, со звуком — ${ws.filter(w=>hasAudio(w.a)).length}`:''}</p><div class="dgrid">${ws.map(w=>`<div class="dcard"><div class="dtx"><span class="dw">${esc(w.a)}</span><span class="dr">«${esc(w.r)}»</span><span class="dm">${esc(w.m)}</span></div>${spk2(w.a)}</div>`).join('')}</div>`:`<p class="note">Ничего не нашлось. Попробуйте другое слово.</p>`};
   $('#dq').oninput=e=>{REF.q=e.target.value;draw()};
   document.querySelectorAll('.thchips button').forEach(b=>b.onclick=()=>{REF.th=b.dataset.th;renderRules()});
   draw();
