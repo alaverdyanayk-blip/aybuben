@@ -27,7 +27,7 @@ function closeLesson(){stopTrace();const el=$('#lesson');el&&el.remove();if(!$('
 function hudLesson(){$('#lprog').style.width=(LS.total?LS.done/LS.total*100:0)+'%';$('#lhearts').innerHTML=LS.practice?`${IC.heart}∞`:`${IC.heart}${S.hearts}`}
 function next(){
   hudLesson();
-  if(!LS.queue.length)return finishLesson();
+  if(!LS.queue.length)return LS.lesson.place?finishPlacement():finishLesson();
   if(!LS.practice&&S.hearts<=0)return failLesson();
   stopTrace();const ex=LS.queue.shift();LS.cur=ex;LS.state='answer';LS.sel=null;
   const box=$('#ex');box.innerHTML='';$('#lfoot').className='l-foot';
@@ -114,7 +114,8 @@ function check(){
   else if(ex.type==='build'){if(!LS.built.length)return;const got=LS.built.map(i=>ex.tiles[i]).join('|');ok=ex.answers.some(a=>a.join('|')===got)}
   LS.state='checked';
   if(ex.item)memUpdate(ex.item,ok);
-  if(ok){LS.done++;LS.combo++;LS.best=Math.max(LS.best,LS.combo);if(ex.tag==='read')S.read++}
+  if(LS.lesson.place){placeAnswer(ex,ok);ok?LS.combo++:(LS.combo=0)}
+  else if(ok){LS.done++;LS.combo++;LS.best=Math.max(LS.best,LS.combo);if(ex.tag==='read')S.read++}
   else{LS.mistakes++;LS.combo=0;if(!LS.practice){S.hearts=Math.max(0,hearts()-1);if(S.hearts===MAXH-1)S.heartsTs=Date.now()}save();LS.queue.push(ex)}
   let detail='';
   if(!ok){const ans=ex.type==='choice'?ex.correct:ex.show;detail=`Правильно: <span class="a">${esc(ans)}</span>`}

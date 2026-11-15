@@ -36,6 +36,7 @@ function renderProfile(){
     <div class="toggle theme-row"><span>Тема</span><div class="seg" role="group" aria-label="Тема">${[['auto','Как в системе'],['light','Светлая'],['dark','Тёмная']].map(([v,t])=>`<button data-theme-set="${v}" aria-pressed="${(S.theme||'auto')===v}">${t}</button>`).join('')}</div></div>
     <div class="toggle"><span>Произносить слова автоматически<br><span class="note">Кнопка с динамиком работает всегда</span></span><button class="switch" role="switch" id="sw-voice" aria-checked="${S.voice!==false}" aria-label="Автоозвучка"></button></div>
     <div class="toggle"><span>Звуки в уроках</span><button class="switch" role="switch" id="sw-sound" aria-checked="${S.sound}" aria-label="Звуки"></button></div>
+    <div class="toggle"><span>Тест на уровень<br><span class="note">Проверит, какие буквы вы уже знаете, и отметит их пройденными</span></span><button class="btn plain sm" id="place-p">Пройти</button></div>
     <div class="toggle"><span>Открыть все уроки<br><span class="note">Для тех, кто уже знает часть материала</span></span><button class="switch" role="switch" id="sw-all" aria-checked="${S.unlockAll}" aria-label="Открыть все уроки"></button></div>
     <div class="row"><button class="btn plain" id="reset">Сбросить прогресс</button><span id="rs-confirm"></span></div>
     <p class="note">${TGW?'Прогресс хранится в облаке Телеграма: он общий для телефона и компьютера.':'Прогресс хранится в этом браузере на этом устройстве.'}</p></div>
@@ -46,6 +47,7 @@ function renderProfile(){
   const chr=$('[data-ch-row]');if(chr)chr.addEventListener('click',()=>track('channel','profile'));
   $('#sw-voice').onclick=()=>{S.voice=S.voice===false;save();renderProfile()};
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
+  $('#place-p').onclick=startPlacement;
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
   wireGrowth();
   document.querySelectorAll('[data-ach]').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));

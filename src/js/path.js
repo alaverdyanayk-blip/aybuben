@@ -24,7 +24,7 @@ function renderLearn(){
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot('happy','m-idle')}</button>
     <ol class="steps3"><li><b class="arm">Ա</b>буквы</li><li><b class="arm">տուն</b>слова</li><li><b class="arm">Բարև</b>фразы</li></ol>
     <div class="w-goal"><span>Сколько заниматься в день?</span><div class="w-goals" role="group" aria-label="Цель дня">${[[10,'1 урок'],[20,'2 урока'],[30,'3 урока']].map(([v,t])=>`<button data-wg="${v}" aria-pressed="${S.goal===v}">${t}</button>`).join('')}</div></div>
-    <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>`
+    <button class="btn cta" id="cta">${esc(ctaLabel)}</button><button class="w-place" id="place">Уже знаю часть букв — проверить уровень</button></section>`
    :`<section class="hero tod-${g.tod}">
     <div class="hero-tx"><div class="hy"><span class="hy-top"><b>${g.hy}!</b>${spk(g.hy,'sm')}</span><span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
@@ -56,6 +56,7 @@ function renderLearn(){
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>guideSheet(+b.dataset.guide));
   $('#ciro').onclick=()=>{bounce($('#ciro .mascot'));say(g.hy)};
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
+  const pb=$('#place');if(pb)pb.onclick=startPlacement;
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   document.querySelectorAll('[data-wg]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.wg;save();document.querySelectorAll('[data-wg]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawHud()});
   const pr=$('#prac');if(pr)pr.onclick=startPractice;

@@ -1,7 +1,7 @@
 /* Шапка (серия, сердца, цель дня) и переключение разделов. */
 function ring(v,max){const p=Math.min(1,v/max),c=2*Math.PI*9;return `<svg class="ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle cx="12" cy="12" r="9" fill="none" stroke="var(--good)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 12 12)"/></svg>`}
 function drawHud(){applyFreeze();const st=streakNow(),fz=frzLeft();
-  $('#hud').innerHTML=`<button class="pill flame ${S.lastDay===today()?'':'off'}" id="hud-st" aria-label="Серия: ${st} ${plural(st,'день','дня','дней')}, заморозок ${fz}">${IC.flame}${st}${fz?`<i class="fz" aria-hidden="true">${IC.frost}</i>`:''}</button><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`;
+  $('#hud').innerHTML=`<button class="pill flame ${S.lastDay===today()?'':'off'}" id="hud-st" aria-label="Серия: ${st} ${plural(st,'день','дня','дней')}, заморозок ${fz}">${IC.flame}${st}${fz&&st?`<i class="fz" aria-hidden="true">${IC.frost}</i>`:''}</button><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`;
   $('#hud-st').onclick=streakSheet}
 /* Окно серии: огонёк, рекорд, заморозки и последние две недели (занимался / заморожен / пропуск) */
 function streakSheet(){const st=streakNow(),fz=frzLeft(),fd=new Set(S.frzDays||[]);

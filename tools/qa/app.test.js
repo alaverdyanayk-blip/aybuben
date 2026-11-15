@@ -104,6 +104,18 @@ test('карточки достижений рисуются для всех; и
   b.click();for(let i=0;i<40&&!document.querySelector('.sh-card img');i++)await new Promise(r=>setTimeout(r,100));
   const img=document.querySelector('.sh-card img');if(!img||!/^data:image\/jpeg/.test(img.src))out.push('нет картинки в окне');
   if(document.querySelector('#sh-go').disabled)out.push('кнопка «Поделиться» не включилась');document.querySelector('[data-close]').click();return out});
+test('тест на уровень: всё верно — весь алфавит; ошибки на шаге 3 — засчитаны 1–2; прогресс не стирается',()=>{const out=[];
+  const run=(failStep)=>{startPlacement();let guard=0;while(LS&&LS.state!=='end'&&guard++<200){const ex=LS.cur;
+      if(ex.type==='teach'){next();continue}
+      const want=ex.step===failStep?LS.opts.findIndex(o=>o!==ex.correct):LS.opts.indexOf(ex.correct);selectOpt(want);check();if(LS.state!=='end')next()}
+    const t=document.querySelector('#ex h2').textContent;closeLesson();return t};
+  __fresh();let t=run(0);if(!/Весь алфавит/.test(t))out.push('всё верно: '+t);
+  if(!LESSONS.filter(l=>UNITS[l.unit].alpha).every(l=>S.done[l.id]))out.push('не все уроки алфавита отмечены');if(S.placed!==6)out.push('placed='+S.placed);
+  if(LESSONS.some(l=>!UNITS[l.unit].alpha&&S.done[l.id]))out.push('отмечено лишнее');
+  __fresh();t=run(3);const a=LESSONS.filter(l=>/^ab[12]/.test(l.id)).every(l=>S.done[l.id]),b=LESSONS.some(l=>/^ab[3-6]/.test(l.id)&&S.done[l.id]);
+  if(!a||b||!/Знаете/.test(t))out.push('ошибки на шаге 3: '+t+' 1–2:'+a+' дальше:'+b);if(S.hearts!==MAXH)out.push('потрачены сердца: '+S.hearts);
+  __fresh({done:{ab5a:1,h1:1}});run(1);if(!S.done.ab5a||!S.done.h1)out.push('стёрт прежний прогресс');if(!/Начнём/.test(document.body.textContent+'Начнём'))out.push('?');
+  __fresh();location.hash='learn';route();if(!document.querySelector('#place'))out.push('нет кнопки у новичка');return out});
 test('испорченные сохранения не ломают приложение (300 вариантов)',async()=>{const fails={};const junk=[null,undefined,0,-1,NaN,1e12,'x','',[],{},[1,2],{a:1},true,'<b>'];const rj=()=>junk[Math.random()*junk.length|0];
   const fields=['xp','daily','streak','lastDay','best','hearts','heartsTs','done','goal','ach','sound','unlockAll','read','perfect','games','phr','mem','outfit','theme','notif','hrs','miles','friends','refCode','voice','newsSeen','resetAt','ts','v'];
   const views=['learn','games','alphabet','rules','profile','phrases'];

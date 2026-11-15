@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="32ff794991"</script>
+<script>window.BUILD_ID="4da6a602e6"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -992,6 +992,15 @@ button.ach:active{transform:translateY(2px)}
 .sh-card{border-radius:20px;overflow:hidden;background:var(--sunk);aspect-ratio:4/5;display:grid;place-items:center;max-height:58vh;margin:0 auto;width:min(100%,46vh)}
 .sh-card img{display:block;width:100%;height:100%;object-fit:contain;-webkit-touch-callout:default;user-select:auto}
 .sh-wait{color:var(--muted);font-weight:600;padding:20px;text-align:center}
+/* Тест на уровень */
+.w-place{grid-area:p;justify-self:center;background:none;border:0;font:inherit;font-size:14px;font-weight:700;color:#FFE3B0;text-decoration:underline;text-underline-offset:3px;padding:6px 8px;cursor:pointer}
+.hero.welcome{grid-template-areas:"t c" "s s" "w w" "a a" "p p"}
+.pl-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:100%}
+.pl-steps span{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px;border-radius:12px;background:var(--sunk);color:var(--muted)}
+.pl-steps b{font-size:18px}.pl-steps small{font-size:10.5px;line-height:1.2;text-align:center}
+.pl-steps .on{background:color-mix(in srgb,var(--good) 18%,var(--surface));color:var(--ink)}.pl-steps .on b{color:var(--good)}
+/* неполученные достижения: приглушён значок, текст остаётся читаемым */
+.ach:not(.on){opacity:1;background:transparent}.ach:not(.on) .ic{opacity:.55}.ach:not(.on) b{color:var(--muted)}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -2399,7 +2408,7 @@ try{seedMem()}catch(e){}
 /* Шапка (серия, сердца, цель дня) и переключение разделов. */
 function ring(v,max){const p=Math.min(1,v/max),c=2*Math.PI*9;return `<svg class="ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle cx="12" cy="12" r="9" fill="none" stroke="var(--good)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 12 12)"/></svg>`}
 function drawHud(){applyFreeze();const st=streakNow(),fz=frzLeft();
-  $('#hud').innerHTML=`<button class="pill flame ${S.lastDay===today()?'':'off'}" id="hud-st" aria-label="Серия: ${st} ${plural(st,'день','дня','дней')}, заморозок ${fz}">${IC.flame}${st}${fz?`<i class="fz" aria-hidden="true">${IC.frost}</i>`:''}</button><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`;
+  $('#hud').innerHTML=`<button class="pill flame ${S.lastDay===today()?'':'off'}" id="hud-st" aria-label="Серия: ${st} ${plural(st,'день','дня','дней')}, заморозок ${fz}">${IC.flame}${st}${fz&&st?`<i class="fz" aria-hidden="true">${IC.frost}</i>`:''}</button><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`;
   $('#hud-st').onclick=streakSheet}
 /* Окно серии: огонёк, рекорд, заморозки и последние две недели (занимался / заморожен / пропуск) */
 function streakSheet(){const st=streakNow(),fz=frzLeft(),fd=new Set(S.frzDays||[]);
@@ -2441,7 +2450,7 @@ function renderLearn(){
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot('happy','m-idle')}</button>
     <ol class="steps3"><li><b class="arm">Ա</b>буквы</li><li><b class="arm">տուն</b>слова</li><li><b class="arm">Բարև</b>фразы</li></ol>
     <div class="w-goal"><span>Сколько заниматься в день?</span><div class="w-goals" role="group" aria-label="Цель дня">${[[10,'1 урок'],[20,'2 урока'],[30,'3 урока']].map(([v,t])=>`<button data-wg="${v}" aria-pressed="${S.goal===v}">${t}</button>`).join('')}</div></div>
-    <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>`
+    <button class="btn cta" id="cta">${esc(ctaLabel)}</button><button class="w-place" id="place">Уже знаю часть букв — проверить уровень</button></section>`
    :`<section class="hero tod-${g.tod}">
     <div class="hero-tx"><div class="hy"><span class="hy-top"><b>${g.hy}!</b>${spk(g.hy,'sm')}</span><span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
@@ -2473,6 +2482,7 @@ function renderLearn(){
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>guideSheet(+b.dataset.guide));
   $('#ciro').onclick=()=>{bounce($('#ciro .mascot'));say(g.hy)};
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
+  const pb=$('#place');if(pb)pb.onclick=startPlacement;
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   document.querySelectorAll('[data-wg]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.wg;save();document.querySelectorAll('[data-wg]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawHud()});
   const pr=$('#prac');if(pr)pr.onclick=startPractice;
@@ -2545,7 +2555,7 @@ function closeLesson(){stopTrace();const el=$('#lesson');el&&el.remove();if(!$('
 function hudLesson(){$('#lprog').style.width=(LS.total?LS.done/LS.total*100:0)+'%';$('#lhearts').innerHTML=LS.practice?`${IC.heart}∞`:`${IC.heart}${S.hearts}`}
 function next(){
   hudLesson();
-  if(!LS.queue.length)return finishLesson();
+  if(!LS.queue.length)return LS.lesson.place?finishPlacement():finishLesson();
   if(!LS.practice&&S.hearts<=0)return failLesson();
   stopTrace();const ex=LS.queue.shift();LS.cur=ex;LS.state='answer';LS.sel=null;
   const box=$('#ex');box.innerHTML='';$('#lfoot').className='l-foot';
@@ -2632,7 +2642,8 @@ function check(){
   else if(ex.type==='build'){if(!LS.built.length)return;const got=LS.built.map(i=>ex.tiles[i]).join('|');ok=ex.answers.some(a=>a.join('|')===got)}
   LS.state='checked';
   if(ex.item)memUpdate(ex.item,ok);
-  if(ok){LS.done++;LS.combo++;LS.best=Math.max(LS.best,LS.combo);if(ex.tag==='read')S.read++}
+  if(LS.lesson.place){placeAnswer(ex,ok);ok?LS.combo++:(LS.combo=0)}
+  else if(ok){LS.done++;LS.combo++;LS.best=Math.max(LS.best,LS.combo);if(ex.tag==='read')S.read++}
   else{LS.mistakes++;LS.combo=0;if(!LS.practice){S.hearts=Math.max(0,hearts()-1);if(S.hearts===MAXH-1)S.heartsTs=Date.now()}save();LS.queue.push(ex)}
   let detail='';
   if(!ok){const ans=ex.type==='choice'?ex.correct:ex.show;detail=`Правильно: <span class="a">${esc(ans)}</span>`}
@@ -2990,6 +3001,7 @@ function renderProfile(){
     <div class="toggle theme-row"><span>Тема</span><div class="seg" role="group" aria-label="Тема">${[['auto','Как в системе'],['light','Светлая'],['dark','Тёмная']].map(([v,t])=>`<button data-theme-set="${v}" aria-pressed="${(S.theme||'auto')===v}">${t}</button>`).join('')}</div></div>
     <div class="toggle"><span>Произносить слова автоматически<br><span class="note">Кнопка с динамиком работает всегда</span></span><button class="switch" role="switch" id="sw-voice" aria-checked="${S.voice!==false}" aria-label="Автоозвучка"></button></div>
     <div class="toggle"><span>Звуки в уроках</span><button class="switch" role="switch" id="sw-sound" aria-checked="${S.sound}" aria-label="Звуки"></button></div>
+    <div class="toggle"><span>Тест на уровень<br><span class="note">Проверит, какие буквы вы уже знаете, и отметит их пройденными</span></span><button class="btn plain sm" id="place-p">Пройти</button></div>
     <div class="toggle"><span>Открыть все уроки<br><span class="note">Для тех, кто уже знает часть материала</span></span><button class="switch" role="switch" id="sw-all" aria-checked="${S.unlockAll}" aria-label="Открыть все уроки"></button></div>
     <div class="row"><button class="btn plain" id="reset">Сбросить прогресс</button><span id="rs-confirm"></span></div>
     <p class="note">${TGW?'Прогресс хранится в облаке Телеграма: он общий для телефона и компьютера.':'Прогресс хранится в этом браузере на этом устройстве.'}</p></div>
@@ -3000,6 +3012,7 @@ function renderProfile(){
   const chr=$('[data-ch-row]');if(chr)chr.addEventListener('click',()=>track('channel','profile'));
   $('#sw-voice').onclick=()=>{S.voice=S.voice===false;save();renderProfile()};
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
+  $('#place-p').onclick=startPlacement;
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
   wireGrowth();
   document.querySelectorAll('[data-ach]').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));
@@ -3160,6 +3173,45 @@ async function achShare(id){const a=ACH.find(v=>v.id===id);if(!a||!S.ach[id])ret
     else{try{await navigator.clipboard.writeText(SHARE_TEXT(a)+' '+link);go.textContent='Текст скопирован'}catch(e){}}};
   sv.onclick=()=>{if(TGW){note.hidden=false;note.textContent='Нажмите на картинку и удерживайте — появится «Сохранить изображение».';return}
     const l=document.createElement('a');l.href=url;l.download=`aybuben-${a.id}.jpg`;document.body.appendChild(l);l.click();l.remove()}}
+/* Тест на уровень: для тех, кто уже знает часть букв. Идёт по шагам алфавита (6 шагов), на каждом
+   три вопроса по буквам и одно слово. Шаг засчитан, если ошибок не больше одной; на первом незачтённом шаге тест
+   заканчивается. Засчитанные шаги отмечаются пройденными (только добавляются — прогресс не стирается).
+   Сердца не тратятся, память повторений не трогается. */
+const PL_STEP=4,PL_MISS=2;
+function placeItems(){const items=[];
+  GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n),lp=lettersUpTo(n),pool=wordsUpTo(n),fresh=pool.filter(w=>w.L===n);
+    const ls=sample(grp,3);while(ls.length<3)ls.push(pick(grp));
+    const q=[qL2S(ls[0],lp,true),qS2L(ls[1],lp,true),qL2S(ls[2],lp,true)];
+    const w=pick(fresh.length?fresh:pool);if(w)q.push(qRead(w,pool));else q.push(qS2L(pick(grp),lp,true));
+    q.forEach(x=>{x.step=n;delete x.item;items.push(x)})});
+  return items}
+function startPlacement(){if($('#lesson'))return;track('place','start');
+  const items=[{type:'teach',title:'Проверим, что вы уже знаете',html:`<p>Покажу буквы и слова — от простых к сложным. Ошибки не страшны: сердца не тратятся.</p><p>Где начнёте путаться, там и остановимся. Всё, что вы уже знаете, отмечу пройденным — учиться начнёте с нового.</p><p class="note">Около 3–5 минут, до ${GROUPS.length*PL_STEP} вопросов.</p>`},...placeItems()];
+  startLesson({id:'place',t:'Тест на уровень',place:{res:{}},gen:()=>items},true);
+  LS.total=items.length-1}
+/* Ответ в тесте: ошибка не повторяется в конце, а второй промах на шаге завершает тест */
+function placeAnswer(ex,ok){const r=LS.lesson.place.res,st=r[ex.step]=r[ex.step]||{ok:0,bad:0};ok?st.ok++:st.bad++;LS.done++;
+  if(st.bad>=PL_MISS)LS.queue=[]}
+function placeLevel(res){let k=0;for(let n=1;n<=GROUPS.length;n++){const r=res[n];if(r&&r.bad<PL_MISS&&r.ok+r.bad>=PL_STEP)k=n;else break}return k}
+function finishPlacement(){LS.state='end';const k=placeLevel(LS.lesson.place.res);
+  let marked=0;
+  LESSONS.forEach(l=>{const m=/^ab(\d)[abw]$/.exec(l.id);if(m&&+m[1]<=k&&!S.done[l.id]){S.done[l.id]=1;marked++}});
+  S.placed=Math.max(S.placed||0,k);if(marked){seedMem()}
+  addXP(10);const newA=checkAch();save();syncU();track('place',String(k));
+  const nL=LETTERS.filter(l=>l.L<=k).length,nxt=LESSONS.find((l,i)=>unlocked(i)&&!S.done[l.id]);
+  const head=k===GROUPS.length?'Весь алфавит — ваш!':k?`Знаете ${nL} ${plural(nL,'букву','буквы','букв')} из ${LETTERS.length}`:'Начнём с самого начала';
+  const line=k===GROUPS.length?'Ни одна буква вас не смутила. Дальше — правила чтения: там прячутся звуки, которых нет на письме.':
+    k?`Шаги 1–${k} алфавита засчитаны${marked?`, отметил пройденными ${marked} ${plural(marked,'урок','урока','уроков')}`:''}. Дальше — новые буквы.`:
+    'Ничего страшного: первые буквы займут пару минут, а дальше пойдёт быстрее.';
+  $('#lprog').style.width='100%';
+  $('#ex').innerHTML=`<div class="end"><span id="end-ciro">${mascot(k?'cheer':'happy','m-jump')}</span><h2>${head}</h2>
+   <div class="bubble">${line}${nxt?`<p style="margin-top:6px;font-weight:700">Следующий урок: ${esc(nxt.t)}</p>`:''}</div>
+   <div class="pl-steps" role="img" aria-label="Засчитано шагов: ${k} из ${GROUPS.length}">${GROUPS.map((g,i)=>`<span class="${i<k?'on':''}"><b>${i+1}</b><small>${esc(g)}</small></span>`).join('')}</div>
+   ${newA.length?`<div class="achv-new">${newA.map(a=>`<button class="chip ach-sh" data-ach="${a.id}">${IC[a.ic]} ${esc(a.t)} <u>Поделиться</u></button>`).join('')}</div>`:''}</div>`;
+  $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">${nxt?'К урокам':'Продолжить'}</button>`);
+  tapNext($('#nxt'),()=>{location.hash='learn';closeLesson()});$('#nxt').focus();
+  document.querySelectorAll('.ach-sh').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));
+  if(k)sWin();if(k)confetti()}
 /* Запуск. */
 route();
 </script>
