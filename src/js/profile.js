@@ -50,6 +50,8 @@ function renderProfile(){
   $('#place-p').onclick=startPlacement;
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
   wireGrowth();
+  /* У рисунков значков свой пустой отступ слева — сдвигаем каждый, чтобы край рисунка совпал с началом числа */
+  document.querySelectorAll('.card.ctop .ic svg').forEach(sv=>{try{const g=sv.getBBox(),vb=sv.viewBox.baseVal,k=sv.getBoundingClientRect().width/vb.width;if(k>0)sv.style.marginLeft=(-(g.x-vb.x)*k+1).toFixed(1)+'px'}catch(e){}});
   document.querySelectorAll('[data-ach]').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));
   document.querySelectorAll('.wr-cat,.fold').forEach(d=>d.ontoggle=()=>{WR_OPEN[d.dataset.wr]=d.open});
   $('#reset').onclick=()=>{$('#rs-confirm').innerHTML='<button class="btn bad" id="rs-yes">Да, стереть всё</button>';$('#rs-yes').onclick=()=>{const b=$('#rs-yes');b.disabled=true;b.textContent='Стираю…';let gone=false;const st=resetState();const go=()=>{if(gone)return;gone=true;location.reload()};if(window.__resetCloud){window.__resetCloud(go,st);setTimeout(go,3000)}else go()}};

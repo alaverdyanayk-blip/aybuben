@@ -366,7 +366,7 @@ button.ach:active{transform:translateY(2px)}
 .cards{align-items:stretch}
 .card.ctop{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:2px;padding:14px 16px}
 .c-top{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:6px}
-.card.ctop .ic{display:flex;width:30px;height:30px;align-items:center;justify-content:center}
+.card.ctop .ic{display:flex;height:34px;align-items:center;justify-content:flex-start}
 .card.ctop .ic .i{width:30px;height:30px}
 .c-fz{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--b3);background:color-mix(in srgb,var(--b3) 14%,var(--surface));border-radius:99px;padding:3px 9px 3px 6px}
 .c-fz .i{width:16px;height:16px}

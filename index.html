@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="b28028d73f"</script>
+<script>window.BUILD_ID="60136c65f2"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1015,7 +1015,7 @@ button.ach:active{transform:translateY(2px)}
 .cards{align-items:stretch}
 .card.ctop{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:2px;padding:14px 16px}
 .c-top{display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:6px}
-.card.ctop .ic{display:flex;width:30px;height:30px;align-items:center;justify-content:center}
+.card.ctop .ic{display:flex;height:34px;align-items:center;justify-content:flex-start}
 .card.ctop .ic .i{width:30px;height:30px}
 .c-fz{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--b3);background:color-mix(in srgb,var(--b3) 14%,var(--surface));border-radius:99px;padding:3px 9px 3px 6px}
 .c-fz .i{width:16px;height:16px}
@@ -3057,6 +3057,8 @@ function renderProfile(){
   $('#place-p').onclick=startPlacement;
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
   wireGrowth();
+  /* У рисунков значков свой пустой отступ слева — сдвигаем каждый, чтобы край рисунка совпал с началом числа */
+  document.querySelectorAll('.card.ctop .ic svg').forEach(sv=>{try{const g=sv.getBBox(),vb=sv.viewBox.baseVal,k=sv.getBoundingClientRect().width/vb.width;if(k>0)sv.style.marginLeft=(-(g.x-vb.x)*k+1).toFixed(1)+'px'}catch(e){}});
   document.querySelectorAll('[data-ach]').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));
   document.querySelectorAll('.wr-cat,.fold').forEach(d=>d.ontoggle=()=>{WR_OPEN[d.dataset.wr]=d.open});
   $('#reset').onclick=()=>{$('#rs-confirm').innerHTML='<button class="btn bad" id="rs-yes">Да, стереть всё</button>';$('#rs-yes').onclick=()=>{const b=$('#rs-yes');b.disabled=true;b.textContent='Стираю…';let gone=false;const st=resetState();const go=()=>{if(gone)return;gone=true;location.reload()};if(window.__resetCloud){window.__resetCloud(go,st);setTimeout(go,3000)}else go()}};
