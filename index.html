@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="ca2441e4b8"</script>
+<script>window.BUILD_ID="11a728cdc3"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1001,6 +1001,11 @@ button.ach:active{transform:translateY(2px)}
 .pl-steps .on{background:color-mix(in srgb,var(--good) 18%,var(--surface));color:var(--ink)}.pl-steps .on b{color:var(--good)}
 /* неполученные достижения: приглушён значок, текст остаётся читаемым */
 .ach:not(.on){opacity:1;background:transparent}.ach:not(.on) .ic{opacity:.55}.ach:not(.on) b{color:var(--muted)}
+.card .l.nw,.fzl{white-space:nowrap}
+.fzl{gap:3px}
+/* Второстепенная кнопка: своя подложка и рамка, чтобы не сливалась с карточкой ни в светлой, ни в тёмной теме */
+.btn.plain{background:color-mix(in srgb,var(--accent) 12%,var(--surface));color:var(--ink);border:1.5px solid color-mix(in srgb,var(--accent) 40%,var(--line));box-shadow:0 var(--edge) 0 color-mix(in srgb,var(--accent) 40%,var(--line))}
+.btn.plain:active:not(:disabled){box-shadow:0 1px 0 color-mix(in srgb,var(--accent) 40%,var(--line))}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -3005,7 +3010,7 @@ function renderProfile(){
     ${wrGroup('fr','За друзей',REFC.map(refOwned),REFC.some(c=>c.id===S.outfit),`${REFC.map(c=>{const op=refOwned(c),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:c.n?`${c.n} ${plural(c.n,'друг','друга','друзей')} пройдут первый урок`:'Если пришёл по приглашению'}</span></button>`}).join('')}`)}</div>
    </div></div>
    <div class="cards">
-    <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div><div class="l fzl">${IC.frost} заморозок: ${frzLeft()} из ${FRZ_MAX}</div></div></div>
+    <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l nw">${plural(streakNow(),'день','дня','дней')} подряд</div><div class="l nw">рекорд ${S.best||0}</div><div class="l fzl" title="Заморозка серии: пропущенный день не гасит огонёк">${IC.frost}заморозки: ${frzLeft()}/${FRZ_MAX}</div></div></div>
     <div class="card"><span style="color:var(--gold-deep)">${IC.bolt}</span><div><div class="v">${S.xp}</div><div class="l">всего XP</div></div></div>
     <div class="card"><span style="color:var(--b1)">${IC.crown}</span><div><div class="v">${level()}</div><div class="l">уровень · до следующего ${100-S.xp%100} XP</div></div></div>
     <div class="card"><span style="color:var(--b2)">${IC.book}</span><div><div class="v">${doneL}/${LESSONS.length}</div><div class="l">уроков пройдено</div></div></div>

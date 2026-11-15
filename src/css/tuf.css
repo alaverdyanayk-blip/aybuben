@@ -352,3 +352,8 @@ button.ach:active{transform:translateY(2px)}
 .pl-steps .on{background:color-mix(in srgb,var(--good) 18%,var(--surface));color:var(--ink)}.pl-steps .on b{color:var(--good)}
 /* неполученные достижения: приглушён значок, текст остаётся читаемым */
 .ach:not(.on){opacity:1;background:transparent}.ach:not(.on) .ic{opacity:.55}.ach:not(.on) b{color:var(--muted)}
+.card .l.nw,.fzl{white-space:nowrap}
+.fzl{gap:3px}
+/* Второстепенная кнопка: своя подложка и рамка, чтобы не сливалась с карточкой ни в светлой, ни в тёмной теме */
+.btn.plain{background:color-mix(in srgb,var(--accent) 12%,var(--surface));color:var(--ink);border:1.5px solid color-mix(in srgb,var(--accent) 40%,var(--line));box-shadow:0 var(--edge) 0 color-mix(in srgb,var(--accent) 40%,var(--line))}
+.btn.plain:active:not(:disabled){box-shadow:0 1px 0 color-mix(in srgb,var(--accent) 40%,var(--line))}
