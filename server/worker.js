@@ -14,7 +14,7 @@
 // remind — открыли приложение кнопкой под напоминанием (p — тип напоминания);
 // nt_ask / nt_yes / nt_no — Циро предложил напоминания / согласились / отказались (p — какой раз спрашивал);
 // channel — нажали ссылку на канал (p — откуда: news / profile)
-const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game', 'phrase', 'remind', 'nt_ask', 'nt_yes', 'nt_no', 'channel']);
+const EVENTS = new Set(['open', 'lesson', 'lesson_first', 'practice', 'fail', 'game', 'phrase', 'remind', 'nt_ask', 'nt_yes', 'nt_no', 'channel', 'share']);
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, ev TEXT NOT NULL, p TEXT, src TEXT);
 CREATE INDEX IF NOT EXISTS ev_day ON events(day, ev);

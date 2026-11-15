@@ -97,6 +97,13 @@ test('заморозка серии: спасает пропуск, тратит
   __fresh({streak:0,lastDay:__d(-2)});drawHud();e(frzLeft()===1,'без серии заморозка не тратится');
   __fresh({streak:4,lastDay:__d(-2)});route();document.querySelector('#hud-st').click();const sh=document.querySelector('.sheet');e(sh&&/Заморозка серии: 0 из 2/.test(sh.textContent)&&sh.querySelectorAll('.st-days .fz').length===1,'окно огонька показывает заморозку');
   document.querySelector('[data-close]').click();FRZ.saved=0;return out});
+test('карточки достижений рисуются для всех; из профиля открывается окно с картинкой',async()=>{const out=[];__fresh({xp:120,done:{ab1a:1}});
+  for(const a of ACH){try{const c=await drawAchCard(a);if(c.width!==1080||c.height!==1350)out.push(a.id+': размер')}catch(e){out.push(a.id+': '+e.message)}if(!a.b)out.push(a.id+': нет текста для карточки')}
+  S.ach={first:today()};location.hash='profile';route();const b=document.querySelector('[data-ach="first"]');if(!b)return out.concat('нет кнопки достижения');
+  if(document.querySelector('[data-ach="abc"]'))out.push('неполученное достижение открывается');
+  b.click();for(let i=0;i<40&&!document.querySelector('.sh-card img');i++)await new Promise(r=>setTimeout(r,100));
+  const img=document.querySelector('.sh-card img');if(!img||!/^data:image\/jpeg/.test(img.src))out.push('нет картинки в окне');
+  if(document.querySelector('#sh-go').disabled)out.push('кнопка «Поделиться» не включилась');document.querySelector('[data-close]').click();return out});
 test('испорченные сохранения не ломают приложение (300 вариантов)',async()=>{const fails={};const junk=[null,undefined,0,-1,NaN,1e12,'x','',[],{},[1,2],{a:1},true,'<b>'];const rj=()=>junk[Math.random()*junk.length|0];
   const fields=['xp','daily','streak','lastDay','best','hearts','heartsTs','done','goal','ach','sound','unlockAll','read','perfect','games','phr','mem','outfit','theme','notif','hrs','miles','friends','refCode','voice','newsSeen','resetAt','ts','v'];
   const views=['learn','games','alphabet','rules','profile','phrases'];

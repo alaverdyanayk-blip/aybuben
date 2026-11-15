@@ -38,7 +38,7 @@
 ## Статистика
 - Страница: https://aybuben-stats.alaverdyanayk.workers.dev (пароль не задан — открыта по ссылке; можно добавить секрет ADMIN_PASSWORD).
 - `server/worker.js` + `server/wrangler.toml` — Cloudflare Worker `aybuben-stats` + D1 `aybuben`. Cloudflare сам собирает его из GitHub при push (Workers Builds, Root directory = server).
-- Приложение шлёт события через `src/stats-sender.js`; адрес сервера — в `src/analytics.json`, build.py вставляет отправщик. События: open, lesson, lesson_first, practice, fail, game, phrase, remind, nt_ask/nt_yes/nt_no, channel (`track()` в приложении; список разрешённых — `EVENTS` в worker.js).
+- Приложение шлёт события через `src/stats-sender.js`; адрес сервера — в `src/analytics.json`, build.py вставляет отправщик. События: open, lesson, lesson_first, practice, fail, game, phrase, remind, nt_ask/nt_yes/nt_no, channel, share (`track()` в приложении; список разрешённых — `EVENTS` в worker.js).
 - Секреты (вводит только пользователь, в панели Cloudflare): ADMIN_PASSWORD, BOT_TOKEN (проверка подписи Telegram), SALT — все необязательны.
 
 ## Как выкатить обновление

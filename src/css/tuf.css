@@ -336,3 +336,10 @@ button.pill{font:inherit;font-weight:800;cursor:pointer}
 /* Пара кнопок «послушать / 0,7×» */
 .spk2{display:inline-flex;align-items:center;gap:12px;flex:none}
 .spk.slow.sm{width:auto;height:32px;min-width:44px;padding:0 9px;flex-direction:row;font-size:13px;font-weight:800;border-radius:99px;line-height:1}
+/* Карточка достижения */
+button.ach{font:inherit;color:inherit;text-align:left;cursor:pointer}
+button.ach:active{transform:translateY(2px)}
+.ach-sh{font:inherit;font-weight:700;cursor:pointer;border:0}.ach-sh u{text-decoration:none;color:var(--accent);margin-left:4px}
+.sh-card{border-radius:20px;overflow:hidden;background:var(--sunk);aspect-ratio:4/5;display:grid;place-items:center;max-height:58vh;margin:0 auto;width:min(100%,46vh)}
+.sh-card img{display:block;width:100%;height:100%;object-fit:contain;-webkit-touch-callout:default;user-select:auto}
+.sh-wait{color:var(--muted);font-weight:600;padding:20px;text-align:center}

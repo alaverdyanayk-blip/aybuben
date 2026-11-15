@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="5ce3cdbaaf"</script>
+<script>window.BUILD_ID="32ff794991"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -985,6 +985,13 @@ button.pill{font:inherit;font-weight:800;cursor:pointer}
 /* Пара кнопок «послушать / 0,7×» */
 .spk2{display:inline-flex;align-items:center;gap:12px;flex:none}
 .spk.slow.sm{width:auto;height:32px;min-width:44px;padding:0 9px;flex-direction:row;font-size:13px;font-weight:800;border-radius:99px;line-height:1}
+/* Карточка достижения */
+button.ach{font:inherit;color:inherit;text-align:left;cursor:pointer}
+button.ach:active{transform:translateY(2px)}
+.ach-sh{font:inherit;font-weight:700;cursor:pointer;border:0}.ach-sh u{text-decoration:none;color:var(--accent);margin-left:4px}
+.sh-card{border-radius:20px;overflow:hidden;background:var(--sunk);aspect-ratio:4/5;display:grid;place-items:center;max-height:58vh;margin:0 auto;width:min(100%,46vh)}
+.sh-card img{display:block;width:100%;height:100%;object-fit:contain;-webkit-touch-callout:default;user-select:auto}
+.sh-wait{color:var(--muted);font-weight:600;padding:20px;text-align:center}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -1552,26 +1559,26 @@ const PHR=[
    {q:['Ձեզ շտապօգնությո՞ւն է պետք։','дзез штапогнутʰюн э петкʰ','Вам нужна скорая?'],a:['Ոչ, ամեն ինչ կարգին է։','вочʰ, амен инчʰ каргин э','Нет, всё в порядке.'],w:['Ինձ թալանել են։','Կես կիլո, խնդրում եմ։']},
    {q:['Ո՞ւմ զանգեմ։','ум зангем','Кому позвонить?'],a:['Ոստիկանություն կանչեք։','востиканутʰюн канчʰекʰ','Вызовите полицию.'],w:['Մեկ սուրճ, խնդրում եմ։','Ահա, խնդրեմ։']}]}
 ];
-/* ДОСТИЖЕНИЯ (данные): {id, t: название, d: условие словами, ic: значок из js/icons.js, ok: проверка}. */
+/* ДОСТИЖЕНИЯ (данные): {id, t: название, d: условие словами, b: как это звучит на карточке, ic: значок из js/icons.js, ok: проверка}. */
 const ACH=[
- {id:'first',t:'Первый шаг',d:'Пройти первый урок',ic:'star',ok:()=>Object.keys(S.done).length>0},
- {id:'abc',t:'Весь алфавит',d:'Пройти весь алфавит',ic:'book',ok:()=>LESSONS.filter(l=>UNITS[l.unit].alpha).every(l=>S.done[l.id])},
- {id:'reader',t:'Читатель',d:'Прочитать 50 слов',ic:'eye',ok:()=>S.read>=50},
- {id:'perfect',t:'Без ошибок',d:'Пройти урок без единой ошибки',ic:'target',ok:()=>S.perfect>0},
- {id:'s3',t:'Три дня подряд',d:'Серия из 3 дней',ic:'flame',ok:()=>S.best>=3},
- {id:'s7',t:'Неделя',d:'Серия из 7 дней',ic:'flame',ok:()=>S.best>=7},
- {id:'x100',t:'Сто очков',d:'Набрать 100 XP',ic:'bolt',ok:()=>S.xp>=100},
- {id:'x500',t:'Пятьсот',d:'Набрать 500 XP',ic:'bolt',ok:()=>S.xp>=500},
- {id:'gram',t:'Грамматика',d:'Пройти все грамматические разделы',ic:'crown',ok:()=>LESSONS.filter(l=>{const u=UNITS[l.unit];return !u.alpha&&!u.theme&&u.t!=='Литературный язык'}).every(l=>S.done[l.id])},
- {id:'games',t:'Игрок',d:'Сыграть во все мини-игры',ic:'star',ok:()=>GAMES.every(g=>S.games[g.id])},
- {id:'fall20',t:'Ловкие руки',d:'Набрать 20 очков в «Буквопаде»',ic:'bolt',ok:()=>((S.games.fall||{}).best||0)>=20},
- {id:'echo10',t:'Чуткое ухо',d:'Угадать все 10 слов в «Эхо»',ic:'eye',ok:()=>((S.games.echo||{}).best||0)>=10},
- {id:'memo3',t:'Отличная память',d:'Собрать «Найди пары» на три звезды',ic:'star',ok:()=>!!S.memo3},
- {id:'lit',t:'Литературная норма',d:'Пройти раздел «Литературный язык»',ic:'quill',ok:()=>LESSONS.filter(l=>UNITS[l.unit].t==='Литературный язык').every(l=>S.done[l.id])},
- {id:'vocab5',t:'Словарный запас',d:'Пройти 5 тематических разделов',ic:'book',ok:()=>THEMES.filter(th=>LESSONS.filter(l=>UNITS[l.unit].theme===th.id).every(l=>S.done[l.id])).length>=5},
- {id:'trip1',t:'В дорогу!',d:'Пройти диалог любой ситуации во «Фразах»',ic:'star',ok:()=>PHR.some(p=>phDone(p.id))},
- {id:'tripAll',t:'Свой в Ереване',d:'Пройти все ситуации во «Фразах»',ic:'crown',ok:()=>PHR.every(p=>phDone(p.id))},
- {id:'vocabAll',t:'Ходячий словарь',d:'Пройти все тематические разделы',ic:'crown',ok:()=>LESSONS.filter(l=>UNITS[l.unit].theme).every(l=>S.done[l.id])}
+ {id:'first',t:'Первый шаг',d:'Пройти первый урок',b:'Первый урок армянского позади',ic:'star',ok:()=>Object.keys(S.done).length>0},
+ {id:'abc',t:'Весь алфавит',d:'Пройти весь алфавит',b:'Все 39 букв армянского алфавита пройдены',ic:'book',ok:()=>LESSONS.filter(l=>UNITS[l.unit].alpha).every(l=>S.done[l.id])},
+ {id:'reader',t:'Читатель',d:'Прочитать 50 слов',b:'Прочитано 50 армянских слов',ic:'eye',ok:()=>S.read>=50},
+ {id:'perfect',t:'Без ошибок',d:'Пройти урок без единой ошибки',b:'Урок без единой ошибки',ic:'target',ok:()=>S.perfect>0},
+ {id:'s3',t:'Три дня подряд',d:'Серия из 3 дней',b:'Три дня занятий подряд',ic:'flame',ok:()=>S.best>=3},
+ {id:'s7',t:'Неделя',d:'Серия из 7 дней',b:'Семь дней занятий подряд',ic:'flame',ok:()=>S.best>=7},
+ {id:'x100',t:'Сто очков',d:'Набрать 100 XP',b:'100 XP в армянском',ic:'bolt',ok:()=>S.xp>=100},
+ {id:'x500',t:'Пятьсот',d:'Набрать 500 XP',b:'500 XP в армянском',ic:'bolt',ok:()=>S.xp>=500},
+ {id:'gram',t:'Грамматика',d:'Пройти все грамматические разделы',b:'Все грамматические разделы пройдены',ic:'crown',ok:()=>LESSONS.filter(l=>{const u=UNITS[l.unit];return !u.alpha&&!u.theme&&u.t!=='Литературный язык'}).every(l=>S.done[l.id])},
+ {id:'games',t:'Игрок',d:'Сыграть во все мини-игры',b:'Сыграно во все мини-игры',ic:'star',ok:()=>GAMES.every(g=>S.games[g.id])},
+ {id:'fall20',t:'Ловкие руки',d:'Набрать 20 очков в «Буквопаде»',b:'20 очков в «Буквопаде»',ic:'bolt',ok:()=>((S.games.fall||{}).best||0)>=20},
+ {id:'echo10',t:'Чуткое ухо',d:'Угадать все 10 слов в «Эхо»',b:'Все 10 слов в «Эхо» угаданы на слух',ic:'eye',ok:()=>((S.games.echo||{}).best||0)>=10},
+ {id:'memo3',t:'Отличная память',d:'Собрать «Найди пары» на три звезды',b:'«Найди пары» на три звезды',ic:'star',ok:()=>!!S.memo3},
+ {id:'lit',t:'Литературная норма',d:'Пройти раздел «Литературный язык»',b:'Раздел «Литературный язык» пройден',ic:'quill',ok:()=>LESSONS.filter(l=>UNITS[l.unit].t==='Литературный язык').every(l=>S.done[l.id])},
+ {id:'vocab5',t:'Словарный запас',d:'Пройти 5 тематических разделов',b:'Пять тематических разделов пройдены',ic:'book',ok:()=>THEMES.filter(th=>LESSONS.filter(l=>UNITS[l.unit].theme===th.id).every(l=>S.done[l.id])).length>=5},
+ {id:'trip1',t:'В дорогу!',d:'Пройти диалог любой ситуации во «Фразах»',b:'Первый диалог из «Фраз» пройден',ic:'star',ok:()=>PHR.some(p=>phDone(p.id))},
+ {id:'tripAll',t:'Свой в Ереване',d:'Пройти все ситуации во «Фразах»',b:'Все ситуации во «Фразах» пройдены',ic:'crown',ok:()=>PHR.every(p=>phDone(p.id))},
+ {id:'vocabAll',t:'Ходячий словарь',d:'Пройти все тематические разделы',b:'Все тематические разделы пройдены',ic:'crown',ok:()=>LESSONS.filter(l=>UNITS[l.unit].theme).every(l=>S.done[l.id])}
 ];
 /* ОЗВУЧКА (данные): список всего, для чего есть запись в папке audio/. Имя файла = fnv(ключ) + .mp3 (см. js/sound.js). */
 const AUDIO_KEYS=new Set(["ա", "ազա՞տ եք", "ազատ համար ունե՞ք", "ազգական", "աթոռ", "ալերգիա ունե՞ք", "ալերգիա ունեմ", "ականջ", "ահա այս դեղը", "ահա իմ անձնագիրը", "ահա, խնդրեմ", "աղ", "աղջիկ", "աղջիկը", "աղջիկներ", "աղվես", "աղքատ", "ամառ", "ամեն ինչ լա՞վ էր", "ամեն ինչ կարգին է", "ամիս", "ամուսին", "ամպ", "ամպրոպ", "այբ", "այգի", "այդ", "այծ", "այն", "այո", "այս", "այս հասցեով, խնդրում եմ", "այս տունը մեծ է", "այսպես", "այստեղ", "այստեղ ռուսերեն խոսող կա՞", "այսօր", "անել", "անձրև", "անուն", "անտառ", "աշխատանք", "աշխատել", "աշուն", "աչք", "ապուր", "ապրել", "աջ թեքվեք", "առանց շաքարի", "առավոտ", "առյուծ", "ասացի", "ասել", "ասեցի", "ասում ա", "ասում է", "աստղ", "ավելի դանդաղ խոսեք, խնդրում եմ", "ավելի դանդաղ, խնդրում եմ", "ավտոբուս", "ատամ", "ատամս ցավում է", "արագ", "արդեն", "արծիվ", "արջ", "արև", "ափսե", "բա", "բազմոց", "բաժակ", "բակ", "բանալի", "բանալին, խնդրում եմ", "բանկ", "բառ", "բարի", "բարի գալուստ ամրագրում ունե՞ք", "բարի գիշեր", "բարի երեկո", "բարի լույս", "բարձր", "բարև", "բարև ձեզ", "բարև ձեզ, ինչպե՞ս եք", "բացել", "բեն", "բերան", "բժիշկ", "բոլոր", "բրինձ", "գա", "գաթա", "գալ", "գալիս", "գայլ", "գարուն", "գդալ", "գեղեցիկ", "գետ", "գիմ", "գինի", "գինին", "գիշեր", "գիտենալ", "գիրք", "գիրքը", "գիրքը սեղանին է", "գիրքը տալիս եմ արամին", "գլուխ", "գլուխս ցավում է", "գյուղ", "գնալ", "գնացեք ուղիղ, երկրորդ փողոցից թեքվեք ձախ, հետո…", "գնացք", "գնել", "գնում եմ ավտոբուսով", "գորգ", "գումար", "գրասենյակ", "գրել", "գրիչ", "գրում", "գրում եմ գրիչով", "գրքեր", "դա", "դանակ", "դանդաղ", "դաս", "դավայ գնանք", "դատարկ", "դեղատոմս պե՞տք է", "դեղատուն", "դեղին", "դեղձ", "դեմք", "դժվար", "դու", "դու բժիշկ ես", "դու խմում ես ջուր", "դու հայ ես", "դու հայերեն խոսում ես", "դու ուսանող չես", "դու չես կարդում", "դու ջուր ես խմում", "դուռ", "դուստր", "դուք բժիշկ չեք", "դուք երևանից եք", "դուք լավ եք խոսում հայերեն", "դպրոց", "դրամ", "ե", "ե՞րբ", "եկեղեցի", "եկեք գնանք", "եղանակ", "եղբայր", "եղբայրդ", "ենք", "եչ", "ես", "ես ապրում եմ երևանում", "ես ապրում եմ մոսկվայում", "ես արդեն ասացի", "ես բժիշկ չեմ", "ես գալիս եմ", "ես երևանից եմ", "ես թռչում եմ մոսկվա", "ես ինձ վատ եմ զգում", "ես խոսում եմ հայերեն", "ես կմնամ երեք գիշեր", "ես կորցրել եմ անձնագիրս", "ես համար եմ ամրագրել", "ես հայ եմ", "ես հայ չեմ", "ես հայերեն եմ խոսում", "ես հայերեն եմ սովորում", "ես հայերեն լավ չեմ հասկանում", "ես հայերեն վատ եմ խոսում", "ես հաց չեմ ուտում", "ես միս չեմ ուտում", "ես մոլորվել եմ", "ես մոսկվայից եմ", "ես մոսկվայում եմ ապրում", "ես նամակ գրում եմ", "ես ուսանող եմ", "ես չգիտեմ", "ես չեմ հասկանում", "ես ռուսաստանից եմ", "ես սիրում եմ քեզ", "ես տանն եմ", "երազ", "երբեք", "երգել", "երեխա", "երեկ", "երեկո", "երեսուն", "երեք", "երեքշաբթի", "երկար", "երկինք", "երկնագույն", "երկու", "երկուշաբթի", "երևան", "եք", "զա", "զանգ", "զբոսաշրջիկ եմ", "զգո՛ւյշ", "է", "էդ", "էժան", "էն", "էշ", "էջ", "էս", "էսպես", "էսօր", "ը", "ըթ", "ըլնել", "ընթրիք", "ընկեր", "ընկերդ", "ընկերներ", "ընկերուհի", "ընկույզ", "ընտանիք", "ըստեղ", "թա", "թագավոր", "թանգարան", "թանկ", "թանկ է", "թանկ է մի քիչ զիջեք", "թեյ", "թիթեռ", "թո", "թոռ", "թութ", "թռչուն", "թև", "ժա", "ժամ", "ժամանակ", "ժամը քանիսի՞ն պետք է ազատել սենյակը", "ժե", "ի", "ի՞նչ", "ի՞նչ ես անում", "ի՞նչ եք ուզում", "ի՞նչ է ձեր անունը", "ի՞նչ է պատահել", "ի՞նչ է սա", "ի՞նչ խորհուրդ կտաք", "ի՞նչ կա ճամպրուկում", "ի՞նչ կպատվիրեք", "իմ", "իմ անունը արամ է", "իմ անունն արամ է", "իմ ճամպրուկը կորել է", "ինը", "ինի", "ինձ բժիշկ է պետք", "ինձ էլ նույնը", "ինձ թալանել են", "ինձ տարեք կենտրոն", "ինձ տարեք օդանավակայան", "ինձ տաքսի է պետք", "իննսուն", "ինչ", "ինչ-որ բան ունե՞ք գլխացավի դեմ", "ինչի՞", "ինչո՞վ կարող եմ օգնել", "ինչո՞ւ", "ինչո՞ւ ես ուշանում", "ինչպե՞ս", "ինչպե՞ս ես", "ինչպե՞ս եք", "ինչպե՞ս էր ձեր հանգիստը", "ինչպե՞ս խմել այս դեղը", "ինչպե՞ս հասնել հանրապետության հրապարակ", "ինչքա՞ն արժե", "ինչքա՞ն կարժենա", "ինքնաթիռ", "լա", "լամպ", "լավ", "լավ եմ", "լավ եմ, շնորհակալություն", "լավ, հասկացա", "լավաշ", "լեզու", "լիճ", "լինել", "լիքը", "լյուն", "լոգարան", "լոլիկ", "լուսին", "լսել", "խա", "խաղ", "խաղող", "խանութ", "խե", "խելացի", "խի՞", "խմել", "խնդրեմ", "խնդրում եմ, մաքրեք սենյակը", "խնձոր", "խնձորներ", "խոզ", "խոհանոց", "խոսել", "խոսում", "խոտ", "խորոված", "ծա", "ծաղիկ", "ծառ", "ծառեր", "ծառը", "ծիրան", "ծիրանագույն", "ծնողներ", "ծով", "ծունկ", "կա", "կաթ", "կամուրջ", "կանաչ", "կանգառ", "կանգնեք այստեղ", "կապույտ", "կատու", "կատուդ", "կատուն", "կատուներ", "կարագ", "կարգ", "կարդալ", "կարդում", "կարդում եմ", "կարելի՞ է փորձել", "կարելի՞ է քարտով վճարել", "կարճ", "կարճ ասած", "կարմիր", "կարո՞ղ եք տաքսի կանչել", "կարող եմ", "կարոչե", "կարում եմ", "կարտոֆիլ", "կեղտոտ", "կեն", "կես կիլո, խնդրում եմ", "կիլոն ինչքա՞ն է", "կիլոն հազար դրամ է", "կին", "կիրակի", "կծո՞ւ է", "կով", "կրակ", "կրկնեք, խնդրում եմ", "հա", "հազար", "համալսարան", "համակարգիչ", "համեղ", "հայ", "հայաստան", "հայելի", "հայր", "հայրիկ", "հաշիվը, խնդրում եմ", "հասանք երկու հազար դրամ", "հասկանալ", "հասցեն ասեք, խնդրում եմ", "հավ", "հատակ", "հարյուր", "հարուստ", "հարսանիք", "հարց", "հաց", "հեշտ", "հեռախոս", "հեռախոսս գողացել են", "հեռո՞ւ է", "հեռուստացույց", "հետո ո՞ր կողմ թեքվեմ", "հիմա", "հին", "հինգ", "հինգ րոպե ոտքով", "հինգշաբթի", "հիշել", "հիսուն", "հիվանդանոց", "հո", "հող", "հորաքույր", "հրապարակ", "ձա", "ձախ թեքվեք", "ձեզ շտապօգնությո՞ւն է պետք", "ձեռք", "ձեր", "ձեր անձնագիրը, խնդրում եմ", "ձեր անունը ի՞նչ է", "ձեր փաստաթղթերը, խնդրում եմ", "ձի", "ձմեռ", "ձմերուկ", "ձյուն", "ձու", "ձուկ", "ձուն", "ղա", "ղատ", "ճա", "ճանապարհն ինչքա՞ն կտևի", "ճանճ", "ճաշ", "ճաշարան", "ճե", "ճիշտ", "մա", "մազ", "մածուն", "մահճակալ", "մայր", "մայրը", "մայրիկ", "մայրս", "մանուշակագույն", "մանր չունեմ", "մանրը պետք չէ", "մատ", "մատիտ", "մարդ", "մարմին", "մարտ", "մաքուր", "մեծ", "մեկ", "մեկ գիշերն ինչքա՞ն արժե", "մեկ կիլո տվեք", "մեկ սուրճ, խնդրում եմ", "մեղու", "մեղր", "մեն", "մենյուն, խնդրում եմ", "մենք", "մենք ապրում ենք երևանում", "մենք դպրոցում ենք", "մենք երևանում ենք ապրում", "մենք ընկերներ ենք", "մենք հաց ուտում ենք", "մենք ուսանող ենք", "մենք ուսանողներ չենք", "մենք ռուսերեն չենք խոսում", "մեջք", "մետրո", "մեր", "մեր տունը մեծ է", "մերսի", "մեքենա", "մի աղջիկ", "մի գիրք", "մի հատ գիրք", "մի քիչ զիջեք", "միայն հագուստ է", "միշտ", "միս", "մկրատ", "մնալ", "մոխրագույն", "մոռանալ", "մոտ է", "մոտ է շնորհակալություն", "մորաքույր", "մուկ", "յա", "յի", "յոթ", "յոթանասուն", "նա", "նա բժիշկ է", "նա բժիշկ չէ", "նա գալիս է դպրոցից", "նա գինի չի խմում", "նա գիրք կարդում է", "նա ուսանող չէ", "նա չի գրում", "նա տանը չէ", "նախաճաշ", "նախաճաշը ներառվա՞ծ է", "նամակ", "նապաստակ", "նարնջագույն", "ներեցեք, կարո՞ղ եք օգնել", "ներողություն", "նոր", "նորմալ եմ", "նու", "նուռ", "նստել", "նրանց", "նրանք", "նրանք ապրում են երևանում", "նրանք երևանից չեն", "նրանք չեն խոսում ռուսերեն", "նրանք ռուսերեն չեն խոսում", "նրանք տանն են", "շա", "շաբաթ", "շագանակագույն", "շատ", "շատ հաճելի է", "շատ համեղ էր", "շաքար", "շնորհակալություն", "շնորհակալություն, ամեն ինչ լավ էր", "շնորհակալություն, ես հայերեն եմ սովորում", "շուկա", "շուն", "շուտ", "շտապել", "շտապօգնություն կանչեք", "ո", "ո՞վ", "ո՞վ է նա", "ո՞րն է ինտերնետի գաղտնաբառը", "ո՞րն է ձեր այցի նպատակը", "ո՞ւմ զանգեմ", "ո՞ւր", "ո՞ւր գնանք", "ո՞ւր ես գնում", "ո՞ւր եք ուզում հասնել", "ոչ", "ոչ, ամեն ինչ կարգին է", "ոչ, շնորհակալություն", "ոչխար", "ոսկի", "ոստիկանություն կանչեք", "ով", "ոտք", "ոտքով կարելի՞ է գնալ", "որ", "որդի", "որտե՞ղ", "որտե՞ղ ես ապրում", "որտե՞ղ է գրանցումը", "որտե՞ղ է ելքը", "որտե՞ղ է զուգարանը", "որտե՞ղ է մետրոն", "որտե՞ղ է մոտակա կանգառը", "որտե՞ղ է մոտակա հիվանդանոցը", "որտե՞ղ կարող եմ փող փոխել", "որտեղի՞ց եք", "ու", "ուզենալ", "ութ", "ութսուն", "ուժե", "ուժեղ", "ուղեբեռ ունե՞ք", "ուղիղ գնացեք", "ունենալ", "ուշ", "ուս", "ուսանող", "ուսուցիչ", "ուտել", "ուտում", "ուրախ", "ուրախ եմ ծանոթանալ", "ուրբաթ", "ուրիշ բա՞ն", "չա", "չեմ", "չեն", "չենք", "չեք", "չէ", "չի", "չորեքշաբթի", "չորս", "չվերթն ուշանում է", "պա", "պանիր", "պապիկ", "պատ", "պատառաքաղ", "պատասխան", "պատուհան", "պարել", "պարզապես", "պե", "պրոստո", "ջա", "ջե", "ջերմություն ունեմ", "ջուր", "ջուր, խնդրում եմ", "ռա", "սա", "սա արամի գիրքն է", "սա ի՞նչ է", "սա իմ մայրն է", "սա իմ տունն է", "սա ձեռքի ուղեբեռ է", "սալոր", "սառը", "սառնարան", "սար", "սարեր", "սե", "սեխ", "սեղան", "սեղան կա՞ երկու հոգու համար", "սենյակ", "սենյակում տաք ջուր չկա", "սեր", "սիրել", "սիրտ", "սխալ", "սխտոր", "սոխ", "սովորել", "սուրճ", "սուրճը շաքարո՞վ", "սպասել", "սպիտակ", "ստանալ", "սև", "վա", "վազել", "վաթսուն", "վաղը", "վատ", "վարդ", "վարդագույն", "վարունգ", "վեվ", "վերցնել", "վեց", "վիզ", "տա", "տալ", "տանիք", "տանձ", "տասը", "տատ", "տատիկ", "տարի", "տաք", "տաքսի", "տենալ", "տեսնել", "տետր", "տխուր", "տղա", "տղամարդ", "տյուն", "տներ", "տնից", "տոլմա", "տոպրակ ունե՞ք", "տուն", "տունս", "րա", "րե", "րոպե", "ցա", "ցածր", "ցերեկ", "ցո", "ցույց տվեք քարտեզի վրա", "ցուրտ", "ցտեսություն", "փա", "փակել", "փյուր", "փող", "փողոց", "փոր", "փորս ցավում է", "փոքր", "քա", "քաղաք", "քաղցր", "քամի", "քանի՞", "քանի՞ գիշեր կմնաք", "քանի՞ հոգի եք", "քանի՞ տարեկան ես", "քառասուն", "քար", "քարտո՞վ, թե՞ կանխիկ", "քարտով", "քարտով կարելի՞ է", "քե", "քեռի", "քիթ", "քնել", "քո", "քույր", "քույրեր", "քույրս", "քսան", "օ", "օգնել", "օգնեցե՛ք", "օդ", "օձ", "օր", "օրը երեք անգամ, ուտելուց հետո", "օրը քանի՞ անգամ", "ֆա", "ֆե", "ֆուտբոլ", "և"]);
@@ -2412,7 +2419,7 @@ setInterval(drawHud,60000);
 const OFF=[0,48,72,48,0,-48,-72,-48];
 function ciroStatus(){const st=streakNow(),tx=todayXP(),left=Math.max(0,S.goal-tx),fresh=!S.xp&&!Object.keys(S.done).length;
   if(fresh)return {mood:'happy',t:'Я — Циро, армянский абрикос. Научу тебя читать и писать на литературном армянском. Начнём с первых букв?'};
-  if(FRZ.saved&&tx<S.goal)return {mood:'wow',t:`${FRZ.saved>1?`Тебя не было ${FRZ.saved} ${plural(FRZ.saved,'день','дня','дней')}`:'Вчера ты пропустил день'} — заморозка сохранила огонёк. ${frzLeft()?`Осталось заморозок: ${frzLeft()}.`:'Заморозок больше нет — сегодня урок обязателен!'}`};
+  if(FRZ.saved&&tx<S.goal)return {mood:'wow',t:`${FRZ.saved>1?`Тебя не было ${FRZ.saved} ${plural(FRZ.saved,'день','дня','дней')}`:'Вчера ты пропустил день'} — заморозка сохранила огонёк. ${frzLeft()?`Осталось заморозок: ${frzLeft()}.`:'Заморозок больше нет, так что сегодня один урок — и огонёк горит дальше.'}`};
   if(tx>=S.goal)return {mood:'cheer',t:st>=3?`Цель дня выполнена! ${st} ${plural(st,'день','дня','дней')} подряд — бабушка уже рассказала соседям. Ещё урок?`:`Цель дня выполнена!${st>1?` Огонёк горит ${st} ${plural(st,'день','дня','дней')}.`:''} Можно отдохнуть… или ещё урок?`};
   if(st>0&&S.lastDay!==today())return {mood:'wow',t:`Огонёк горит ${st} ${plural(st,'день','дня','дней')}. Один урок сегодня — и он не погаснет!`};
   if(S.lastDay&&daysBetween(S.lastDay,today())>=3)return {mood:'sad',t:'Соскучился! Долму пришлось доедать одному. Начнём с повторения?'};
@@ -2660,9 +2667,9 @@ function finishLesson(){
    <div class="bubble">${line}${goalNow?`<p style="margin-top:6px;font-weight:700">Цель дня выполнена! Огонёк: ${streakNow()} ${plural(streakNow(),'день','дня','дней')}.</p>`:''}</div>
    ${mile}${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}
    <div class="tiles3"><div class="stat" style="--c:var(--gold-deep)"><div class="h">XP</div><div class="v">+${xp}</div></div><div class="stat" style="--c:var(--good)"><div class="h">Точность</div><div class="v">${acc}%</div></div><div class="stat" style="--c:var(--b3)"><div class="h">Время</div><div class="v">${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</div></div></div>
-   ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<span class="chip">${IC[a.ic]} ${esc(a.t)}</span>`).join('')}</div></div>`:''}${!prac?askNotif():''}${!prac&&!PL?inviteNudge():''}</div>`;
+   ${newA.length?`<div><p style="margin:0 0 8px;font-weight:700">Новое достижение</p><div class="achv-new">${newA.map(a=>`<button class="chip ach-sh" data-ach="${a.id}">${IC[a.ic]} ${esc(a.t)} <u>Поделиться</u></button>`).join('')}</div></div>`:''}${!prac?askNotif():''}${!prac&&!PL?inviteNudge():''}</div>`;
   $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">Продолжить</button>`);tapNext($('#nxt'),closeLesson);$('#nxt').focus();
-  wireWear('#end-ciro');wireGrowth();sWin();confetti();
+  wireWear('#end-ciro');wireGrowth();document.querySelectorAll('.ach-sh').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));sWin();confetti();
 }
 function failLesson(){LS.state='end';if(LS.lesson.id!=='practice')track('fail',lref(LS.lesson));
   $('#ex').innerHTML=`<div class="end">${mascot('sleep','m-idle')}<h2 style="color:var(--bad)">Сердца закончились</h2><div class="bubble">Сердечко восстанавливается за 30 минут. Или давай потренируемся на пройденном — сразу получишь одно.</div></div>`;
@@ -2974,7 +2981,7 @@ function renderProfile(){
    </div>
    <div class="box week"><h3>Неделя</h3>${chart}</div>
    <div class="box"><h3>Цель дня</h3><div class="goals">${[[10,'Лёгкая','1 урок'],[20,'Обычная','2 урока'],[30,'Серьёзная','3 урока'],[50,'Интенсив','5 уроков']].map(([v,t,d])=>`<button data-g="${v}" aria-pressed="${S.goal===v}"><b>${t} · ${v} XP</b><span>около ${d} в день</span></button>`).join('')}</div></div>
-   <details class="box fold" data-wr="ach" ${WR_OPEN.ach?'open':''}><summary><h3>Достижения</h3><span>${Object.keys(S.ach).length} из ${ACH.length}</span></summary><div class="agrid2">${ACH.map(a=>`<div class="ach ${S.ach[a.id]?'on':''}"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></details>
+   <details class="box fold" data-wr="ach" ${WR_OPEN.ach?'open':''}><summary><h3>Достижения</h3><span>${Object.keys(S.ach).length} из ${ACH.length}</span></summary>${Object.keys(S.ach).length?'<p class="note" style="margin:0 0 10px">Нажмите на полученное — Циро нарисует карточку, чтобы похвастаться.</p>':''}<div class="agrid2">${ACH.map(a=>S.ach[a.id]?`<button class="ach on" data-ach="${a.id}" aria-label="${esc(a.t)}: открыть карточку"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></button>`:`<div class="ach"><span class="ic">${IC[a.ic]}</span><b>${a.t}</b><span>${a.d}</span></div>`).join('')}</div></details>
    ${inviteBox()}
    ${contactBox()}
    <a class="box ch-row" href="${CHANNEL}" target="_blank" rel="noopener" data-ch-row><span class="ch-ico" aria-hidden="true">📣</span><span><b>Канал Циро</b><small>Обновления, новые уроки и функции</small></span><span class="ch-go" aria-hidden="true">›</span></a>
@@ -2995,6 +3002,7 @@ function renderProfile(){
   $('#sw-sound').onclick=()=>{S.sound=!S.sound;save();renderProfile()};
   $('#sw-all').onclick=()=>{S.unlockAll=!S.unlockAll;save();renderProfile()};
   wireGrowth();
+  document.querySelectorAll('[data-ach]').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));
   document.querySelectorAll('.wr-cat,.fold').forEach(d=>d.ontoggle=()=>{WR_OPEN[d.dataset.wr]=d.open});
   $('#reset').onclick=()=>{$('#rs-confirm').innerHTML='<button class="btn bad" id="rs-yes">Да, стереть всё</button>';$('#rs-yes').onclick=()=>{const b=$('#rs-yes');b.disabled=true;b.textContent='Стираю…';let gone=false;const st=resetState();const go=()=>{if(gone)return;gone=true;location.reload()};if(window.__resetCloud){window.__resetCloud(go,st);setTimeout(go,3000)}else go()}};
 }
@@ -3090,6 +3098,68 @@ function syncU(now,explicit){if(!TGW)return;if(explicit){syncX=true;NT_EDIT=Date
   if(location.hash==='#go'||sp==='go'||rem){try{const q=new URLSearchParams(location.search);q.delete('r');const qs=q.toString();history.replaceState(null,'',location.pathname+(qs?'?'+qs:''))}catch(e){}
     setTimeout(()=>{if(rem)track('remind',rem);if(LS)return;const i=LESSONS.findIndex((l,i)=>unlocked(i)&&!S.done[l.id]);if(i<0)startPractice();else if(hearts()>0)startLesson(LESSONS[i],false)},400)}
 })();
+/* Карточка достижения: картинка 1080×1350 с Циро, которую можно сохранить или отправить друзьям.
+   Рисуется на холсте прямо в приложении, на сервер ничего не уходит. */
+const SHARE_W=1080,SHARE_H=1350;
+/* SVG Циро для холста: свой xmlns и копия общих градиентов (в приложении они лежат один раз в разметке) */
+function mascotSrc(mood,outfit){const defs=document.querySelector('#cg-body');const d=defs?defs.closest('defs'):null;
+  let s=mascot(mood,'',outfit).replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" ');
+  if(d)s=s.replace(/(<svg[^>]*>)/,'$1'+d.outerHTML);
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s)}
+function iconSrc(ic,color){const s=(IC[ic]||IC.star).replace('<svg ',`<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" color="${color}" `).replace('class="i" ','');
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s)}
+const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
+/* Перенос строки по словам под ширину */
+function wrapLines(x,text,w){const out=[];let line='';for(const word of String(text).split(' ')){const t=line?line+' '+word:word;if(x.measureText(t).width>w&&line){out.push(line);line=word}else line=t}if(line)out.push(line);return out}
+function shareStats(){const st=Math.max(streakNow(),0),kn=LETTERS.filter(letterLearned).length,parts=[];
+  if(kn)parts.push(`${kn} ${plural(kn,'буква','буквы','букв')}`);if(st>1)parts.push(`${st} ${plural(st,'день','дня','дней')} подряд`);parts.push(`${S.xp} XP`);return parts.join('  ·  ')}
+async function drawAchCard(a){
+  try{if(document.fonts&&document.fonts.ready)await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))])}catch(e){}
+  const c=document.createElement('canvas');c.width=SHARE_W;c.height=SHARE_H;const x=c.getContext('2d'),W=SHARE_W,H=SHARE_H;
+  const g=x.createLinearGradient(0,0,W*.6,H);g.addColorStop(0,'#B02A42');g.addColorStop(.55,'#8E1A30');g.addColorStop(1,'#5E1222');x.fillStyle=g;x.fillRect(0,0,W,H);
+  /* узор из ромбов, как на главной */
+  x.save();x.globalAlpha=.08;x.strokeStyle='#fff';x.fillStyle='#fff';x.lineWidth=3;
+  for(let yy=-60;yy<H+60;yy+=108)for(let xx=-60;xx<W+60;xx+=108){x.beginPath();x.moveTo(xx,yy-45);x.lineTo(xx+45,yy);x.lineTo(xx,yy+45);x.lineTo(xx-45,yy);x.closePath();x.stroke();x.beginPath();x.moveTo(xx,yy-18);x.lineTo(xx+18,yy);x.lineTo(xx,yy+18);x.lineTo(xx-18,yy);x.fill()}
+  x.restore();
+  /* сияние за Циро */
+  const rg=x.createRadialGradient(W/2,470,40,W/2,470,420);rg.addColorStop(0,'rgba(255,214,140,.55)');rg.addColorStop(1,'rgba(255,214,140,0)');x.fillStyle=rg;x.fillRect(0,0,W,H);
+  x.textAlign='center';x.textBaseline='alphabetic';
+  x.fillStyle='rgba(255,255,255,.85)';x.font='700 44px "Noto Serif Armenian","Noto Serif",Georgia,serif';x.fillText('Այբուբեն',W/2,110);
+  try{const m=await loadImg(mascotSrc('cheer'));x.drawImage(m,W/2-280,150,560,560)}catch(e){}
+  try{const r=86;x.fillStyle='#F6B24C';x.beginPath();x.arc(W/2+230,620,r,0,Math.PI*2);x.fill();x.lineWidth=10;x.strokeStyle='#fff';x.stroke();const ic=await loadImg(iconSrc(a.ic,'#6E1424'));x.drawImage(ic,W/2+230-52,620-52,104,104)}catch(e){}
+  x.fillStyle='#FFD98A';x.font='800 64px "Noto Serif Armenian","Noto Serif",Georgia,serif';x.fillText('Կեցցե՛ս!',W/2,800);
+  x.fillStyle='rgba(255,255,255,.75)';x.font='600 34px "Golos Text",system-ui,sans-serif';x.fillText('Достижение',W/2,860);
+  x.fillStyle='#fff';x.font='800 82px "Golos Text",system-ui,sans-serif';let ty=960;
+  wrapLines(x,a.t,W-140).slice(0,2).forEach(l=>{x.fillText(l,W/2,ty);ty+=92});
+  x.fillStyle='#FBE0E5';x.font='500 40px "Golos Text",system-ui,sans-serif';
+  wrapLines(x,a.b||a.d,W-200).slice(0,2).forEach(l=>{x.fillText(l,W/2,ty);ty+=54});
+  /* плашка со статистикой */
+  const sline=shareStats();x.font='700 36px "Golos Text",system-ui,sans-serif';const sw=Math.min(W-120,x.measureText(sline).width+80);
+  x.fillStyle='rgba(0,0,0,.22)';x.beginPath();x.roundRect?x.roundRect(W/2-sw/2,1150,sw,76,38):x.rect(W/2-sw/2,1150,sw,76);x.fill();
+  x.fillStyle='#fff';x.fillText(sline,W/2,1201);
+  x.fillStyle='rgba(255,255,255,.8)';x.font='600 32px "Golos Text",system-ui,sans-serif';x.fillText('Учу армянский с Циро  ·  @'+BOT,W/2,1300);
+  return c}
+const SHARE_TEXT=a=>`Новое достижение в Айбубене: «${a.t}» 🍑 Учу читать по-армянски с абрикосом Циро.`;
+/* Окно карточки: картинка, «Поделиться» (файлом, если устройство умеет, иначе ссылкой в Телеграме) и «Сохранить» */
+async function achShare(id){const a=ACH.find(v=>v.id===id);if(!a||!S.ach[id])return;
+  const s=sheet(`<div class="sheet-top"><b>Достижение</b><button class="x" data-close aria-label="Закрыть">✕</button></div>
+   <div class="sh-card"><div class="sh-wait">Рисую карточку…</div></div>
+   <div class="btns two"><button class="btn" id="sh-go" disabled>Поделиться</button><button class="btn plain" id="sh-save" disabled>Сохранить</button></div>
+   <p class="note" id="sh-note" hidden></p>`);
+  let blob=null,url='';
+  try{const c=await drawAchCard(a);url=c.toDataURL('image/jpeg',.92);blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.92))}catch(e){}
+  const box=s.el.querySelector('.sh-card');if(!box)return;
+  box.innerHTML=url?`<img src="${url}" alt="Карточка достижения «${esc(a.t)}»">`:`<div class="sh-wait">Не получилось нарисовать карточку. Можно отправить ссылку.</div>`;
+  const go=s.el.querySelector('#sh-go'),sv=s.el.querySelector('#sh-save'),note=s.el.querySelector('#sh-note');go.disabled=false;sv.disabled=!url;
+  const file=blob?new File([blob],`aybuben-${a.id}.jpg`,{type:'image/jpeg'}):null;
+  const link=S.refCode?inviteLink():`https://t.me/${BOT}`;
+  go.onclick=async()=>{track('share',a.id);
+    if(file&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text:SHARE_TEXT(a)+' '+link});return}catch(e){if(e&&e.name==='AbortError')return}}
+    if(TGW&&TGW.openTelegramLink)TGW.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(SHARE_TEXT(a)));
+    else if(navigator.share)navigator.share({text:SHARE_TEXT(a),url:link}).catch(()=>{});
+    else{try{await navigator.clipboard.writeText(SHARE_TEXT(a)+' '+link);go.textContent='Текст скопирован'}catch(e){}}};
+  sv.onclick=()=>{if(TGW){note.hidden=false;note.textContent='Нажмите на картинку и удерживайте — появится «Сохранить изображение».';return}
+    const l=document.createElement('a');l.href=url;l.download=`aybuben-${a.id}.jpg`;document.body.appendChild(l);l.click();l.remove()}}
 /* Запуск. */
 route();
 </script>
