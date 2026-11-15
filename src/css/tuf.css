@@ -301,3 +301,19 @@ a.box.ch-row{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;te
 .tr-how.pulse{animation:trpulse .9s ease-out 1}
 @keyframes trpulse{0%{transform:scale(1)}20%{transform:scale(1.04)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.tr-how.pulse{animation:none}}
+/* Главная карточка меняет цвет вместе с приветствием: утро, день (гранат), вечер, ночь */
+.hero.tod-morning{background:linear-gradient(155deg,#B9531F 0%,#A63B24 55%,#7F2626 100%);box-shadow:0 6px 0 #5A1A1A,0 22px 30px -18px rgb(127 38 38/.7)}
+.hero.tod-morning .tr{color:#FFE2CF}.hero.tod-morning p{color:#FFF1E6}
+.hero.tod-evening{background:linear-gradient(155deg,#8A2D5E 0%,#6C2252 55%,#481638 100%);box-shadow:0 6px 0 #33102A,0 22px 30px -18px rgb(72 22 56/.7)}
+.hero.tod-evening .tr{color:#F2D6E6}.hero.tod-evening p{color:#FAEAF3}
+.hero.tod-night{background:linear-gradient(160deg,#3B3470 0%,#2A2552 55%,#1B1838 100%);box-shadow:0 6px 0 #121027,0 22px 30px -18px rgb(27 24 56/.7)}
+.hero.tod-night .tr{color:#CFCBF2}.hero.tod-night p{color:#E7E5FA}.hero.tod-night .goal b{color:#FFD98A}
+.hero.tod-night::after{display:block;content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;opacity:.8;
+  background:radial-gradient(1.5px 1.5px at 12% 22%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 38% 12%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 55% 30%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 70% 62%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 24% 58%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 88% 48%,#fff 50%,transparent 51%)}
+.hero .cta:has(small){display:flex;flex-direction:column;justify-content:center;gap:1px;line-height:1.15;padding:9px 16px}
+.hero .cta small{font-size:12.5px;font-weight:600;opacity:.8;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* «Циро знает» — текст не мельче «Слова дня» */
+.fact .lbl{font-size:12.5px}
+.fact .ft{font-size:16px;line-height:1.4;font-weight:500}
+.fact .more{font-size:12.5px}
+.fact .mascot{width:64px;height:64px}

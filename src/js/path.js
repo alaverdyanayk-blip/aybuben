@@ -4,7 +4,7 @@ function ciroStatus(){const st=streakNow(),tx=todayXP(),left=Math.max(0,S.goal-t
   if(fresh)return {mood:'happy',t:'Я — Циро, армянский абрикос. Научу тебя читать и писать на литературном армянском. Начнём с первых букв?'};
   if(tx>=S.goal)return {mood:'cheer',t:st>=3?`Цель дня выполнена! ${st} ${plural(st,'день','дня','дней')} подряд — бабушка уже рассказала соседям. Ещё урок?`:`Цель дня выполнена!${st>1?` Огонёк горит ${st} ${plural(st,'день','дня','дней')}.`:''} Можно отдохнуть… или ещё урок?`};
   if(st>0&&S.lastDay!==today())return {mood:'wow',t:`Огонёк горит ${st} ${plural(st,'день','дня','дней')}. Один урок сегодня — и он не погаснет!`};
-  if(S.lastDay&&daysBetween(S.lastDay,today())>=3)return {mood:'sad',t:'Наконец-то! Мне пришлось одному доедать всю долму. Начнём с повторения?'};
+  if(S.lastDay&&daysBetween(S.lastDay,today())>=3)return {mood:'sad',t:'Соскучился! Долму пришлось доедать одному. Начнём с повторения?'};
   if(st===0&&(S.best||0)>0)return {mood:'sad',t:'Огонёк погас, но это не беда. Зажжём новый?'};
   const n=Math.ceil(left/10);return {mood:'happy',t:`До цели дня ${left} XP — примерно ${n} ${plural(n,'урок','урока','уроков')}.`}}
 function renderLearn(){
@@ -13,6 +13,8 @@ function renderLearn(){
   const kn=new Set(LETTERS.filter(letterLearned).map(l=>l.k)),wr=WORDS.filter(w=>hasAudio(w.a)&&readable(w,kn)),wpool=wr.length>=5?wr:WORDS.filter(w=>hasAudio(w.a)),wod=wpool.length?wpool[Math.floor(Date.now()/864e5)%wpool.length]:null;
   if(S.factI==null)S.factI=Math.floor(Math.random()*FACTS.length);
   const ctaLabel=curIdx<0?'Тренировка':(!S.xp?'Начать первый урок':`Продолжить · ${LESSONS[curIdx].t}`);
+  /* На главной кнопка в две строки: действие крупно, название урока мелко */
+  const ctaHtml=curIdx>=0&&S.xp?`<span>Продолжить</span><small>${esc(LESSONS[curIdx].t)}</small>`:esc(ctaLabel);
   const due=dueKeys().length,wl=wod?[...wod.a].length:0;
   const fresh=!S.xp&&!Object.keys(S.done).length;
   /* Новичок видит приветствие: кто такой Циро, как устроен курс, выбор цели дня. */
@@ -22,11 +24,11 @@ function renderLearn(){
     <ol class="steps3"><li><b class="arm">Ա</b>буквы</li><li><b class="arm">տուն</b>слова</li><li><b class="arm">Բարև</b>фразы</li></ol>
     <div class="w-goal"><span>Сколько заниматься в день?</span><div class="w-goals" role="group" aria-label="Цель дня">${[[10,'1 урок'],[20,'2 урока'],[30,'3 урока']].map(([v,t])=>`<button data-wg="${v}" aria-pressed="${S.goal===v}">${t}</button>`).join('')}</div></div>
     <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>`
-   :`<section class="hero">
+   :`<section class="hero tod-${g.tod}">
     <div class="hero-tx"><div class="hy"><span class="hy-top"><b>${g.hy}!</b>${spk(g.hy,'sm')}</span><span class="tr">${g.tr}</span></div><p>${stt.t}</p></div>
     <button class="hero-ciro" id="ciro" aria-label="Циро, нажми — поздоровается">${mascot(stt.mood,'m-idle')}</button>
-    <div class="goal"><div class="bar ${pct>=100?'good':''}" role="img" aria-label="Цель дня: ${tx} из ${S.goal} XP"><i style="width:${pct}%"></i></div><b>${tx} / ${S.goal} XP</b></div>
-    <button class="btn cta" id="cta">${esc(ctaLabel)}</button></section>`;
+    <div class="goal"><div class="bar ${pct>=100?'good':''}" role="img" aria-label="Цель дня: ${tx} из ${S.goal} XP"><i style="width:${pct}%"></i></div><b>Цель дня · ${tx} из ${S.goal}</b></div>
+    <button class="btn cta" id="cta" aria-label="${esc(ctaLabel)}">${ctaHtml}</button></section>`;
   let html=`<div class="home">${whatsNew()}${heroHtml}
    <div class="quick">
     ${wod?`<div class="qc wod" id="wod" role="button" tabindex="0" aria-label="Слово дня: послушать"><span class="qtx"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></span><span class="spk" data-say="${esc(wod.a)}" aria-hidden="true">${SPK_SVG}</span></div>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">появится после первых букв</span></div>`}
