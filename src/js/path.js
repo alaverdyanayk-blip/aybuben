@@ -35,7 +35,7 @@ function renderLearn(){
     ${wod?`<div class="qc wod" id="wod" role="button" tabindex="0" aria-label="Слово дня: послушать"><span class="qtx"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></span><span class="spk" data-say="${esc(wod.a)}" aria-hidden="true">${SPK_SVG}</span></div>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">появится после первых букв</span></div>`}
     ${Object.keys(S.done).length?`<button class="qc" id="prac"><span class="lbl">Тренировка</span><span class="w">${due>30?'30+ слов':due?`${due} ${plural(due,'слово','слова','слов')}`:'10 заданий'}</span><span class="m">${due?'пора повторить':'+5 XP и сердце'}</span></button>`:''}
    </div>
-   <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button></div>
+   <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button>${storyTile()}</div>
   <div class="units">`;
   const curUnit=curIdx<0?-1:LESSONS[curIdx].unit;
   UNITS.forEach((u,ui)=>{const dn=u.lessons.filter(l=>S.done[l.id]).length,all=dn===u.lessons.length,locked=u.lessons.every(l=>!unlocked(LESSONS.indexOf(l)));
@@ -56,6 +56,7 @@ function renderLearn(){
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>guideSheet(+b.dataset.guide));
   $('#ciro').onclick=()=>{bounce($('#ciro .mascot'));say(g.hy)};
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
+  const sb=$('#stories');if(sb)sb.onclick=()=>{location.hash='stories'};
   const pb=$('#place');if(pb)pb.onclick=startPlacement;
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   document.querySelectorAll('[data-wg]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.wg;save();document.querySelectorAll('[data-wg]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawHud()});

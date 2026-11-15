@@ -32,3 +32,8 @@ const REFC=[
  {id:'uncle',t:'Ереванский дядя',n:5,d:'Кепка-аэродром и нарды. Партию?'}
 ];
 const HATS=new Set(['cap','crown','taxi','pilot','chef','bellhop','tourist','doctor','police','uncle']);
+
+/* HISTC — за истории о людях (раздел «Истории», data/stories.js): st — id истории */
+const HISTC=[
+ {id:'nzhdeh',t:'Гарегин Нжде',st:'nzhdeh',d:'Башлык и портупея сюникского спарапета'}
+];

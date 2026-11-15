@@ -1,6 +1,6 @@
 /* Циро: рисунок, настроения, наряды и костюмы, приветствие. */
 function outfitSvg(o){const K='#2B1E22';
- if(COSTUMES.some(c=>c.id===o)||REFC.some(c=>c.id===o))return costumeSvg(o);
+ if(COSTUMES.some(c=>c.id===o)||REFC.some(c=>c.id===o)||HISTC.some(c=>c.id===o))return costumeSvg(o);
  if(o==='glasses')return `<g fill="#fff" fill-opacity=".18" stroke="${K}" stroke-width="3"><circle cx="47" cy="61" r="12.5"/><circle cx="73" cy="61" r="12.5"/></g><path d="M59 59.5Q60 56.5 61 59.5M34.6 58 22 54M85.4 58 98 54" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
  if(o==='cap')return `<path d="M21 51C21 17 99 17 99 51Q60 41 21 51Z" fill="#4D6596"/><path d="M60 21C53 30 51 40 51 46" stroke="#3B4F78" stroke-width="2.2" fill="none"/><circle cx="60" cy="20.5" r="3.6" fill="#3B4F78"/><path d="M70 47Q96 38 114 50Q93 55 70 51Z" fill="#3B4F78"/>`;
  if(o==='scarf')return `<g stroke="#5A1A12" stroke-width=".8"><path d="M24 85Q60 99 96 85L95.5 89.5Q60 103.5 24.5 89.5Z" fill="#D0283A"/><path d="M24.5 89.5Q60 103.5 95.5 89.5L95 94Q60 108 25 94Z" fill="#2A4FA8"/><path d="M25 94Q60 108 95 94L94 98Q60 112 26 98Z" fill="#F2A800"/><path d="M80 99 88 116 95 113 87 97Z" fill="#D0283A"/></g>`;
@@ -28,6 +28,12 @@ function costumeSvg(o){const K='#2B1E22';
   return `<path d="M27 42Q60 33 93 42L93 34Q60 26 27 34Z" fill="#35323A"/><ellipse cx="62" cy="29" rx="45" ry="12" fill="#4A4650"/><ellipse cx="60" cy="27" rx="35" ry="7.5" fill="#57525E"/><circle cx="60" cy="25.5" r="2.6" fill="#35323A"/><path d="M50 40Q68 37 84 41Q80 46 66 46Q55 45.5 50 40Z" fill="#2A272E"/>
   <g transform="rotate(-8 16 96)"><rect x="0" y="84" width="32" height="24" rx="2.5" fill="#9A5B2E" stroke="#5A3418" stroke-width="1.4"/><rect x="2.2" y="86.2" width="27.6" height="19.6" fill="#F4EEE4"/>${tri}<path d="M16 84v24" stroke="#5A3418" stroke-width="1.8"/><circle cx="9" cy="96" r="2" fill="#fff" stroke="#333" stroke-width=".8"/><circle cx="23" cy="96" r="2" fill="#2B1E22"/></g>`}
  if(o==='tamada')return `<path d="M60 73.5Q52 69 44 72Q41 77 46 76.5Q53 74 60 76.5Q67 74 74 76.5Q79 77 76 72Q68 69 60 73.5Z" fill="#3B2116"/><g transform="rotate(14 103 82)"><path d="M95 64H111Q111 78 103 79Q95 78 95 64Z" fill="#fff" fill-opacity=".35" stroke="#B9A89A" stroke-width="1.4"/><path d="M96 69H110Q109.5 77.5 103 78Q96.5 77.5 96 69Z" fill="#8E1B2E"/><path d="M103 79V95M97 95H109" stroke="#B9A89A" stroke-width="2" stroke-linecap="round"/></g>`;
+ /* Гарегин Нжде, Сюник 1921: чёрный башлык, усы, портупея через плечо, крест за храбрость */
+ if(o==='nzhdeh')return `<path fill-rule="evenodd" d="M13 96Q8 50 30 26Q44 12 57 5Q60 3 63 5Q76 12 90 26Q112 50 107 96Q100 101 94 94Q98 80 95 64Q92 46 80 38Q70 33 60 33Q50 33 40 38Q28 46 25 64Q22 80 26 94Q20 101 13 96Z" fill="#1E1A1D"/><path d="M57 7Q46 16 38 30M63 7Q74 16 82 30" stroke="#3A3438" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M22 92Q60 112 98 92L100 101Q60 122 20 101Z" fill="#1E1A1D"/><path d="M24 96Q60 114 96 96" stroke="#3A3438" stroke-width="1.4" fill="none"/><path d="M90 98Q99 106 97 118L89 117Q91 108 85 101Z" fill="#1E1A1D"/>
+  <path d="M60 74.5Q55 71.5 49.5 73.5Q47 74.5 45.5 77Q50 75.5 54 76.5Q57.5 77 60 76Q62.5 77 66 76.5Q70 75.5 74.5 77Q73 74.5 70.5 73.5Q65 71.5 60 74.5Z" fill="#2B1A12"/>
+  <path d="M100 86Q78 100 46 116" stroke="#6E4524" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="66" y="99" width="7" height="5" rx="1" fill="#C9A24A" transform="rotate(-27 69 101)"/>
+  <g transform="translate(34 108)"><path d="M0-6 1.6-1.6 6 0 1.6 1.6 0 6-1.6 1.6-6 0-1.6-1.6Z" fill="#E7C46A" stroke="#8C6A1E" stroke-width=".8"/><circle r="1.6" fill="#C8283A"/></g>`;
  if(o==='bowtie')return `<path d="M60 103 45 96v15Z" fill="#D0283A"/><path d="M60 103 75 96v15Z" fill="#D0283A"/><circle cx="50" cy="101" r="1.3" fill="#fff"/><circle cx="49" cy="106" r="1.3" fill="#fff"/><circle cx="70" cy="101" r="1.3" fill="#fff"/><circle cx="71" cy="106" r="1.3" fill="#fff"/><circle cx="60" cy="103" r="3.6" fill="#A51F30"/>`;
  return ''}
 function mascot(mood='happy',cls='',outfit){

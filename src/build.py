@@ -23,12 +23,12 @@ JS = [
     'js/utils',
     # контент
     'data/outfits', 'data/ciro-lines', 'data/letters', 'data/words', 'data/themes', 'data/rules',
-    'data/phrases', 'data/achievements', 'data/audio-keys','data/strokes',
+    'data/phrases', 'data/achievements', 'data/audio-keys','data/strokes','data/stories',
     # логика
     'js/icons', 'js/ciro', 'js/alphabet','js/trace', 'js/exercises',
     'data/course',  # курс собирается из генераторов упражнений, поэтому идёт после них
     'js/state', 'js/sound', 'js/phrases', 'js/memory', 'js/app', 'js/path', 'js/lesson', 'js/games',
-    'js/reference', 'js/profile', 'js/growth', 'js/share', 'js/placement',
+    'js/reference', 'js/profile', 'js/growth', 'js/share', 'js/placement', 'js/stories',
     'js/main',
 ]
 

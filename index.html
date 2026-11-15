@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="60136c65f2"</script>
+<script>window.BUILD_ID="d87e049141"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -1023,6 +1023,31 @@ button.ach:active{transform:translateY(2px)}
 .card.ctop .l{line-height:1.35}
 .card.ctop .ic.fl .i{width:34px;height:34px}
 .c-fz{color:color-mix(in srgb,var(--b3) 55%,var(--ink))}
+/* Истории */
+.stx{display:flex;flex-direction:column;gap:14px}
+.tile2.story{margin-top:0}.tile2.story .mascot{width:58px;height:58px}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.st-card{display:flex;align-items:center;gap:12px;text-align:left;font:inherit;color:inherit;background:var(--surface);border:0;border-radius:20px;padding:12px 14px 12px 10px;box-shadow:0 var(--edge) 0 var(--line);cursor:pointer}
+.st-card:active{transform:translateY(2px)}
+.st-art{flex:none;width:86px;height:86px;border-radius:18px;background:color-mix(in srgb,var(--brand,#9C1F35) 12%,var(--surface));display:grid;place-items:center}
+.st-art .mascot{width:80px;height:80px}.st-art.sm{width:52px;height:52px;border-radius:14px}.st-art.sm .mascot{width:48px;height:48px}
+.st-tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.st-tx b{font-size:17px}.st-tx .hy{color:var(--muted);font-weight:600}
+.st-tx .d{font-size:12.5px;color:var(--muted)}.st-tx em{font-style:normal;font-size:12px;font-weight:700;color:var(--muted)}
+.st-pr{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:4px}.st-pr i{display:block;height:100%;background:var(--good);border-radius:9px}
+.st-head{display:flex;align-items:center;gap:12px}.st-head>div{display:flex;flex-direction:column;flex:1;min-width:0}.st-head b{font-size:17px}.st-head .arm{color:var(--muted);font-weight:600}
+.st-n{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.st-dots{display:flex;gap:5px}.st-dots i{flex:1;height:5px;border-radius:9px;background:var(--line)}.st-dots i.on{background:var(--good)}.st-dots i.cur{background:var(--accent)}
+.st-page{background:var(--surface);border-radius:22px;padding:18px 16px;box-shadow:0 var(--edge) 0 var(--line);display:flex;flex-direction:column;gap:10px}
+.st-when{font-size:13px}
+.st-page h2{margin:0;font-size:26px;line-height:1.2}.st-ru{margin:-6px 0 4px;color:var(--muted);font-weight:600}
+.st-ss{display:flex;flex-direction:column;gap:8px}
+.st-s{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;cursor:pointer}
+.st-s .hy{font-size:19px;line-height:1.45}
+.st-s .ru{display:none;font-size:14.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.st-s.open{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}.st-s.open .ru{display:block}
+.st-all{align-self:flex-start;padding:4px 0}
+.st-nav{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.st-src{font-size:12px}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -1098,6 +1123,11 @@ const REFC=[
  {id:'uncle',t:'Ереванский дядя',n:5,d:'Кепка-аэродром и нарды. Партию?'}
 ];
 const HATS=new Set(['cap','crown','taxi','pilot','chef','bellhop','tourist','doctor','police','uncle']);
+
+/* HISTC — за истории о людях (раздел «Истории», data/stories.js): st — id истории */
+const HISTC=[
+ {id:'nzhdeh',t:'Гарегин Нжде',st:'nzhdeh',d:'Башлык и портупея сюникского спарапета'}
+];
 /* РЕПЛИКИ ЦИРО (данные): факты об Армении, похвала, утешение, шутки в конце урока, праздники серии.
    Можно свободно дополнять списки. В FACTS допускается <b class="arm">армянский текст</b>. */
 const CONTACT={tg:'ggayk',url:'https://t.me/ggayk'};
@@ -1700,6 +1730,65 @@ const STROKES={
 'ու':{w:74,s:['M5.1 32.4Q6.7 43.3 7.4 43.9Q8.1 44.5 8.8 76.6','M8.2 44.4Q12.4 37 14 35.7Q15.6 34.4 18.7 34.6Q21.7 34.8 24.9 36Q28.2 37.2 29.5 38.1Q30.8 39 31.7 40.1Q32.7 41.3 33.9 45.1Q35.2 49 35.4 56.5Q35.6 63.9 35 74.9','M42 34.9L43.1 72.8Q46.8 73.5 69.5 73.9']},
 'Ու':{w:79,s:['M8.5 20.2Q6.3 29.9 5.6 37.1Q5 44.2 5 52.5Q5 60.8 7.1 73.9','M8.5 20.2Q10.3 17.2 11.3 16.3Q12.3 15.5 16.6 14.5Q20.9 13.5 24.1 13.7Q27.3 13.9 29.3 14.5Q31.3 15 34.1 17.5Q36.8 20.1 38.9 29.6Q40.9 39.1 41.4 72.5','M47 34.9L48.1 72.8Q51.8 73.5 74.5 73.9']}
 };
+/* ИСТОРИИ (данные): чтение об исторических личностях. Открываются, когда выучены все буквы.
+   История: {id, t: имя по-русски, hy: имя по-армянски, years, d: подпись, src: источники,
+     cards: [{hy: заголовок, ru: перевод заголовка, when: место и время, s: [[армянское предложение, перевод], …]}],
+     quiz: [{q: вопрос, a: верный ответ, w: [неверные], hy?: армянское слово крупно]}.
+   Костюм за историю — в data/outfits.js (HISTC, поле st = id истории), рисунок — в js/ciro.js.
+   Армянский текст — простая литературная норма. Новый текст перед выкладкой проверяет носитель языка. */
+const STORIES=[
+ {id:'nzhdeh',t:'Гарегин Нжде',hy:'Գարեգին Նժդեհ',years:'1886–1955',d:'Полководец и спарапет Сюника',
+  src:['Википедия: «Garegin Nzhdeh» (англ.)','Aurora Humanitarian Initiative: «Garegin Nzhdeh (Ter-Harutyunyan)»'],
+  cards:[
+   {hy:'Ծնունդ',ru:'Рождение',when:'Կզնուտ · 1886',s:[
+    ['Գարեգին Նժդեհը ծնվել է 1886 թվականին Կզնուտ գյուղում։','Гарегин Нжде родился в 1886 году в селе Кзнут.'],
+    ['Նրա հայրը գյուղի քահանա էր։','Его отец был сельским священником.'],
+    ['Նրա իսկական անունը Գարեգին Տեր-Հարությունյան է։','Его настоящее имя — Гарегин Тер-Арутюнян.'],
+    ['«Նժդեհ» բառը նշանակում է «պանդուխտ»։','Слово «Нжде» значит «странник».']]},
+   {hy:'Ուսում',ru:'Учёба',when:'Թիֆլիս · Պետերբուրգ · Սոֆիա',s:[
+    ['Նժդեհը սովորել է Նախիջևանում և Թիֆլիսում։','Нжде учился в Нахичеване и Тифлисе.'],
+    ['Հետո նա Պետերբուրգում իրավունք է սովորել։','Потом он изучал право в Петербурге.'],
+    ['Սոֆիայում նա ավարտել է զինվորական դպրոց։','В Софии он окончил военное училище.']]},
+   {hy:'Առաջին բանտը',ru:'Первая тюрьма',when:'1909',s:[
+    ['1909 թվականին Նժդեհին ձերբակալեցին։','В 1909 году Нжде арестовали.'],
+    ['Նա երեք տարի անցկացրեց բանտում։','Он провёл три года в тюрьме.']]},
+   {hy:'Բալկանյան պատերազմ',ru:'Балканская война',when:'1912–1913',s:[
+    ['1912 թվականին Նժդեհը կռվեց Անդրանիկի կողքին։','В 1912 году Нжде сражался рядом с Андраником.'],
+    ['Նրանք կռվում էին Օսմանյան կայսրության դեմ։','Они воевали против Османской империи.'],
+    ['Նժդեհը ստացավ քաջության խաչ։','Нжде получил крест за храбрость.']]},
+   {hy:'Ղարաքիլիսա',ru:'Каракилиса',when:'Մայիս · 1918',s:[
+    ['1918 թվականի մայիսին թուրքական բանակը հարձակվեց Հայաստանի վրա։','В мае 1918 года турецкая армия напала на Армению.'],
+    ['Նժդեհը կազմակերպեց Ղարաքիլիսայի պաշտպանությունը։','Нжде организовал оборону Каракилисы.'],
+    ['Կռիվը տևեց չորս օր, և Նժդեհը վիրավորվեց։','Бой длился четыре дня, и Нжде был ранен.'],
+    ['Այսօր Ղարաքիլիսան կոչվում է Վանաձոր։','Сегодня Каракилиса называется Ванадзор.']]},
+   {hy:'Սյունիք',ru:'Сюник',when:'1920–1921',s:[
+    ['Նժդեհը չլքեց Սյունիքը։','Нжде не покинул Сюник.'],
+    ['1921 թվականի ապրիլին Տաթևում հռչակվեց Լեռնահայաստանը։','В апреле 1921 года в Татеве провозгласили Горную Армению.'],
+    ['Նժդեհը դարձավ նրա սպարապետը։','Нжде стал её спарапетом.'],
+    ['«Սպարապետ» նշանակում է «գլխավոր հրամանատար»։','«Спарапет» значит «главнокомандующий».'],
+    ['Նույն տարվա հուլիսին Նժդեհը հեռացավ Իրան։','В июле того же года Нжде ушёл в Иран.']]},
+   {hy:'Արտասահմանում',ru:'За границей',when:'Բուլղարիա · ԱՄՆ',s:[
+    ['Նժդեհը երկար տարիներ ապրեց Բուլղարիայում։','Нжде много лет жил в Болгарии.'],
+    ['1933 թվականին նա Ամերիկայում հիմնեց երիտասարդական շարժում։','В 1933 году он основал в Америке молодёжное движение.'],
+    ['Նրա գաղափարը կոչվում է ցեղակրոնություն։','Его идея называется «цехакронутюн».'],
+    ['«Ցեղ» նշանակում է «տոհմ», իսկ «կրոն»՝ «հավատ»։','«Цех» значит «род», а «крон» — «вера».']]},
+   {hy:'Երկրորդ համաշխարհային պատերազմ',ru:'Вторая мировая война',when:'1942–1944',s:[
+    ['Պատերազմի տարիներին Նժդեհը համագործակցեց Գերմանիայի հետ։','В годы войны Нжде сотрудничал с Германией.'],
+    ['Նա ասում էր, որ ուզում է Հայաստանը պաշտպանել Թուրքիայից։','Он говорил, что хочет защитить Армению от Турции.'],
+    ['Պատմաբանները մինչև հիմա վիճում են այդ մասին։','Историки до сих пор спорят об этом.']]},
+   {hy:'Վերջին տարիները',ru:'Последние годы',when:'1944–1955',s:[
+    ['1944 թվականին Նժդեհին ձերբակալեցին Բուլղարիայում։','В 1944 году Нжде арестовали в Болгарии.'],
+    ['Նա մահացավ 1955 թվականին Վլադիմիրի բանտում։','Он умер в 1955 году во Владимирской тюрьме.'],
+    ['Երևանում նրա անունով կա հրապարակ և մետրոյի կայարան։','В Ереване в его честь названы площадь и станция метро.']]}
+  ],
+  quiz:[
+   {q:'Что значит слово «Нжде»?',a:'странник',w:['воин','орёл','вождь']},
+   {q:'Что значит это слово?',hy:'քահանա',a:'священник',w:['учитель','солдат','царь']},
+   {q:'Как сегодня называется Каракилиса?',a:'Ванадзор',w:['Гюмри','Дилижан','Капан']},
+   {q:'Где провозгласили Горную Армению?',a:'в Татеве',w:['в Капане','в Горисе','в Ереване']},
+   {q:'Что значит это слово?',hy:'սպարապետ',a:'главнокомандующий',w:['священник','судья','посол']}
+  ]}
+];
 /* Значки интерфейса (SVG). */
 const IC={
  flame:'<svg class="i" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.2 1.8 1 3 2.3 3.5C10.5 9.5 11 5.5 12 2z"/></svg>',
@@ -1715,7 +1804,7 @@ const IC={
 };
 /* Циро: рисунок, настроения, наряды и костюмы, приветствие. */
 function outfitSvg(o){const K='#2B1E22';
- if(COSTUMES.some(c=>c.id===o)||REFC.some(c=>c.id===o))return costumeSvg(o);
+ if(COSTUMES.some(c=>c.id===o)||REFC.some(c=>c.id===o)||HISTC.some(c=>c.id===o))return costumeSvg(o);
  if(o==='glasses')return `<g fill="#fff" fill-opacity=".18" stroke="${K}" stroke-width="3"><circle cx="47" cy="61" r="12.5"/><circle cx="73" cy="61" r="12.5"/></g><path d="M59 59.5Q60 56.5 61 59.5M34.6 58 22 54M85.4 58 98 54" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
  if(o==='cap')return `<path d="M21 51C21 17 99 17 99 51Q60 41 21 51Z" fill="#4D6596"/><path d="M60 21C53 30 51 40 51 46" stroke="#3B4F78" stroke-width="2.2" fill="none"/><circle cx="60" cy="20.5" r="3.6" fill="#3B4F78"/><path d="M70 47Q96 38 114 50Q93 55 70 51Z" fill="#3B4F78"/>`;
  if(o==='scarf')return `<g stroke="#5A1A12" stroke-width=".8"><path d="M24 85Q60 99 96 85L95.5 89.5Q60 103.5 24.5 89.5Z" fill="#D0283A"/><path d="M24.5 89.5Q60 103.5 95.5 89.5L95 94Q60 108 25 94Z" fill="#2A4FA8"/><path d="M25 94Q60 108 95 94L94 98Q60 112 26 98Z" fill="#F2A800"/><path d="M80 99 88 116 95 113 87 97Z" fill="#D0283A"/></g>`;
@@ -1743,6 +1832,12 @@ function costumeSvg(o){const K='#2B1E22';
   return `<path d="M27 42Q60 33 93 42L93 34Q60 26 27 34Z" fill="#35323A"/><ellipse cx="62" cy="29" rx="45" ry="12" fill="#4A4650"/><ellipse cx="60" cy="27" rx="35" ry="7.5" fill="#57525E"/><circle cx="60" cy="25.5" r="2.6" fill="#35323A"/><path d="M50 40Q68 37 84 41Q80 46 66 46Q55 45.5 50 40Z" fill="#2A272E"/>
   <g transform="rotate(-8 16 96)"><rect x="0" y="84" width="32" height="24" rx="2.5" fill="#9A5B2E" stroke="#5A3418" stroke-width="1.4"/><rect x="2.2" y="86.2" width="27.6" height="19.6" fill="#F4EEE4"/>${tri}<path d="M16 84v24" stroke="#5A3418" stroke-width="1.8"/><circle cx="9" cy="96" r="2" fill="#fff" stroke="#333" stroke-width=".8"/><circle cx="23" cy="96" r="2" fill="#2B1E22"/></g>`}
  if(o==='tamada')return `<path d="M60 73.5Q52 69 44 72Q41 77 46 76.5Q53 74 60 76.5Q67 74 74 76.5Q79 77 76 72Q68 69 60 73.5Z" fill="#3B2116"/><g transform="rotate(14 103 82)"><path d="M95 64H111Q111 78 103 79Q95 78 95 64Z" fill="#fff" fill-opacity=".35" stroke="#B9A89A" stroke-width="1.4"/><path d="M96 69H110Q109.5 77.5 103 78Q96.5 77.5 96 69Z" fill="#8E1B2E"/><path d="M103 79V95M97 95H109" stroke="#B9A89A" stroke-width="2" stroke-linecap="round"/></g>`;
+ /* Гарегин Нжде, Сюник 1921: чёрный башлык, усы, портупея через плечо, крест за храбрость */
+ if(o==='nzhdeh')return `<path fill-rule="evenodd" d="M13 96Q8 50 30 26Q44 12 57 5Q60 3 63 5Q76 12 90 26Q112 50 107 96Q100 101 94 94Q98 80 95 64Q92 46 80 38Q70 33 60 33Q50 33 40 38Q28 46 25 64Q22 80 26 94Q20 101 13 96Z" fill="#1E1A1D"/><path d="M57 7Q46 16 38 30M63 7Q74 16 82 30" stroke="#3A3438" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M22 92Q60 112 98 92L100 101Q60 122 20 101Z" fill="#1E1A1D"/><path d="M24 96Q60 114 96 96" stroke="#3A3438" stroke-width="1.4" fill="none"/><path d="M90 98Q99 106 97 118L89 117Q91 108 85 101Z" fill="#1E1A1D"/>
+  <path d="M60 74.5Q55 71.5 49.5 73.5Q47 74.5 45.5 77Q50 75.5 54 76.5Q57.5 77 60 76Q62.5 77 66 76.5Q70 75.5 74.5 77Q73 74.5 70.5 73.5Q65 71.5 60 74.5Z" fill="#2B1A12"/>
+  <path d="M100 86Q78 100 46 116" stroke="#6E4524" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="66" y="99" width="7" height="5" rx="1" fill="#C9A24A" transform="rotate(-27 69 101)"/>
+  <g transform="translate(34 108)"><path d="M0-6 1.6-1.6 6 0 1.6 1.6 0 6-1.6 1.6-6 0-1.6-1.6Z" fill="#E7C46A" stroke="#8C6A1E" stroke-width=".8"/><circle r="1.6" fill="#C8283A"/></g>`;
  if(o==='bowtie')return `<path d="M60 103 45 96v15Z" fill="#D0283A"/><path d="M60 103 75 96v15Z" fill="#D0283A"/><circle cx="50" cy="101" r="1.3" fill="#fff"/><circle cx="49" cy="106" r="1.3" fill="#fff"/><circle cx="70" cy="101" r="1.3" fill="#fff"/><circle cx="71" cy="106" r="1.3" fill="#fff"/><circle cx="60" cy="103" r="3.6" fill="#A51F30"/>`;
  return ''}
 function mascot(mood='happy',cls='',outfit){
@@ -2242,7 +2337,7 @@ const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
      2 — новый порядок букв (уроки ab1a…ab6w) и память повторений mem
      3 — номер версии v, слияние с облаком, отметка сброса resetAt */
 const SCHEMA=3;
-const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},frzGot:1,frzUsed:0,frzDays:[]};
+const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},frzGot:1,frzUsed:0,frzDays:[],stR:{},stQ:{}};
 const fresh=()=>Object.assign(JSON.parse(JSON.stringify(S0)),{heartsTs:Date.now()});
 const OLD_GROUPS=[['ա','ն','մ','ր','տ','ու','ս'],['ե','բ','վ','և','ի','կ','լ'],['հ','դ','գ','յ','ո','օ','շ'],['ք','թ','պ','փ','չ','ճ','ց','ծ'],['ժ','խ','ղ','ռ','ջ','ձ','զ'],['է','ը','ֆ']];   // шаги алфавита в схеме 1
 const MIGRATIONS={
@@ -2294,6 +2389,7 @@ function mergeState(a,b){
   m.miles=each(n.miles,o.miles,(x,y)=>x&&y?(x<y?x:y):x||y);
   m.hrs=each(n.hrs,o.hrs,num);
   m.frzGot=num(n.frzGot,o.frzGot);m.frzDays=[...new Set([...(n.frzDays||[]),...(o.frzDays||[])].filter(x=>typeof x==='string'))].sort().slice(-60);m.frzUsed=Math.max(num(n.frzUsed,o.frzUsed),m.frzDays.length);
+  m.stR=each(n.stR,o.stR,num);m.stQ=each(n.stQ,o.stQ,num);
   m.phr=each(n.phr,o.phr,(x,y)=>each(x,y,num));
   m.games=each(n.games,o.games,(x,y,k)=>{if(!x||!y)return x||y;const low=gameLow(k),bx=x.best,by=y.best;
     return Object.assign({},y,x,{plays:num(x.plays,y.plays),best:bx==null?by:by==null?bx:low?Math.min(bx,by):Math.max(bx,by)})});
@@ -2459,7 +2555,7 @@ function streakSheet(){const st=streakNow(),fz=frzLeft(),fd=new Set(S.frzDays||[
    <div class="st-head"><span class="st-fl">${IC.flame}<b>${st}</b></span><div>${st?`${plural(st,'день','дня','дней')} подряд`:'Огонёк пока не горит'}<br><span class="note">Рекорд: ${S.best||0}</span></div></div>
    <div class="st-days" role="img" aria-label="Последние 7 дней">${days.map(d=>`<span class="${d.on?'on':d.fz?'fz':''} ${d.t?'t':''}"><i>${d.fz&&!d.on?IC.frost:d.on?IC.flame:''}</i><small>${d.wd}</small></span>`).join('')}</div>
    <div class="st-frz"><span class="fzi">${IC.frost}</span><div><b>Заморозка серии: ${fz} из ${FRZ_MAX}</b><p>Пропустил день — огонёк не погаснет, заморозка сработает сама. Новая — за каждые 7 дней подряд.</p></div></div>`)}
-const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases};
+const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases,stories:renderStories};
 /* Тема: S.theme = 'light' | 'dark' | 'auto' (или пусто) — как в системе / Телеграме. */
 function applyThemePref(){if(window.__applyTheme)return window.__applyTheme();const t=S.theme,el=document.documentElement;if(t==='light'||t==='dark')el.setAttribute('data-theme',t);else el.removeAttribute('data-theme')}
 function route(){applyThemePref();const [hb,hs]=location.hash.slice(1).split('/'),v=VIEWS[hb]?hb:'learn';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));$('#logo').innerHTML=mascot('happy');drawHud();VIEWS[v](hs)}
@@ -2503,7 +2599,7 @@ function renderLearn(){
     ${wod?`<div class="qc wod" id="wod" role="button" tabindex="0" aria-label="Слово дня: послушать"><span class="qtx"><span class="lbl">Слово дня</span><span class="w arm ${wl>8?'xs':wl>5?'sm':''}">${esc(wod.a)}</span><span class="m">«${esc(wod.r)}» — ${esc(wod.m)}</span></span><span class="spk" data-say="${esc(wod.a)}" aria-hidden="true">${SPK_SVG}</span></div>`:`<div class="qc"><span class="lbl">Слово дня</span><span class="w">скоро</span><span class="m">появится после первых букв</span></div>`}
     ${Object.keys(S.done).length?`<button class="qc" id="prac"><span class="lbl">Тренировка</span><span class="w">${due>30?'30+ слов':due?`${due} ${plural(due,'слово','слова','слов')}`:'10 заданий'}</span><span class="m">${due?'пора повторить':'+5 XP и сердце'}</span></button>`:''}
    </div>
-   <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button></div>
+   <button class="tile2 fact" id="fact">${mascot('think')}<span class="tx"><span class="lbl">Циро знает</span><span class="ft" id="fact-t">${FACTS[S.factI%FACTS.length]}</span><span class="more">Нажми — расскажу ещё</span></span></button>${storyTile()}</div>
   <div class="units">`;
   const curUnit=curIdx<0?-1:LESSONS[curIdx].unit;
   UNITS.forEach((u,ui)=>{const dn=u.lessons.filter(l=>S.done[l.id]).length,all=dn===u.lessons.length,locked=u.lessons.every(l=>!unlocked(LESSONS.indexOf(l)));
@@ -2524,6 +2620,7 @@ function renderLearn(){
   document.querySelectorAll('[data-guide]').forEach(b=>b.onclick=()=>guideSheet(+b.dataset.guide));
   $('#ciro').onclick=()=>{bounce($('#ciro .mascot'));say(g.hy)};
   $('#fact').onclick=()=>{S.factI=(S.factI+1)%FACTS.length;save();$('#fact-t').innerHTML=FACTS[S.factI];bounce($('#fact .mascot'))};
+  const sb=$('#stories');if(sb)sb.onclick=()=>{location.hash='stories'};
   const pb=$('#place');if(pb)pb.onclick=startPlacement;
   $('#cta').onclick=()=>{if(curIdx<0)return startPractice();if(hearts()>0)startLesson(LESSONS[curIdx],false);else lessonSheet(curIdx)};
   document.querySelectorAll('[data-wg]').forEach(b=>b.onclick=()=>{S.goal=+b.dataset.wg;save();document.querySelectorAll('[data-wg]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawHud()});
@@ -2597,7 +2694,7 @@ function closeLesson(){stopTrace();const el=$('#lesson');el&&el.remove();if(!$('
 function hudLesson(){$('#lprog').style.width=(LS.total?LS.done/LS.total*100:0)+'%';$('#lhearts').innerHTML=LS.practice?`${IC.heart}∞`:`${IC.heart}${S.hearts}`}
 function next(){
   hudLesson();
-  if(!LS.queue.length)return LS.lesson.place?finishPlacement():finishLesson();
+  if(!LS.queue.length)return LS.lesson.place?finishPlacement():LS.lesson.story?finishStory():finishLesson();
   if(!LS.practice&&S.hearts<=0)return failLesson();
   stopTrace();const ex=LS.queue.shift();LS.cur=ex;LS.state='answer';LS.sel=null;
   const box=$('#ex');box.innerHTML='';$('#lfoot').className='l-foot';
@@ -3024,6 +3121,7 @@ function renderProfile(){
     <div class="wr-prev"><span id="wr-ciro">${mascot('happy','m-idle')}</span><div class="lv"><b>Уровень ${lv}</b><div class="bar"><i style="width:${into}%"></i></div><span class="note">до уровня ${lv+1}: ${100-into} XP</span></div></div>
     <div class="wr-col">${wrGroup('lv','За уровень',OUTFITS.map(o=>level()>=o.lv),OUTFITS.some(o=>o.id&&o.id===S.outfit)||!S.outfit,`${OUTFITS.map(o=>{const op=lv>=o.lv,on=(S.outfit||null)===o.id;return `<button class="wr-item ${on?'on':''}" data-o="${o.id||''}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',o.id)}<b>${o.t}</b><span>${op?o.d:`Откроется на уровне ${o.lv}`}</span></button>`}).join('')}`)}
     ${wrGroup('ph','За «Фразы»',COSTUMES.map(c=>phDone(c.ph)),COSTUMES.some(c=>c.id===S.outfit),`${COSTUMES.map(c=>{const op=phDone(c.ph),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:`Диалог «${esc(PHR.find(p=>p.id===c.ph).t)}»`}</span></button>`}).join('')}`)}
+    ${wrGroup('hs','За истории',HISTC.map(c=>stDone(c.st)),HISTC.some(c=>c.id===S.outfit),`${HISTC.map(c=>{const op=stDone(c.st),on=S.outfit===c.id,st=STORIES.find(x=>x.id===c.st);return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:`История «${esc(st.t)}»`}</span></button>`}).join('')}`)}
     ${wrGroup('fr','За друзей',REFC.map(refOwned),REFC.some(c=>c.id===S.outfit),`${REFC.map(c=>{const op=refOwned(c),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:c.n?`${c.n} ${plural(c.n,'друг','друга','друзей')} пройдут первый урок`:'Если пришёл по приглашению'}</span></button>`}).join('')}`)}</div>
    </div></div>
    <div class="cards">
@@ -3257,6 +3355,57 @@ function finishPlacement(){LS.state='end';const k=placeLevel(LS.lesson.place.res
   tapNext($('#nxt'),()=>{location.hash='learn';closeLesson()});$('#nxt').focus();
   document.querySelectorAll('.ach-sh').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));
   if(k)sWin();if(k)confetti()}
+/* «Истории»: короткие карточки на армянском об исторических личностях. Нажатие на предложение
+   показывает перевод. В конце — несколько вопросов, за них Циро получает костюм героя.
+   Раздел открыт, когда выучены все буквы (или включено «Открыть все уроки»). */
+const storiesOpen=()=>S.unlockAll||LETTERS.every(letterLearned);
+const stRead=id=>Math.max(0,S.stR[id]|0);
+const stDone=id=>!!S.stQ[id];
+let STC={id:null,i:0,all:false};
+function storyTile(){const open=storiesOpen(),s=STORIES[0],n=s.cards.length,r=Math.min(stRead(s.id),n),kn=LETTERS.filter(letterLearned).length;
+  return `<button class="tile2 story" id="stories">${mascot('happy','',HISTC[0].id)}<span class="tx"><span class="lbl">Истории</span><span class="ft">Читаем по-армянски о людях, которые вошли в историю</span><span class="more">${open?(stDone(s.id)?`${esc(s.t)} — прочитано`:r?`${esc(s.t)} · ${r} из ${n}`:`Первая история — ${esc(s.t)}`):`Откроется, когда выучите все буквы · ${kn} из ${LETTERS.length}`}</span></span></button>`}
+function renderStories(sub){const ST=STORIES.find(x=>x.id===sub);
+  if(!storiesOpen()){const kn=LETTERS.filter(letterLearned).length;
+    $('#view').innerHTML=`<div class="stx">${ciroSay('think',`<p><b>Истории откроются, когда вы выучите все буквы.</b></p><p>Здесь мы читаем по-армянски о людях, которые вошли в историю: коротко, по карточкам, с переводом по нажатию. Сейчас выучено ${kn} из ${LETTERS.length} букв.</p>`)}<button class="btn" id="st-go">К урокам</button></div>`;
+    $('#st-go').onclick=()=>{location.hash='learn'};return}
+  if(!ST){$('#view').innerHTML=`<div class="stx">${ciroSay('happy',`<p><b>Истории.</b> Читаем по-армянски о людях, которые вошли в историю. Нажмите на предложение — появится перевод.</p><p>Дочитайте историю и ответьте на вопросы — Циро получит костюм героя.</p>`)}
+      <div class="st-grid">${STORIES.map(s=>{const n=s.cards.length,r=Math.min(stRead(s.id),n),c=HISTC.find(x=>x.st===s.id);return `<button class="st-card" data-st="${s.id}"><span class="st-art">${mascot(stDone(s.id)?'cheer':'happy','',c&&c.id)}</span><span class="st-tx"><b>${esc(s.t)}</b><span class="arm hy">${esc(s.hy)}</span><span class="d">${esc(s.years)} · ${esc(s.d)}</span><span class="st-pr"><i style="width:${Math.round(r/n*100)}%"></i></span><em>${stDone(s.id)?'Прочитано, костюм получен':r?`Прочитано ${r} из ${n}`:`${n} ${plural(n,'карточка','карточки','карточек')}`}</em></span></button>`}).join('')}</div>
+      <p class="note" style="text-align:center">Скоро — новые истории.</p></div>`;
+    document.querySelectorAll('.st-card').forEach(b=>b.onclick=()=>{location.hash='stories/'+b.dataset.st});return}
+  if(STC.id!==ST.id)STC={id:ST.id,i:Math.min(stRead(ST.id),ST.cards.length-1),all:false};
+  const n=ST.cards.length,i=STC.i,c=ST.cards[i],last=i===n-1;
+  S.stR[ST.id]=Math.max(stRead(ST.id),i+1);save();
+  $('#view').innerHTML=`<div class="stx">
+    <a class="ph-back" href="#stories">← Все истории</a>
+    <div class="st-head"><span class="st-art sm">${mascot('happy','',(HISTC.find(x=>x.st===ST.id)||{}).id)}</span><div><b>${esc(ST.t)}</b><span class="arm">${esc(ST.hy)}</span></div><span class="st-n">${i+1} / ${n}</span></div>
+    <div class="st-dots" aria-hidden="true">${ST.cards.map((_,k)=>`<i class="${k<i?'on':k===i?'cur':''}"></i>`).join('')}</div>
+    <article class="st-page">
+     <span class="chip st-when arm">${esc(c.when)}</span>
+     <h2 class="arm">${esc(c.hy)}</h2><p class="st-ru">${esc(c.ru)}</p>
+     <div class="st-ss">${c.s.map((x,k)=>`<button class="st-s ${STC.all?'open':''}" data-k="${k}" aria-expanded="${STC.all}"><span class="arm hy">${esc(x[0])}</span><span class="ru">${esc(x[1])}</span></button>`).join('')}</div>
+     <button class="link st-all" id="st-all">${STC.all?'Скрыть перевод':'Показать весь перевод'}</button>
+    </article>
+    <div class="st-nav"><button class="btn plain" id="st-prev" ${i?'':'disabled'}>Назад</button><button class="btn" id="st-next">${last?(stDone(ST.id)?'Пройти вопросы ещё раз':'Ответить на вопросы'):'Дальше'}</button></div>
+    ${i===0?`<p class="note st-src">Нажмите на предложение — появится перевод. Источники: ${ST.src.map(esc).join('; ')}.</p>`:''}
+  </div>`;
+  document.querySelectorAll('.st-s').forEach(b=>b.onclick=()=>{const o=!b.classList.contains('open');b.classList.toggle('open',o);b.setAttribute('aria-expanded',o)});
+  $('#st-all').onclick=()=>{STC.all=!STC.all;renderStories(ST.id)};
+  $('#st-prev').onclick=()=>{if(STC.i>0){STC.i--;STC.all=false;renderStories(ST.id);scrollTo(0,0)}};
+  $('#st-next').onclick=()=>{if(last)return storyQuiz(ST);STC.i++;STC.all=false;renderStories(ST.id);scrollTo(0,0)}}
+function storyQuiz(st){track('story','quiz-'+st.id);
+  const items=shuffle(st.quiz).map(x=>x.hy?CH('Что значит это слово?',x.hy,x.a,x.w,{bigCls:'word'}):CH('Вопрос по истории',x.q,x.a,x.w,{bigCls:'ru'}));
+  startLesson({id:'story',t:st.t,story:st.id,gen:()=>items},true)}
+function finishStory(){LS.state='end';const st=STORIES.find(x=>x.id===LS.lesson.story),c=HISTC.find(x=>x.st===st.id),first=!stDone(st.id);
+  S.stQ[st.id]=1;if(first)addXP(10);const newA=checkAch();save();syncU();track('story','done-'+st.id);
+  $('#lprog').style.width='100%';
+  $('#ex').innerHTML=`<div class="end"><span id="end-ciro">${mascot('cheer','m-jump',c&&c.id)}</span><h2>${first?'История прочитана!':'Отлично, всё помните!'}</h2>
+   <div class="bubble">${c?`<p><b>${first?'Новый костюм':'Костюм'}: «${esc(c.t)}».</b> ${esc(c.d)}.</p>`:''}<p>${first?'+10 XP. ':''}Скоро здесь появятся новые истории.</p></div>
+   ${c?`<button class="btn sm" data-wear="${c.id}" ${S.outfit===c.id?'disabled':''}>${S.outfit===c.id?'Надето':'Надеть костюм'}</button>`:''}
+   ${newA.length?`<div class="achv-new">${newA.map(a=>`<button class="chip ach-sh" data-ach="${a.id}">${IC[a.ic]} ${esc(a.t)} <u>Поделиться</u></button>`).join('')}</div>`:''}</div>`;
+  $('#lfoot').className='l-foot';foot(`<span></span><button class="btn" id="nxt">К историям</button>`);
+  tapNext($('#nxt'),()=>{location.hash='stories';closeLesson()});
+  wireWear('#end-ciro');document.querySelectorAll('.ach-sh').forEach(b=>b.onclick=()=>achShare(b.dataset.ach));
+  if(first){sWin();confetti()}}
 /* Запуск. */
 route();
 </script>

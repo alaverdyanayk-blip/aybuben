@@ -126,6 +126,20 @@ test('новые слова: сначала «как читается», зна�
   const w=WORDS.find(x=>x.a==='տուն');S.mem[w.a]=[2,nowS()];if(qWord(w,WORDS).prompt!=='Что значит это слово?')out.push('встреченное слово не спрашивает значение');
   for(const x of WORDS){const o=sayOpts(x);if(o.length<3||o.includes(x.r))out.push('мало вариантов: '+x.a);if(out.length>12)break}
   return [...new Set(out)].slice(0,12)});
+test('истории: закрыты до конца алфавита; карточки и перевод по нажатию; вопросы дают костюм; данные в порядке',async()=>{const out=[],e=(c,w)=>{if(!c)out.push(w)};
+  __fresh();location.hash='stories';route();e(/Истории откроются/.test($('#view').textContent),'раздел открыт без алфавита');
+  for(const st of STORIES){e(HISTC.some(c=>c.st===st.id),st.id+': нет костюма');e(st.quiz.every(q=>!q.w.includes(q.a)&&new Set([q.a,...q.w]).size===4),st.id+': варианты в вопросах');
+    st.cards.forEach((c,i)=>{e(c.s.length>=2,st.id+' '+i+': мало предложений');c.s.forEach(x=>{e(/[\u0531-\u0587]/.test(x[0])&&/[а-яё]/i.test(x[1]),st.id+' '+i+': пара предложение/перевод');e(/։$/.test(x[0]),st.id+' '+i+': нет армянской точки: '+x[0])})})}
+  __fresh({done:Object.fromEntries(LESSONS.filter(l=>UNITS[l.unit].alpha).map(l=>[l.id,1]))});location.hash='learn';route();e(/Первая история/.test($('#stories').textContent),'плитка на главной');
+  location.hash='stories/nzhdeh';STC={id:null};route();const b=document.querySelector('.st-s');b.click();e(b.classList.contains('open'),'перевод не открывается');
+  const n=STORIES[0].cards.length;for(let i=1;i<n;i++)$('#st-next').click();e(stRead('nzhdeh')===n,'прочитано '+stRead('nzhdeh'));
+  $('#st-next').click();e(LS&&LS.lesson.story==='nzhdeh','вопросы не начались');let g=0;
+  while(LS&&LS.state!=='end'&&g++<40){if(g===2){selectOpt(LS.opts.findIndex(o=>o!==LS.cur.correct));check();next();continue}selectOpt(LS.opts.indexOf(LS.cur.correct));check();if(LS.state!=='end')next()}
+  e(stDone('nzhdeh')&&S.hearts===MAXH,'костюм/сердца: '+stDone('nzhdeh')+' '+S.hearts);const xp=S.xp;document.querySelector('[data-wear]').click();e(S.outfit==='nzhdeh','костюм не надевается');closeLesson();
+  storyQuiz(STORIES[0]);g=0;while(LS&&LS.state!=='end'&&g++<40){selectOpt(LS.opts.indexOf(LS.cur.correct));check();if(LS.state!=='end')next()}closeLesson();e(S.xp===xp,'повтор снова дал XP');
+  location.hash='profile';route();e(!document.querySelector('.wr-item[data-o="nzhdeh"]').disabled,'костюма нет в гардеробе');
+  const m=mergeState({v:3,ts:1,stR:{nzhdeh:3}},{v:3,ts:2,stR:{nzhdeh:1},stQ:{nzhdeh:1}});e(m.stR.nzhdeh===3&&m.stQ.nzhdeh===1,'слияние историй');
+  location.hash='learn';return out});
 test('испорченные сохранения не ломают приложение (300 вариантов)',async()=>{const fails={};const junk=[null,undefined,0,-1,NaN,1e12,'x','',[],{},[1,2],{a:1},true,'<b>'];const rj=()=>junk[Math.random()*junk.length|0];
   const fields=['xp','daily','streak','lastDay','best','hearts','heartsTs','done','goal','ach','sound','unlockAll','read','perfect','games','phr','mem','outfit','theme','notif','hrs','miles','friends','refCode','voice','newsSeen','resetAt','ts','v'];
   const views=['learn','games','alphabet','rules','profile','phrases'];

@@ -374,3 +374,28 @@ button.ach:active{transform:translateY(2px)}
 .card.ctop .l{line-height:1.35}
 .card.ctop .ic.fl .i{width:34px;height:34px}
 .c-fz{color:color-mix(in srgb,var(--b3) 55%,var(--ink))}
+/* Истории */
+.stx{display:flex;flex-direction:column;gap:14px}
+.tile2.story{margin-top:0}.tile2.story .mascot{width:58px;height:58px}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.st-card{display:flex;align-items:center;gap:12px;text-align:left;font:inherit;color:inherit;background:var(--surface);border:0;border-radius:20px;padding:12px 14px 12px 10px;box-shadow:0 var(--edge) 0 var(--line);cursor:pointer}
+.st-card:active{transform:translateY(2px)}
+.st-art{flex:none;width:86px;height:86px;border-radius:18px;background:color-mix(in srgb,var(--brand,#9C1F35) 12%,var(--surface));display:grid;place-items:center}
+.st-art .mascot{width:80px;height:80px}.st-art.sm{width:52px;height:52px;border-radius:14px}.st-art.sm .mascot{width:48px;height:48px}
+.st-tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.st-tx b{font-size:17px}.st-tx .hy{color:var(--muted);font-weight:600}
+.st-tx .d{font-size:12.5px;color:var(--muted)}.st-tx em{font-style:normal;font-size:12px;font-weight:700;color:var(--muted)}
+.st-pr{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:4px}.st-pr i{display:block;height:100%;background:var(--good);border-radius:9px}
+.st-head{display:flex;align-items:center;gap:12px}.st-head>div{display:flex;flex-direction:column;flex:1;min-width:0}.st-head b{font-size:17px}.st-head .arm{color:var(--muted);font-weight:600}
+.st-n{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.st-dots{display:flex;gap:5px}.st-dots i{flex:1;height:5px;border-radius:9px;background:var(--line)}.st-dots i.on{background:var(--good)}.st-dots i.cur{background:var(--accent)}
+.st-page{background:var(--surface);border-radius:22px;padding:18px 16px;box-shadow:0 var(--edge) 0 var(--line);display:flex;flex-direction:column;gap:10px}
+.st-when{font-size:13px}
+.st-page h2{margin:0;font-size:26px;line-height:1.2}.st-ru{margin:-6px 0 4px;color:var(--muted);font-weight:600}
+.st-ss{display:flex;flex-direction:column;gap:8px}
+.st-s{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:11px 13px;cursor:pointer}
+.st-s .hy{font-size:19px;line-height:1.45}
+.st-s .ru{display:none;font-size:14.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.st-s.open{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}.st-s.open .ru{display:block}
+.st-all{align-self:flex-start;padding:4px 0}
+.st-nav{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.st-src{font-size:12px}

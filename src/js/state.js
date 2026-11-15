@@ -6,7 +6,7 @@ const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
      2 — новый порядок букв (уроки ab1a…ab6w) и память повторений mem
      3 — номер версии v, слияние с облаком, отметка сброса resetAt */
 const SCHEMA=3;
-const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},frzGot:1,frzUsed:0,frzDays:[]};
+const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},frzGot:1,frzUsed:0,frzDays:[],stR:{},stQ:{}};
 const fresh=()=>Object.assign(JSON.parse(JSON.stringify(S0)),{heartsTs:Date.now()});
 const OLD_GROUPS=[['ա','ն','մ','ր','տ','ու','ս'],['ե','բ','վ','և','ի','կ','լ'],['հ','դ','գ','յ','ո','օ','շ'],['ք','թ','պ','փ','չ','ճ','ց','ծ'],['ժ','խ','ղ','ռ','ջ','ձ','զ'],['է','ը','ֆ']];   // шаги алфавита в схеме 1
 const MIGRATIONS={
@@ -58,6 +58,7 @@ function mergeState(a,b){
   m.miles=each(n.miles,o.miles,(x,y)=>x&&y?(x<y?x:y):x||y);
   m.hrs=each(n.hrs,o.hrs,num);
   m.frzGot=num(n.frzGot,o.frzGot);m.frzDays=[...new Set([...(n.frzDays||[]),...(o.frzDays||[])].filter(x=>typeof x==='string'))].sort().slice(-60);m.frzUsed=Math.max(num(n.frzUsed,o.frzUsed),m.frzDays.length);
+  m.stR=each(n.stR,o.stR,num);m.stQ=each(n.stQ,o.stQ,num);
   m.phr=each(n.phr,o.phr,(x,y)=>each(x,y,num));
   m.games=each(n.games,o.games,(x,y,k)=>{if(!x||!y)return x||y;const low=gameLow(k),bx=x.best,by=y.best;
     return Object.assign({},y,x,{plays:num(x.plays,y.plays),best:bx==null?by:by==null?bx:low?Math.min(bx,by):Math.max(bx,by)})});

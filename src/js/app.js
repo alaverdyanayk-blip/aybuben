@@ -10,7 +10,7 @@ function streakSheet(){const st=streakNow(),fz=frzLeft(),fd=new Set(S.frzDays||[
    <div class="st-head"><span class="st-fl">${IC.flame}<b>${st}</b></span><div>${st?`${plural(st,'день','дня','дней')} подряд`:'Огонёк пока не горит'}<br><span class="note">Рекорд: ${S.best||0}</span></div></div>
    <div class="st-days" role="img" aria-label="Последние 7 дней">${days.map(d=>`<span class="${d.on?'on':d.fz?'fz':''} ${d.t?'t':''}"><i>${d.fz&&!d.on?IC.frost:d.on?IC.flame:''}</i><small>${d.wd}</small></span>`).join('')}</div>
    <div class="st-frz"><span class="fzi">${IC.frost}</span><div><b>Заморозка серии: ${fz} из ${FRZ_MAX}</b><p>Пропустил день — огонёк не погаснет, заморозка сработает сама. Новая — за каждые 7 дней подряд.</p></div></div>`)}
-const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases};
+const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases,stories:renderStories};
 /* Тема: S.theme = 'light' | 'dark' | 'auto' (или пусто) — как в системе / Телеграме. */
 function applyThemePref(){if(window.__applyTheme)return window.__applyTheme();const t=S.theme,el=document.documentElement;if(t==='light'||t==='dark')el.setAttribute('data-theme',t);else el.removeAttribute('data-theme')}
 function route(){applyThemePref();const [hb,hs]=location.hash.slice(1).split('/'),v=VIEWS[hb]?hb:'learn';document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));$('#logo').innerHTML=mascot('happy');drawHud();VIEWS[v](hs)}

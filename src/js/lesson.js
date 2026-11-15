@@ -27,7 +27,7 @@ function closeLesson(){stopTrace();const el=$('#lesson');el&&el.remove();if(!$('
 function hudLesson(){$('#lprog').style.width=(LS.total?LS.done/LS.total*100:0)+'%';$('#lhearts').innerHTML=LS.practice?`${IC.heart}∞`:`${IC.heart}${S.hearts}`}
 function next(){
   hudLesson();
-  if(!LS.queue.length)return LS.lesson.place?finishPlacement():finishLesson();
+  if(!LS.queue.length)return LS.lesson.place?finishPlacement():LS.lesson.story?finishStory():finishLesson();
   if(!LS.practice&&S.hearts<=0)return failLesson();
   stopTrace();const ex=LS.queue.shift();LS.cur=ex;LS.state='answer';LS.sel=null;
   const box=$('#ex');box.innerHTML='';$('#lfoot').className='l-foot';
