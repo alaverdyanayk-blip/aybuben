@@ -39,6 +39,12 @@ def read(*parts):
 
 css = '\n'.join(read('css', n + '.css').rstrip('\n') for n in CSS)
 js = '\n'.join(read(n + '.js').rstrip('\n') for n in JS)
+# Ужимаем без риска: в CSS убираем комментарии и переносы строк, в JS — только комментарии,
+# которые стоят целиком на своих строках (описания функций). Код и строки не трогаются.
+import re
+css = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+css = re.sub(r'\s*\n\s*', '', css)
+js = re.sub(r'(?m)^[ \t]*/\*.*?\*/[ \t]*\n', '', js, flags=re.S)
 app = read('app.html')
 assert '/*@CSS*/' in app and '/*@JS*/' in app, 'в app.html нет меток /*@CSS*/ и /*@JS*/'
 html = app.replace('/*@CSS*/', css, 1).replace('/*@JS*/', js, 1)

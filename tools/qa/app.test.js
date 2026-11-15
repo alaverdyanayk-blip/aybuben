@@ -222,7 +222,13 @@ const LAYOUT=async(b,w)=>{const p=await b.newPage({viewport:{width:w,height:760}
       if(document.documentElement.scrollWidth>innerWidth+1)out.push(v+': горизонтальная прокрутка '+document.documentElement.scrollWidth);
       const wide=[...document.querySelectorAll('main *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1&&getComputedStyle(e).position!=='fixed'&&!e.closest('.scroll-x,.chips,.tabs')&&!(function(n){for(n=n.parentElement;n&&n!==document.body;n=n.parentElement){const o=getComputedStyle(n).overflowX;if(o==='auto'||o==='scroll'||o==='hidden')return true}return false})(e)}).slice(0,2);
       wide.forEach(e=>out.push(v+': вылезает '+e.tagName.toLowerCase()+'.'+[...e.classList].join('.')))}
-    startLesson(LESSONS[0],false);await new Promise(r=>setTimeout(r,150));if(document.documentElement.scrollWidth>innerWidth+1)out.push('урок: горизонтальная прокрутка');closeLesson();return out})};
+    startLesson(LESSONS[0],false);await new Promise(r=>setTimeout(r,150));if(document.documentElement.scrollWidth>innerWidth+1)out.push('урок: горизонтальная прокрутка');closeLesson();
+    /* итог игры и кнопки профиля: всё помещается в ширину экрана */
+    const fits=(sel,name)=>document.querySelectorAll(sel).forEach(e=>{const r=e.getBoundingClientRect();if(r.right>innerWidth+1||e.scrollWidth>e.clientWidth+1)out.push(name+': не помещается «'+e.textContent.trim().slice(0,20)+'»')});
+    openGame('odd');gameOver(3,3,'Верно 3 из 10');fits('#gfoot .btn','итог игры');closeGame();
+    location.hash='profile';route();fits('.pf-btn','кнопки профиля');
+    S.unlockAll=true;location.hash='stories/nzhdeh';STC={id:null};ST_LANG='hy';route();if(document.documentElement.scrollWidth>innerWidth+1)out.push('история по-армянски: горизонтальная прокрутка');ST_LANG='ru';
+    return out})};
 
 /* ---------- запуск ---------- */
 (async()=>{const b=await chromium.launch();let fail=0,pass=0;const t0=Date.now();
@@ -232,5 +238,5 @@ const LAYOUT=async(b,w)=>{const p=await b.newPage({viewport:{width:w,height:760}
     try{res=await p.evaluate(t.fn)}catch(e){res=['тест упал: '+e.message.split('\n')[0]]}
     if(perr.length)res=(res||[]).concat([...new Set(perr)].map(m=>'ошибка на странице: '+m));
     const ok=!res||!res.length;ok?pass++:fail++;console.log((ok?'✓ ':'✗ ')+t.name+(ok?'':'\n    '+res.slice(0,8).join('\n    ')+(res.length>8?'\n    … ещё '+(res.length-8):'')))}
-  if(!ONLY||'вёрстка'.includes(ONLY)||ONLY==='layout')for(const w of [360,390]){const r=await LAYOUT(b,w);const ok=!r.length;ok?pass++:fail++;console.log((ok?'✓ ':'✗ ')+'вёрстка '+w+' px'+(ok?'':'\n    '+r.slice(0,8).join('\n    ')))}
+  if(!ONLY||'вёрстка'.includes(ONLY)||ONLY==='layout')for(const w of [320,360,390]){const r=await LAYOUT(b,w);const ok=!r.length;ok?pass++:fail++;console.log((ok?'✓ ':'✗ ')+'вёрстка '+w+' px'+(ok?'':'\n    '+r.slice(0,8).join('\n    ')))}
   console.log(`\n${pass} прошло, ${fail} не прошло · ${((Date.now()-t0)/1000).toFixed(0)} с`);await b.close();process.exit(fail?1:0)})();

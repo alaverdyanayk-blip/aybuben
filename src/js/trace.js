@@ -35,7 +35,7 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
     <div class="tr-bar"><span class="tr-msg" role="status" aria-live="polite">Штрих 1 из ${strokes.length}: начните с точки</span>
     <div class="tr-btns"><button class="btn plain sm" data-tr="show">Показать</button><button class="btn plain sm" data-tr="again">Заново</button></div></div></div>`;
   const cv=box.querySelector('canvas'),ctx=cv.getContext('2d'),msg=box.querySelector('.tr-msg');
-  let cur=0,mist=0,drawn=[],raw=null,anim=0,done=false,k=1,ox=0,oy=0;
+  let cur=0,mist=0,raw=null,anim=0,done=false,k=1,ox=0,oy=0;
   let COL={},W=0,H=0,dead=false;
   const readCol=()=>{const cs=getComputedStyle(document.documentElement);['--line','--sunk','--brand','--apri','--apri-deep','--good','--ink'].forEach(n=>COL[n]=cs.getPropertyValue(n).trim())};
   const css=n=>COL[n];
@@ -43,7 +43,7 @@ function tracer(box,key,opts={}){const G=STROKES[key];if(!G)return null;
   function fit(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;W=r.width;H=r.height;readCol();cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);
     k=Math.min(r.height/(TR_BOT-TR_TOP),r.width/(w+24));ox=(r.width-w*k)/2;oy=(r.height-(TR_BOT-TR_TOP)*k)/2}
   function path(pts,upto=1){const n=Math.max(2,Math.round(pts.length*upto));ctx.beginPath();pts.slice(0,n).forEach((p,i)=>{const [x,y]=P(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y)})}
-  function arrow(st,col){const a=st.pts[0],b=st.pts[Math.min(5,st.pts.length-1)],[x,y]=P(a),[x2,y2]=P(b),ang=Math.atan2(y2-y,x2-x);
+  function arrow(st,col){const a=st.pts[0],[x,y]=P(a);
     ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 11px Golos Text, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(strokes.indexOf(st)+1),x,y+.5);
     const m=st.pts[Math.min(9,st.pts.length-1)],[mx,my]=P(m),m2=st.pts[Math.min(11,st.pts.length-1)],[mx2,my2]=P(m2),aa=Math.atan2(my2-my,mx2-mx);
     ctx.strokeStyle=col;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(mx2-Math.cos(aa-0.5)*8,my2-Math.sin(aa-0.5)*8);ctx.lineTo(mx2,my2);ctx.lineTo(mx2-Math.cos(aa+0.5)*8,my2-Math.sin(aa+0.5)*8);ctx.stroke()}
