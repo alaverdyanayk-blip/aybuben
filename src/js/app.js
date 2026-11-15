@@ -3,12 +3,12 @@ function ring(v,max){const p=Math.min(1,v/max),c=2*Math.PI*9;return `<svg class=
 function drawHud(){applyFreeze();const st=streakNow(),fz=frzLeft();
   $('#hud').innerHTML=`<button class="pill flame ${S.lastDay===today()?'':'off'}" id="hud-st" aria-label="Серия: ${st} ${plural(st,'день','дня','дней')}, заморозок ${fz}">${IC.flame}${st}${fz&&st?`<i class="fz" aria-hidden="true">${IC.frost}</i>`:''}</button><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`;
   $('#hud-st').onclick=streakSheet}
-/* Окно серии: огонёк, рекорд, заморозки и последние две недели (занимался / заморожен / пропуск) */
+/* Окно серии: огонёк, рекорд, заморозки и последние 7 дней (занимался / заморожен / пропуск) */
 function streakSheet(){const st=streakNow(),fz=frzLeft(),fd=new Set(S.frzDays||[]);
-  const days=[...Array(14)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-13+i);const k=dstr(d);return {k,wd:'вспнвтсрчтптсб'.substr(d.getDay()*2,2),on:(S.daily[k]||0)>0,fz:fd.has(k),t:k===today()}});
+  const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);const k=dstr(d);return {k,wd:'вспнвтсрчтптсб'.substr(d.getDay()*2,2),on:(S.daily[k]||0)>0,fz:fd.has(k),t:k===today()}});
   sheet(`<div class="sheet-top"><b>Огонёк</b><button class="x" data-close aria-label="Закрыть">✕</button></div>
    <div class="st-head"><span class="st-fl">${IC.flame}<b>${st}</b></span><div>${st?`${plural(st,'день','дня','дней')} подряд`:'Огонёк пока не горит'}<br><span class="note">Рекорд: ${S.best||0}</span></div></div>
-   <div class="st-days" role="img" aria-label="Последние две недели">${days.map(d=>`<span class="${d.on?'on':d.fz?'fz':''} ${d.t?'t':''}"><i>${d.fz&&!d.on?IC.frost:d.on?IC.flame:''}</i><small>${d.wd}</small></span>`).join('')}</div>
+   <div class="st-days" role="img" aria-label="Последние 7 дней">${days.map(d=>`<span class="${d.on?'on':d.fz?'fz':''} ${d.t?'t':''}"><i>${d.fz&&!d.on?IC.frost:d.on?IC.flame:''}</i><small>${d.wd}</small></span>`).join('')}</div>
    <div class="st-frz"><span class="fzi">${IC.frost}</span><div><b>Заморозка серии: ${fz} из ${FRZ_MAX}</b><p>Пропустил день — огонёк не погаснет, заморозка сработает сама. Новая — за каждые 7 дней подряд.</p></div></div>`)}
 const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases};
 /* Тема: S.theme = 'light' | 'dark' | 'auto' (или пусто) — как в системе / Телеграме. */
