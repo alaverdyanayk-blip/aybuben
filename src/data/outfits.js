@@ -35,5 +35,5 @@ const HATS=new Set(['cap','crown','taxi','pilot','chef','bellhop','tourist','doc
 
 /* HISTC — за истории о людях (раздел «Истории», data/stories.js): st — id истории */
 const HISTC=[
- {id:'nzhdeh',t:'Гарегин Нжде',st:'nzhdeh',d:'Башлык и портупея сюникского спарапета'}
+ {id:'nzhdeh',t:'Гарегин Нжде',st:'nzhdeh',d:'Папаха, усы и патронташи фидаи'}
 ];
