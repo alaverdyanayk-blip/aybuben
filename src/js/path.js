@@ -2,6 +2,7 @@
 const OFF=[0,48,72,48,0,-48,-72,-48];
 function ciroStatus(){const st=streakNow(),tx=todayXP(),left=Math.max(0,S.goal-tx),fresh=!S.xp&&!Object.keys(S.done).length;
   if(fresh)return {mood:'happy',t:'Я — Циро, армянский абрикос. Научу тебя читать и писать на литературном армянском. Начнём с первых букв?'};
+  if(FRZ.saved&&tx<S.goal)return {mood:'wow',t:`${FRZ.saved>1?`Тебя не было ${FRZ.saved} ${plural(FRZ.saved,'день','дня','дней')}`:'Вчера ты пропустил день'} — заморозка сохранила огонёк. ${frzLeft()?`Осталось заморозок: ${frzLeft()}.`:'Заморозок больше нет — сегодня урок обязателен!'}`};
   if(tx>=S.goal)return {mood:'cheer',t:st>=3?`Цель дня выполнена! ${st} ${plural(st,'день','дня','дней')} подряд — бабушка уже рассказала соседям. Ещё урок?`:`Цель дня выполнена!${st>1?` Огонёк горит ${st} ${plural(st,'день','дня','дней')}.`:''} Можно отдохнуть… или ещё урок?`};
   if(st>0&&S.lastDay!==today())return {mood:'wow',t:`Огонёк горит ${st} ${plural(st,'день','дня','дней')}. Один урок сегодня — и он не погаснет!`};
   if(S.lastDay&&daysBetween(S.lastDay,today())>=3)return {mood:'sad',t:'Соскучился! Долму пришлось доедать одному. Начнём с повторения?'};

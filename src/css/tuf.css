@@ -317,3 +317,19 @@ a.box.ch-row{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;te
 .fact .ft{font-size:16px;line-height:1.4;font-weight:500}
 .fact .more{font-size:12.5px}
 .fact .mascot{width:64px;height:64px}
+/* Заморозка серии */
+button.pill{font:inherit;font-weight:800;cursor:pointer}
+.pill .fz{display:inline-flex;margin-left:-2px;color:var(--b3)}.pill .fz .i{width:13px;height:13px}
+.fzl{display:flex;align-items:center;gap:4px;margin-top:2px}.fzl .i{width:13px;height:13px;color:var(--b3)}
+.st-head{display:flex;align-items:center;gap:14px;font-weight:700;font-size:16px}
+.st-fl{display:flex;align-items:center;gap:4px;color:var(--accent);font-size:34px;font-weight:800}.st-fl .i{width:34px;height:34px}
+.st-days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px 6px}
+.st-days span{display:flex;flex-direction:column;align-items:center;gap:3px}
+.st-days i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--line)}
+.st-days .on i{background:var(--accent-soft,#FCE6CF);color:var(--accent)}
+.st-days .fz i{background:color-mix(in srgb,var(--b3) 18%,var(--surface));color:var(--b3)}
+.st-days .t i{outline:2px solid var(--ink);outline-offset:2px}
+.st-days .i{width:18px;height:18px}.st-days small{font-size:11px;color:var(--muted)}
+.st-frz{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--b3) 12%,var(--surface));border-radius:16px;padding:12px 14px}
+.st-frz .fzi{color:var(--b3)}.st-frz .fzi .i{width:28px;height:28px}.st-frz p{margin:4px 0 0;font-size:14px;line-height:1.4}
+.unlock.frz b{display:flex;align-items:center;gap:6px}.unlock.frz .i{color:var(--b3);width:20px;height:20px}

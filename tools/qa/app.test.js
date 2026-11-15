@@ -85,6 +85,18 @@ test('карточка буквы: у каждой буквы пропись, п
 /* ================= Сохранение и прогресс ================= */
 test('серия: вчера +1, пропуск — заново, часы назад — не трогаем',()=>{const out=[],chk=(o,want,what)=>{Object.assign(S,o);addXP(5);if(S.streak!==want)out.push(what+': '+S.streak+' вместо '+want)};__fresh();
   chk({streak:3,lastDay:__d(-1)},4,'вчера');chk({streak:5,lastDay:__d(-3)},1,'пропуск');chk({streak:2,lastDay:today()},2,'сегодня');chk({streak:7,lastDay:__d(1)},7,'часы назад');chk({streak:0,lastDay:null},1,'первый раз');return out});
+test('заморозка серии: спасает пропуск, тратится, копится за 7 дней, не больше двух',()=>{const out=[],e=(c,w)=>{if(!c)out.push(w)};
+  __fresh({streak:4,lastDay:__d(-2),xp:50,done:{ab1a:1}});e(frzLeft()===1,'у новичка одна заморозка');drawHud();
+  e(S.lastDay===__d(-1)&&streakNow()===4&&frzLeft()===0&&S.frzDays.includes(__d(-1)),'пропуск одного дня не погасил огонёк: '+S.lastDay+' '+streakNow());
+  e(/заморозка сохранила/.test(ciroStatus().t),'Циро говорит про заморозку');FRZ.saved=0;
+  addXP(5);e(S.streak===5,'после заморозки серия растёт дальше: '+S.streak);
+  __fresh({streak:4,lastDay:__d(-3)});drawHud();e(streakNow()===0&&frzLeft()===1,'два пропущенных дня одной заморозкой не спасти');
+  __fresh({streak:6,lastDay:__d(-1),frzGot:1,frzUsed:1});addXP(5);e(S.streak===7&&frzLeft()===1&&FRZ.got===1,'7 дней подряд — новая заморозка');FRZ.got=0;
+  __fresh({streak:13,lastDay:__d(-1),frzGot:2});addXP(5);e(frzLeft()===2&&S.frzGot===2,'больше двух не копится');
+  __fresh({streak:3,lastDay:__d(-3),frzGot:2});drawHud();e(streakNow()===3&&frzLeft()===0,'две заморозки спасают два дня');FRZ.saved=0;
+  __fresh({streak:0,lastDay:__d(-2)});drawHud();e(frzLeft()===1,'без серии заморозка не тратится');
+  __fresh({streak:4,lastDay:__d(-2)});route();document.querySelector('#hud-st').click();const sh=document.querySelector('.sheet');e(sh&&/Заморозка серии: 0 из 2/.test(sh.textContent)&&sh.querySelectorAll('.st-days .fz').length===1,'окно огонька показывает заморозку');
+  document.querySelector('[data-close]').click();FRZ.saved=0;return out});
 test('испорченные сохранения не ломают приложение (300 вариантов)',async()=>{const fails={};const junk=[null,undefined,0,-1,NaN,1e12,'x','',[],{},[1,2],{a:1},true,'<b>'];const rj=()=>junk[Math.random()*junk.length|0];
   const fields=['xp','daily','streak','lastDay','best','hearts','heartsTs','done','goal','ach','sound','unlockAll','read','perfect','games','phr','mem','outfit','theme','notif','hrs','miles','friends','refCode','voice','newsSeen','resetAt','ts','v'];
   const views=['learn','games','alphabet','rules','profile','phrases'];

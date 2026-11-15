@@ -6,7 +6,7 @@ const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
      2 — новый порядок букв (уроки ab1a…ab6w) и память повторений mem
      3 — номер версии v, слияние с облаком, отметка сброса resetAt */
 const SCHEMA=3;
-const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{}};
+const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},frzGot:1,frzUsed:0,frzDays:[]};
 const fresh=()=>Object.assign(JSON.parse(JSON.stringify(S0)),{heartsTs:Date.now()});
 const OLD_GROUPS=[['ա','ն','մ','ր','տ','ու','ս'],['ե','բ','վ','և','ի','կ','լ'],['հ','դ','գ','յ','ո','օ','շ'],['ք','թ','պ','փ','չ','ճ','ց','ծ'],['ժ','խ','ղ','ռ','ջ','ձ','զ'],['է','ը','ֆ']];   // шаги алфавита в схеме 1
 const MIGRATIONS={
@@ -57,6 +57,7 @@ function mergeState(a,b){
   m.ach=each(n.ach,o.ach,(x,y)=>x&&y?(x<y?x:y):x||y);
   m.miles=each(n.miles,o.miles,(x,y)=>x&&y?(x<y?x:y):x||y);
   m.hrs=each(n.hrs,o.hrs,num);
+  m.frzGot=num(n.frzGot,o.frzGot);m.frzDays=[...new Set([...(n.frzDays||[]),...(o.frzDays||[])].filter(x=>typeof x==='string'))].sort().slice(-60);m.frzUsed=Math.max(num(n.frzUsed,o.frzUsed),m.frzDays.length);
   m.phr=each(n.phr,o.phr,(x,y)=>each(x,y,num));
   m.games=each(n.games,o.games,(x,y,k)=>{if(!x||!y)return x||y;const low=gameLow(k),bx=x.best,by=y.best;
     return Object.assign({},y,x,{plays:num(x.plays,y.plays),best:bx==null?by:by==null?bx:low?Math.min(bx,by):Math.max(bx,by)})});
@@ -83,11 +84,21 @@ const daysBetween=(a,b)=>Math.round((new Date(b+'T12:00')-new Date(a+'T12:00'))/
 const streakNow=()=>S.lastDay&&daysBetween(S.lastDay,today())<=1?S.streak:0;
 const todayXP=()=>S.daily[today()]||0;
 function hearts(){if(S.hearts>=MAXH){S.heartsTs=Date.now();return MAXH}const n=Math.floor((Date.now()-S.heartsTs)/REGEN);if(n>0){S.hearts=Math.min(MAXH,S.hearts+n);S.heartsTs+=n*REGEN;save()}return S.hearts}
-function addXP(n){S.xp+=n;const t=today();S.daily[t]=(S.daily[t]||0)+n;
+function addXP(n){applyFreeze();S.xp+=n;const t=today();S.daily[t]=(S.daily[t]||0)+n;
   /* Часы перевели назад или сменился часовой пояс (последний день занятий «в будущем») — серию не трогаем */
   const gap=S.lastDay?daysBetween(S.lastDay,t):null;
-  if(gap===null||gap>1){S.streak=1;S.lastDay=t}else if(gap===1){S.streak++;S.lastDay=t}else if(!S.streak)S.streak=1;
+  if(gap===null||gap>1){S.streak=1;S.lastDay=t}else if(gap===1){S.streak++;S.lastDay=t;if(S.streak%7===0&&frzLeft()<FRZ_MAX){S.frzGot++;FRZ.got=1}}else if(!S.streak)S.streak=1;
   S.best=Math.max(S.best||0,S.streak);save()}
+/* Заморозка серии: пропущенный день не гасит огонёк. Одна есть у всех, новая — за каждые 7 дней подряд, держать можно две.
+   Считаются отдельно полученные и потраченные (frzGot/frzUsed): так копии с двух устройств сливаются без лишних заморозок.
+   Замороженные дни (frzDays) серию не увеличивают — она просто не прерывается. */
+const FRZ_MAX=2,FRZ={got:0,saved:0};   // got — новая заморозка за этот урок, saved — сколько дней спасено при этом входе
+const frzLeft=()=>Math.max(0,Math.min(FRZ_MAX,(S.frzGot|0)-(S.frzUsed|0)));
+function applyFreeze(){if(!S.lastDay||!S.streak)return 0;const t=today(),gap=daysBetween(S.lastDay,t),miss=gap-1;
+  if(miss<1||miss>frzLeft())return 0;
+  for(let i=1;i<=miss;i++){const d=new Date(S.lastDay+'T12:00');d.setDate(d.getDate()+i);S.frzDays.push(dstr(d))}
+  S.frzDays=S.frzDays.slice(-60);S.frzUsed=(S.frzUsed|0)+miss;
+  const y=new Date(t+'T12:00');y.setDate(y.getDate()-1);S.lastDay=dstr(y);FRZ.saved+=miss;save();return miss}
 const level=()=>Math.floor(S.xp/100)+1;
 const unlocked=i=>S.unlockAll||i===0||!!S.done[LESSONS[i].id]||LESSONS.slice(0,i).every(l=>S.done[l.id]);
 function checkAch(){const n=[];ACH.forEach(a=>{if(!S.ach[a.id]&&a.ok()){S.ach[a.id]=today();n.push(a)}});save();return n}

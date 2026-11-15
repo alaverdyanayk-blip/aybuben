@@ -144,7 +144,7 @@ function finishLesson(){
   $('#lprog').style.width='100%';
   const line=pick(prac?ENDLINE.prac:perfect?ENDLINE.perfect:LS.mistakes<=2?ENDLINE.good:ENDLINE.hard);
   if(!prac){S.hrs=S.hrs||{};const hh=new Date().getHours();S.hrs[hh]=(S.hrs[hh]||0)+1}
-  const mile=streakMile();if(!prac&&S.refBy&&!S.refClaimed)refClaim();save();syncU();
+  const mile=streakMile()+(FRZ.got?`<div class="unlock mile frz"><b>${IC.frost} Новая заморозка серии!</b><p style="margin:0">Если пропустишь день, огонёк не погаснет. Сейчас заморозок: ${frzLeft()} из ${FRZ_MAX}.</p></div>`:'');FRZ.got=0;if(!prac&&S.refBy&&!S.refClaimed)refClaim();save();syncU();
   $('#ex').innerHTML=`<div class="end"><span id="end-ciro">${mascot('cheer','m-jump')}</span><h2>${prac?'Тренировка окончена':perfect?'Урок без ошибок!':'Урок пройден!'}</h2>
    <div class="bubble">${line}${goalNow?`<p style="margin-top:6px;font-weight:700">Цель дня выполнена! Огонёк: ${streakNow()} ${plural(streakNow(),'день','дня','дней')}.</p>`:''}</div>
    ${mile}${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}

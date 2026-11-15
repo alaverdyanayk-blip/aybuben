@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="0fbb4d52e6"</script>
+<script>window.BUILD_ID="8b2184ac71"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -966,6 +966,22 @@ a.box.ch-row{flex-direction:row;align-items:center;gap:12px;padding:12px 14px;te
 .fact .ft{font-size:16px;line-height:1.4;font-weight:500}
 .fact .more{font-size:12.5px}
 .fact .mascot{width:64px;height:64px}
+/* Заморозка серии */
+button.pill{font:inherit;font-weight:800;cursor:pointer}
+.pill .fz{display:inline-flex;margin-left:-2px;color:var(--b3)}.pill .fz .i{width:13px;height:13px}
+.fzl{display:flex;align-items:center;gap:4px;margin-top:2px}.fzl .i{width:13px;height:13px;color:var(--b3)}
+.st-head{display:flex;align-items:center;gap:14px;font-weight:700;font-size:16px}
+.st-fl{display:flex;align-items:center;gap:4px;color:var(--accent);font-size:34px;font-weight:800}.st-fl .i{width:34px;height:34px}
+.st-days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px 6px}
+.st-days span{display:flex;flex-direction:column;align-items:center;gap:3px}
+.st-days i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--line)}
+.st-days .on i{background:var(--accent-soft,#FCE6CF);color:var(--accent)}
+.st-days .fz i{background:color-mix(in srgb,var(--b3) 18%,var(--surface));color:var(--b3)}
+.st-days .t i{outline:2px solid var(--ink);outline-offset:2px}
+.st-days .i{width:18px;height:18px}.st-days small{font-size:11px;color:var(--muted)}
+.st-frz{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--b3) 12%,var(--surface));border-radius:16px;padding:12px 14px}
+.st-frz .fzi{color:var(--b3)}.st-frz .fzi .i{width:28px;height:28px}.st-frz p{margin:4px 0 0;font-size:14px;line-height:1.4}
+.unlock.frz b{display:flex;align-items:center;gap:6px}.unlock.frz .i{color:var(--b3);width:20px;height:20px}
 </style>
 
 <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs>
@@ -1653,6 +1669,7 @@ const IC={
  eye:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
  crown:'<svg class="i" viewBox="0 0 24 24" fill="currentColor"><path d="m3 7 4.5 4L12 4l4.5 7L21 7l-2 12H5z"/></svg>',
  target:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>',
+ frost:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M4.2 6.5l15.6 11M4.2 17.5l15.6-11"/><path d="m9 3.5 3 2.5 3-2.5M9 20.5l3-2.5 3 2.5M3 10l3.6 1.5L5.5 15M21 10l-3.6 1.5 1.1 3.5"/></svg>',
  quill:'<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 4C10 5 6 11 5 19"/><path d="M5 19c4-1 9-4 11-9"/></svg>'
 };
 /* Циро: рисунок, настроения, наряды и костюмы, приветствие. */
@@ -2167,7 +2184,7 @@ const KEY='aybuben-v2',REGEN=30*60*1000,MAXH=5;
      2 — новый порядок букв (уроки ab1a…ab6w) и память повторений mem
      3 — номер версии v, слияние с облаком, отметка сброса resetAt */
 const SCHEMA=3;
-const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{}};
+const S0={v:SCHEMA,xp:0,daily:{},streak:0,lastDay:null,best:0,hearts:MAXH,heartsTs:0,done:{},goal:20,ach:{},sound:true,unlockAll:false,read:0,perfect:0,games:{},phr:{},mem:{},frzGot:1,frzUsed:0,frzDays:[]};
 const fresh=()=>Object.assign(JSON.parse(JSON.stringify(S0)),{heartsTs:Date.now()});
 const OLD_GROUPS=[['ա','ն','մ','ր','տ','ու','ս'],['ե','բ','վ','և','ի','կ','լ'],['հ','դ','գ','յ','ո','օ','շ'],['ք','թ','պ','փ','չ','ճ','ց','ծ'],['ժ','խ','ղ','ռ','ջ','ձ','զ'],['է','ը','ֆ']];   // шаги алфавита в схеме 1
 const MIGRATIONS={
@@ -2218,6 +2235,7 @@ function mergeState(a,b){
   m.ach=each(n.ach,o.ach,(x,y)=>x&&y?(x<y?x:y):x||y);
   m.miles=each(n.miles,o.miles,(x,y)=>x&&y?(x<y?x:y):x||y);
   m.hrs=each(n.hrs,o.hrs,num);
+  m.frzGot=num(n.frzGot,o.frzGot);m.frzDays=[...new Set([...(n.frzDays||[]),...(o.frzDays||[])].filter(x=>typeof x==='string'))].sort().slice(-60);m.frzUsed=Math.max(num(n.frzUsed,o.frzUsed),m.frzDays.length);
   m.phr=each(n.phr,o.phr,(x,y)=>each(x,y,num));
   m.games=each(n.games,o.games,(x,y,k)=>{if(!x||!y)return x||y;const low=gameLow(k),bx=x.best,by=y.best;
     return Object.assign({},y,x,{plays:num(x.plays,y.plays),best:bx==null?by:by==null?bx:low?Math.min(bx,by):Math.max(bx,by)})});
@@ -2244,11 +2262,21 @@ const daysBetween=(a,b)=>Math.round((new Date(b+'T12:00')-new Date(a+'T12:00'))/
 const streakNow=()=>S.lastDay&&daysBetween(S.lastDay,today())<=1?S.streak:0;
 const todayXP=()=>S.daily[today()]||0;
 function hearts(){if(S.hearts>=MAXH){S.heartsTs=Date.now();return MAXH}const n=Math.floor((Date.now()-S.heartsTs)/REGEN);if(n>0){S.hearts=Math.min(MAXH,S.hearts+n);S.heartsTs+=n*REGEN;save()}return S.hearts}
-function addXP(n){S.xp+=n;const t=today();S.daily[t]=(S.daily[t]||0)+n;
+function addXP(n){applyFreeze();S.xp+=n;const t=today();S.daily[t]=(S.daily[t]||0)+n;
   /* Часы перевели назад или сменился часовой пояс (последний день занятий «в будущем») — серию не трогаем */
   const gap=S.lastDay?daysBetween(S.lastDay,t):null;
-  if(gap===null||gap>1){S.streak=1;S.lastDay=t}else if(gap===1){S.streak++;S.lastDay=t}else if(!S.streak)S.streak=1;
+  if(gap===null||gap>1){S.streak=1;S.lastDay=t}else if(gap===1){S.streak++;S.lastDay=t;if(S.streak%7===0&&frzLeft()<FRZ_MAX){S.frzGot++;FRZ.got=1}}else if(!S.streak)S.streak=1;
   S.best=Math.max(S.best||0,S.streak);save()}
+/* Заморозка серии: пропущенный день не гасит огонёк. Одна есть у всех, новая — за каждые 7 дней подряд, держать можно две.
+   Считаются отдельно полученные и потраченные (frzGot/frzUsed): так копии с двух устройств сливаются без лишних заморозок.
+   Замороженные дни (frzDays) серию не увеличивают — она просто не прерывается. */
+const FRZ_MAX=2,FRZ={got:0,saved:0};   // got — новая заморозка за этот урок, saved — сколько дней спасено при этом входе
+const frzLeft=()=>Math.max(0,Math.min(FRZ_MAX,(S.frzGot|0)-(S.frzUsed|0)));
+function applyFreeze(){if(!S.lastDay||!S.streak)return 0;const t=today(),gap=daysBetween(S.lastDay,t),miss=gap-1;
+  if(miss<1||miss>frzLeft())return 0;
+  for(let i=1;i<=miss;i++){const d=new Date(S.lastDay+'T12:00');d.setDate(d.getDate()+i);S.frzDays.push(dstr(d))}
+  S.frzDays=S.frzDays.slice(-60);S.frzUsed=(S.frzUsed|0)+miss;
+  const y=new Date(t+'T12:00');y.setDate(y.getDate()-1);S.lastDay=dstr(y);FRZ.saved+=miss;save();return miss}
 const level=()=>Math.floor(S.xp/100)+1;
 const unlocked=i=>S.unlockAll||i===0||!!S.done[LESSONS[i].id]||LESSONS.slice(0,i).every(l=>S.done[l.id]);
 function checkAch(){const n=[];ACH.forEach(a=>{if(!S.ach[a.id]&&a.ok()){S.ach[a.id]=today();n.push(a)}});save();return n}
@@ -2358,8 +2386,16 @@ function seedMem(){/* идемпотентно: только добавляет 
 try{seedMem()}catch(e){}
 /* Шапка (серия, сердца, цель дня) и переключение разделов. */
 function ring(v,max){const p=Math.min(1,v/max),c=2*Math.PI*9;return `<svg class="ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle cx="12" cy="12" r="9" fill="none" stroke="var(--good)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 12 12)"/></svg>`}
-function drawHud(){const st=streakNow();
-  $('#hud').innerHTML=`<span class="pill flame ${S.lastDay===today()?'':'off'}" title="Серия дней">${IC.flame}${st}</span><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`}
+function drawHud(){applyFreeze();const st=streakNow(),fz=frzLeft();
+  $('#hud').innerHTML=`<button class="pill flame ${S.lastDay===today()?'':'off'}" id="hud-st" aria-label="Серия: ${st} ${plural(st,'день','дня','дней')}, заморозок ${fz}">${IC.flame}${st}${fz?`<i class="fz" aria-hidden="true">${IC.frost}</i>`:''}</button><span class="pill heart" title="Сердца">${IC.heart}${hearts()}</span><span class="pill" title="Цель дня: ${todayXP()} из ${S.goal} XP">${ring(todayXP(),S.goal)}<span class="gtxt">${todayXP()}/${S.goal}</span></span>`;
+  $('#hud-st').onclick=streakSheet}
+/* Окно серии: огонёк, рекорд, заморозки и последние две недели (занимался / заморожен / пропуск) */
+function streakSheet(){const st=streakNow(),fz=frzLeft(),fd=new Set(S.frzDays||[]);
+  const days=[...Array(14)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-13+i);const k=dstr(d);return {k,wd:'вспнвтсрчтптсб'.substr(d.getDay()*2,2),on:(S.daily[k]||0)>0,fz:fd.has(k),t:k===today()}});
+  sheet(`<div class="sheet-top"><b>Огонёк</b><button class="x" data-close aria-label="Закрыть">✕</button></div>
+   <div class="st-head"><span class="st-fl">${IC.flame}<b>${st}</b></span><div>${st?`${plural(st,'день','дня','дней')} подряд`:'Огонёк пока не горит'}<br><span class="note">Рекорд: ${S.best||0}</span></div></div>
+   <div class="st-days" role="img" aria-label="Последние две недели">${days.map(d=>`<span class="${d.on?'on':d.fz?'fz':''} ${d.t?'t':''}"><i>${d.fz&&!d.on?IC.frost:d.on?IC.flame:''}</i><small>${d.wd}</small></span>`).join('')}</div>
+   <div class="st-frz"><span class="fzi">${IC.frost}</span><div><b>Заморозка серии: ${fz} из ${FRZ_MAX}</b><p>Пропустил день — огонёк не погаснет, заморозка сработает сама. Новая — за каждые 7 дней подряд.</p></div></div>`)}
 const VIEWS={learn:renderLearn,games:renderGames,alphabet:renderAlphabet,rules:renderRules,profile:renderProfile,phrases:renderPhrases};
 /* Тема: S.theme = 'light' | 'dark' | 'auto' (или пусто) — как в системе / Телеграме. */
 function applyThemePref(){if(window.__applyTheme)return window.__applyTheme();const t=S.theme,el=document.documentElement;if(t==='light'||t==='dark')el.setAttribute('data-theme',t);else el.removeAttribute('data-theme')}
@@ -2371,6 +2407,7 @@ setInterval(drawHud,60000);
 const OFF=[0,48,72,48,0,-48,-72,-48];
 function ciroStatus(){const st=streakNow(),tx=todayXP(),left=Math.max(0,S.goal-tx),fresh=!S.xp&&!Object.keys(S.done).length;
   if(fresh)return {mood:'happy',t:'Я — Циро, армянский абрикос. Научу тебя читать и писать на литературном армянском. Начнём с первых букв?'};
+  if(FRZ.saved&&tx<S.goal)return {mood:'wow',t:`${FRZ.saved>1?`Тебя не было ${FRZ.saved} ${plural(FRZ.saved,'день','дня','дней')}`:'Вчера ты пропустил день'} — заморозка сохранила огонёк. ${frzLeft()?`Осталось заморозок: ${frzLeft()}.`:'Заморозок больше нет — сегодня урок обязателен!'}`};
   if(tx>=S.goal)return {mood:'cheer',t:st>=3?`Цель дня выполнена! ${st} ${plural(st,'день','дня','дней')} подряд — бабушка уже рассказала соседям. Ещё урок?`:`Цель дня выполнена!${st>1?` Огонёк горит ${st} ${plural(st,'день','дня','дней')}.`:''} Можно отдохнуть… или ещё урок?`};
   if(st>0&&S.lastDay!==today())return {mood:'wow',t:`Огонёк горит ${st} ${plural(st,'день','дня','дней')}. Один урок сегодня — и он не погаснет!`};
   if(S.lastDay&&daysBetween(S.lastDay,today())>=3)return {mood:'sad',t:'Соскучился! Долму пришлось доедать одному. Начнём с повторения?'};
@@ -2613,7 +2650,7 @@ function finishLesson(){
   $('#lprog').style.width='100%';
   const line=pick(prac?ENDLINE.prac:perfect?ENDLINE.perfect:LS.mistakes<=2?ENDLINE.good:ENDLINE.hard);
   if(!prac){S.hrs=S.hrs||{};const hh=new Date().getHours();S.hrs[hh]=(S.hrs[hh]||0)+1}
-  const mile=streakMile();if(!prac&&S.refBy&&!S.refClaimed)refClaim();save();syncU();
+  const mile=streakMile()+(FRZ.got?`<div class="unlock mile frz"><b>${IC.frost} Новая заморозка серии!</b><p style="margin:0">Если пропустишь день, огонёк не погаснет. Сейчас заморозок: ${frzLeft()} из ${FRZ_MAX}.</p></div>`:'');FRZ.got=0;if(!prac&&S.refBy&&!S.refClaimed)refClaim();save();syncU();
   $('#ex').innerHTML=`<div class="end"><span id="end-ciro">${mascot('cheer','m-jump')}</span><h2>${prac?'Тренировка окончена':perfect?'Урок без ошибок!':'Урок пройден!'}</h2>
    <div class="bubble">${line}${goalNow?`<p style="margin-top:6px;font-weight:700">Цель дня выполнена! Огонёк: ${streakNow()} ${plural(streakNow(),'день','дня','дней')}.</p>`:''}</div>
    ${mile}${levelUps(lvBefore)}${PL&&PL.n===2&&phFirst?costumeUnlock(PL.id):''}
@@ -2914,7 +2951,7 @@ function renderProfile(){
   const W=320,H=140,bw=30,gap=(W-40-bw*7)/6,yS=v=>H-24-(v/mx)*(H-44);
   const wd=['вс','пн','вт','ср','чт','пт','сб'];
   const chart=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="XP за последние 7 дней"><line x1="20" x2="${W-20}" y1="${yS(S.goal)}" y2="${yS(S.goal)}" stroke="var(--accent)" stroke-dasharray="4 4"/><text x="${W-20}" y="${yS(S.goal)-5}" text-anchor="end" font-size="10" fill="var(--accent)">цель ${S.goal}</text>
-   ${vals.map((v,i)=>{const x=20+i*(bw+gap),y=yS(v);return `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(0,H-24-y)}" rx="6" fill="${v>=S.goal?'var(--good)':'var(--b3)'}" opacity="${v?1:.25}"/>${v?`<text x="${x+bw/2}" y="${y-4}" text-anchor="middle" font-size="10" fill="var(--ink)">${v}</text>`:''}<text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${wd[days[i].getDay()]}</text>`}).join('')}</svg>`;
+   ${vals.map((v,i)=>{const x=20+i*(bw+gap),y=yS(v);return `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(0,H-24-y)}" rx="6" fill="${v>=S.goal?'var(--good)':'var(--b3)'}" opacity="${v?1:.25}"/>${v?`<text x="${x+bw/2}" y="${y-4}" text-anchor="middle" font-size="10" fill="var(--ink)">${v}</text>`:(S.frzDays||[]).includes(dstr(days[i]))?`<text x="${x+bw/2}" y="${H-30}" text-anchor="middle" font-size="14" fill="var(--b3)">❄</text>`:''}<text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${wd[days[i].getDay()]}</text>`}).join('')}</svg>`;
   const doneL=LESSONS.filter(l=>S.done[l.id]).length;
   const lv=level(),into=S.xp%100;
   $('#view').innerHTML=`<div style="display:flex;flex-direction:column;gap:16px">
@@ -2925,7 +2962,7 @@ function renderProfile(){
     ${wrGroup('fr','За друзей',REFC.map(refOwned),REFC.some(c=>c.id===S.outfit),`${REFC.map(c=>{const op=refOwned(c),on=S.outfit===c.id;return `<button class="wr-item ${on?'on':''}" data-o="${c.id}" ${op?'':'disabled'} aria-pressed="${on}">${mascot('happy','',c.id)}<b>${c.t}</b><span>${op?c.d:c.n?`${c.n} ${plural(c.n,'друг','друга','друзей')} пройдут первый урок`:'Если пришёл по приглашению'}</span></button>`}).join('')}`)}</div>
    </div></div>
    <div class="cards">
-    <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div></div></div>
+    <div class="card"><span style="color:var(--accent)">${IC.flame}</span><div><div class="v">${streakNow()}</div><div class="l">${plural(streakNow(),'день','дня','дней')} подряд · рекорд ${S.best||0}</div><div class="l fzl">${IC.frost} заморозок: ${frzLeft()} из ${FRZ_MAX}</div></div></div>
     <div class="card"><span style="color:var(--gold-deep)">${IC.bolt}</span><div><div class="v">${S.xp}</div><div class="l">всего XP</div></div></div>
     <div class="card"><span style="color:var(--b1)">${IC.crown}</span><div><div class="v">${level()}</div><div class="l">уровень · до следующего ${100-S.xp%100} XP</div></div></div>
     <div class="card"><span style="color:var(--b2)">${IC.book}</span><div><div class="v">${doneL}/${LESSONS.length}</div><div class="l">уроков пройдено</div></div></div>
