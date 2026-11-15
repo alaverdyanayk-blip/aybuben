@@ -7,7 +7,7 @@ function placeItems(){const items=[];
   GROUPS.forEach((g,i)=>{const n=i+1,grp=LETTERS.filter(l=>l.L===n),lp=lettersUpTo(n),pool=wordsUpTo(n),fresh=pool.filter(w=>w.L===n);
     const ls=sample(grp,3);while(ls.length<3)ls.push(pick(grp));
     const q=[qL2S(ls[0],lp,true),qS2L(ls[1],lp,true),qL2S(ls[2],lp,true)];
-    const w=pick(fresh.length?fresh:pool);if(w)q.push(qRead(w,pool));else q.push(qS2L(pick(grp),lp,true));
+    const w=pick(fresh.length?fresh:pool);if(w)q.push(qSay(w));else q.push(qS2L(pick(grp),lp,true));
     q.forEach(x=>{x.step=n;delete x.item;items.push(x)})});
   return items}
 function startPlacement(){if($('#lesson'))return;track('place','start');

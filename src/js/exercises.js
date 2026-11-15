@@ -22,6 +22,23 @@ function senses(m){const out=new Set(m.toLowerCase().split(/[,;]/).map(x=>x.repl
 function clash(a,b){if(a===b)return true;const A=senses(a);for(const x of senses(b))if(A.has(x))return true;return false}
 function pairsOf(ws,n){const out=[],ms=[];for(const w of shuffle(ws)){if(out.length>=n)break;if(ms.some(m=>clash(m,w.m)))continue;ms.push(w.m);out.push([w.a,w.m])}return out}
 function qRead(w,pool,strict){const wr=uniq(shuffle(strict||pool.length>=6?pool:WORDS).filter(x=>!clash(x.m,w.m)).map(x=>x.m)).slice(0,3);return CH('Что значит это слово?',w.a,w.m,wr,{item:w.a,bigCls:'word',tag:'read',explain:`читается «${esc(w.r)}»`,after:bd(w.a)})}
+/* Новое слово — сначала проверяем только чтение: варианты произношения отличаются одним звуком
+   (тʰ/т, рр/р, звонкая/глухая, похожие буквы). Значение показывается после ответа; спрашивать его будем,
+   когда слово уже встречалось. Так понятно и тем, кто армянский на слух не знает. */
+const SAYSUB={'тʰ':['т','д'],'т':['тʰ','д'],'д':['т','тʰ'],'кʰ':['к','г'],'к':['кʰ','г'],'г':['к','кʰ'],'пʰ':['п','б'],'п':['пʰ','б'],'б':['п','пʰ'],
+  'чʰ':['ч','дж'],'ч':['чʰ','дж'],'дж':['ч','чʰ'],'цʰ':['ц','дз'],'ц':['цʰ','дз'],'дз':['ц','цʰ'],'рр':['р'],'р':['рр','л'],'гъ':['х','г'],'х':['гъ','һ'],'һ':['х','и'],
+  'з':['с','ж'],'с':['з','ш'],'ж':['ш','з'],'ш':['ж','ч'],'в':['ф','у'],'ф':['в','п'],'л':['н','р'],'н':['л','м'],'м':['н','с'],'е':['э','и'],'э':['е','ы'],'и':['ы','е'],'ы':['и','э'],'о':['у','а'],'у':['о','в'],'а':['о','ы'],'й':['и','в']};
+function sayOpts(w){const t=w.r.match(/тʰ|кʰ|пʰ|чʰ|цʰ|рр|дж|дз|гъ|./gu)||[],out=[],r=w.r;
+  shuffle(t.map((_,i)=>i)).forEach(i=>{const sub=SAYSUB[t[i]];if(!sub)return;for(const x of shuffle(sub)){const c=[...t.slice(0,i),x,...t.slice(i+1)].join('');if(c!==r&&!out.includes(c)){out.push(c);break}}});
+  if(out.length<3)WORDS.filter(x=>x.r!==r&&Math.abs(x.r.length-r.length)<=1).forEach(x=>{if(out.length<3&&!out.includes(x.r))out.push(x.r)});
+  return shuffle(out).slice(0,3)}
+function qSay(w){return CH('Как читается это слово?',w.a,`«${w.r}»`,sayOpts(w).map(x=>`«${x}»`),{item:w.a,bigCls:'word',tag:'read',explain:`<b>${esc(w.a)}</b> — ${esc(w.m)}`,after:bd(w.a)})}
+/* Слово уже встречалось — помнит ли его память повторений (или оно было раньше в этом же уроке) */
+const metWord=(w,also)=>Array.isArray(S.mem[w.a])||!!(also&&also.has(w.a));
+const qWord=(w,pool,strict,also)=>metWord(w,also)?qRead(w,pool,strict):qSay(w);
+/* Пары: со знакомыми словами — слово ↔ перевод, с новыми — слово ↔ как звучит */
+function wordPairs(ws,n,also){const met=ws.filter(w=>metWord(w,also));if(met.length>=n)return MT(pairsOf(met,n));
+  const out=[],rs=[];for(const w of shuffle(ws)){if(out.length>=n)break;if(rs.includes(w.r))continue;rs.push(w.r);out.push([w.a,w.r])}return MT(out)}
 function qWrite(w,pool){const wr=uniq(shuffle(pool.length>=6?pool:WORDS).filter(x=>x.a!==w.a&&!clash(x.m,w.m)).map(x=>x.a)).slice(0,3);return CH(`Как пишется «${w.m}»?`,w.r,w.a,wr,{item:w.a,bigCls:'snd',optArm:true,explain:`<span class="a">${esc(w.a)}</span> — ${esc(w.m)}`})}
 const sameSound=w=>{const n=x=>x.toLowerCase().replace(/\(.*?\)/g,'').replace(/[ʰ\s]/g,'').replace(/һ/g,'х').replace(/ё/g,'е').trim();return n(w.r)===n(w.m)};
 function qBuildWord(w,lp){const extra=sample(lp.filter(l=>!w.u.includes(l.k)),2).map(l=>l.k);return {type:'build',prompt:'Напишите армянскими буквами',sub:sameSound(w)?w.m:`${w.m} — звучит «${w.r}»`,tiles:[...w.u,...extra],answers:[w.u],joiner:'',letters:true,show:w.a,tag:'read',item:w.a}}
@@ -39,7 +56,7 @@ function genLetters(group){
     shuffle(group).forEach(l=>items.push(Math.random()<.5?qS2L(l,pool,true):qL2S(l,pool,true)));
     const cm=caseMatch(group,pool);if(cm)items.push(cm);const cl=group.filter(caseable);if(cl.length)items.push(qCase(pick(cl),pool));
     const okW=WORDS.filter(w=>readable(w,known)),ws=okW.filter(w=>w.u.some(u=>group.some(g=>g.k===u)));
-    if(okW.length>=3){sample(ws,2).forEach(w=>items.push(qRead(w,okW,true)));
+    if(okW.length>=3){sample(ws,2).forEach(w=>items.push(qWord(w,okW,true)));
       sample(ws.filter(w=>hasAudio(w.a)),1).forEach(w=>items.push(qListen(w,okW,true)))}
     return items}
 }
@@ -49,13 +66,13 @@ function genWords(n){
   return ()=>{const pool=wordsUpTo(n),fresh=pool.filter(w=>w.L===n),lp=lettersUpTo(n);
     const pickW=k=>{const a=sample(fresh,Math.ceil(k*.6));return uniq([...a,...sample(pool,k)]).slice(0,k)};
     const items=[];
-    items.push(MT(pairsOf(pool,4)));
-    pickW(2).forEach(w=>items.push(qRead(w,pool)));
+    const seen=new Set();items.push(wordPairs(pool,4));
+    pickW(2).forEach(w=>{items.push(qWord(w,pool));seen.add(w.a)});
     pickW(1).forEach(w=>items.push(qWrite(w,pool)));
     sample(pool.filter(w=>hasAudio(w.a)),2).forEach(w=>items.push(qListen(w,pool)));
     const da=pickW(5).filter(w=>hasAudio(w.a)&&w.u.length<=8).slice(0,2);da.forEach(w=>items.push(qDict(w,lp)));
     pickW(3).filter(w=>w.u.length<=8&&!da.includes(w)).slice(0,2).forEach(w=>items.push(qBuildWord(w,lp)));
-    items.push(MT(pairsOf(pool,5)));
+    items.forEach(x=>{if(x.item&&x.type!=='match')seen.add(x.item)});items.push(wordPairs(pool,5,seen));
     return [items[0],...shuffle(items.slice(1,-1)),items[items.length-1]]}
 }
 function vocabCard(ws){return `<p>Новые слова этого урока. Прочитайте каждое вслух, потом проверим.</p><div class="tw"><table class="vtab">${ws.map(w=>`<tr><td class="a">${esc(w.a)}</td><td>${spk(w.a,'sm')}</td><td class="vr">${esc(w.r)}</td><td>${esc(w.m)}</td></tr>`).join('')}</table></div>`}

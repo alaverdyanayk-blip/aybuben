@@ -116,6 +116,15 @@ test('тест на уровень: всё верно — весь алфави�
   if(!a||b||!/Знаете/.test(t))out.push('ошибки на шаге 3: '+t+' 1–2:'+a+' дальше:'+b);if(S.hearts!==MAXH)out.push('потрачены сердца: '+S.hearts);
   __fresh({done:{ab5a:1,h1:1}});run(1);if(!S.done.ab5a||!S.done.h1)out.push('стёрт прежний прогресс');if(!/Начнём/.test(document.body.textContent+'Начнём'))out.push('?');
   __fresh();location.hash='learn';route();if(!document.querySelector('#place'))out.push('нет кнопки у новичка');return out});
+test('новые слова: сначала «как читается», значение — когда слово уже встречалось; пары с новыми — по звучанию',()=>{const out=[];
+  __fresh();const L=LESSONS.filter(l=>/^ab\dw$/.test(l.id)||/^ab\d[ab]$/.test(l.id));
+  for(let k=0;k<20;k++)for(const l of L){const it=l.gen();
+    it.forEach((x,i)=>{const before=new Set(it.slice(0,i).map(y=>y.item).filter(Boolean));if(x.prompt==='Что значит это слово?')out.push(l.id+': спрашивает значение нового слова '+x.big);
+      if(x.prompt==='Как читается это слово?'){const ok=x.options.filter(o=>o===x.correct).length===1&&x.options.length===4&&new Set(x.options).size===4;if(!ok)out.push(l.id+': варианты чтения '+x.options.join(','))}
+      if(x.type==='match'&&!/^ab\d[ab]$/.test(l.id)&&x.pairs.some(p=>{const w=WORDS.find(v=>v.a===p[0]);return w&&w.r!==w.m&&p[1]===w.m&&!S.mem[w.a]&&!before.has(w.a)}))out.push(l.id+': пара с переводом нового слова')})}
+  const w=WORDS.find(x=>x.a==='տուն');S.mem[w.a]=[2,nowS()];if(qWord(w,WORDS).prompt!=='Что значит это слово?')out.push('встреченное слово не спрашивает значение');
+  for(const x of WORDS){const o=sayOpts(x);if(o.length<3||o.includes(x.r))out.push('мало вариантов: '+x.a);if(out.length>12)break}
+  return [...new Set(out)].slice(0,12)});
 test('испорченные сохранения не ломают приложение (300 вариантов)',async()=>{const fails={};const junk=[null,undefined,0,-1,NaN,1e12,'x','',[],{},[1,2],{a:1},true,'<b>'];const rj=()=>junk[Math.random()*junk.length|0];
   const fields=['xp','daily','streak','lastDay','best','hearts','heartsTs','done','goal','ach','sound','unlockAll','read','perfect','games','phr','mem','outfit','theme','notif','hrs','miles','friends','refCode','voice','newsSeen','resetAt','ts','v'];
   const views=['learn','games','alphabet','rules','profile','phrases'];

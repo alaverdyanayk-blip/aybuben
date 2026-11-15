@@ -72,9 +72,9 @@ function renderChoice(ex,box){
 }
 const ARMRE=/[\u0531-\u0587]/;
 function preSay(ex){if(ex.listen)return null;if(!ARMRE.test(ex.big)||ex.big.includes('___'))return null;
-  if(/^Как это читается|^Как сказать на литературном|^Добавьте артикль|^Сделайте множественное|^Где ударение|^Какой знак|^Что значит знак/.test(ex.prompt))return null;
+  if(/^Как это читается|^Как читается это слово|^Как сказать на литературном|^Добавьте артикль|^Сделайте множественное|^Где ударение|^Какой знак|^Что значит знак/.test(ex.prompt))return null;
   return hasAudio(ex.big)?ex.big:null}
-function postSay(ex){if(ex.listen)return ex.listen;if(ex.type==='build')return ex.show;
+function postSay(ex){if(ex.listen)return ex.listen;if(/^Как читается это слово/.test(ex.prompt)&&hasAudio(ex.big))return ex.big;if(ex.type==='build')return ex.show;
   if(ex.optArm&&hasAudio(ex.correct))return ex.correct;
   if(ex.big&&ex.big.includes('___')){const f=ex.big.replace('___',ex.correct);if(hasAudio(f))return f}
   if(ex.big&&hasAudio(ex.big))return ex.big;return null}
