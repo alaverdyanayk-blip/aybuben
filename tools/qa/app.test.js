@@ -99,7 +99,7 @@ test('заморозка серии: спасает пропуск, тратит
   document.querySelector('[data-close]').click();FRZ.saved=0;return out});
 test('карточки достижений рисуются для всех; из профиля открывается окно с картинкой',async()=>{const out=[];__fresh({xp:120,done:{ab1a:1}});
   for(const a of ACH){try{const c=await drawAchCard(a);if(c.width!==1080||c.height!==1350)out.push(a.id+': размер')}catch(e){out.push(a.id+': '+e.message)}if(!a.b)out.push(a.id+': нет текста для карточки')}
-  S.ach={first:today()};location.hash='profile';route();const b=document.querySelector('[data-ach="first"]');if(!b)return out.concat('нет кнопки достижения');
+  S.ach={first:today()};location.hash='profile';route();$('#pf-go-ach').click();const b=document.querySelector('.sheet [data-ach="first"]');if(!b)return out.concat('нет кнопки достижения');
   if(document.querySelector('[data-ach="abc"]'))out.push('неполученное достижение открывается');
   b.click();for(let i=0;i<40&&!document.querySelector('.sh-card img');i++)await new Promise(r=>setTimeout(r,100));
   const img=document.querySelector('.sh-card img');if(!img||!/^data:image\/jpeg/.test(img.src))out.push('нет картинки в окне');
@@ -154,7 +154,9 @@ test('задания дня: урок, слова на слух, игра; су�
   e(!dqClaim(),'сундучок открылся раньше времени');dqAdd('g');const x=S.xp;e(dqClaim()&&S.xp===x+DQ_XP,'сундучок не дал XP');e(!dqClaim()&&S.xp===x+DQ_XP,'сундучок открылся дважды');
   S.dq.d='2000-01-01';e(dq().l===0&&!dq().c,'новый день не сбросил задания');
   const m=mergeState({v:3,ts:1,dq:{d:'2026-11-15',l:1,h:3,g:0,c:0}},{v:3,ts:2,dq:{d:'2026-11-15',l:0,h:7,g:1,c:0}});e(m.dq.l===1&&m.dq.h===7&&m.dq.g===1,'слияние заданий');
-  location.hash='profile';route();e(document.querySelector('.pf-head'),'нет шапки профиля');const d=$('#pf-wr');e(d&&!d.open,'гардероб открыт сразу');$('#pf-go-wr').click();e(d.open,'кнопка «Гардероб» не открывает');
+  location.hash='profile';route();e(document.querySelector('.pf-head'),'нет шапки профиля');e(!document.querySelector('#view .wr-item'),'гардероб остался на странице');$('#pf-go-wr').click();const wi=document.querySelector('.sheet .wr-item[data-o="glasses"]');e(wi,'гардероб не открылся в шторке');
+  if(wi){S.xp=Math.max(S.xp,150);document.querySelector('[data-close]').click();route();$('#pf-go-wr').click();document.querySelector('.sheet .wr-item[data-o="glasses"]').click();e(S.outfit==='glasses'&&document.querySelector('.sheet .wr-item[data-o="glasses"]').classList.contains('on'),'костюм из шторки не надевается')}
+  document.querySelectorAll('[data-close]').forEach(x=>x.click());
   __fresh({xp:50,done:{ab1a:1}});location.hash='stories';route();e(document.querySelector('.st-lock .st-ring')&&document.querySelectorAll('.st-tc').length>=2,'нет витрины историй');
   location.hash='alphabet';route();e(document.querySelectorAll('.abc-map .at').length===LETTERS.length,'на карте не 39 букв');document.querySelector('.abc-map .at').click();e(document.querySelector('.sheet #cv-tr'),'буква на карте не открывается');document.querySelector('[data-close]').click();
   location.hash='learn';return out});
