@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const U=process.env.QA_URL||'http://localhost:8765/index.html';
 const T=[];const test=(name,fn)=>T.push({name,fn});
 
-async function page(b,{st=null,search='',hash='',sp='',serverOn=false,write=true,slowFirstU=0}={}){let srv=serverOn,nU=0;
+async function page(b,{st=null,search='',hash='',sp='',serverOn=false,write=true,slowFirstU=0,cloud=null}={}){let srv=serverOn,nU=0;
   const p=await b.newPage({viewport:{width:390,height:844}});p.errs=[];p.calls=[];p.on('pageerror',e=>p.errs.push(e.message));
   await p.route(/googleapis|gstatic/,r=>r.fulfill({body:''}));
   await p.route(/workers\.dev/,r=>{const u=r.request().url(),body=r.request().postData()||'';const path=u.split('.dev')[1].split('?')[0];let j={};try{j=JSON.parse(body)}catch(e){}p.calls.push([path,j]);
@@ -12,7 +12,7 @@ async function page(b,{st=null,search='',hash='',sp='',serverOn=false,write=true
     if(path==='/u'){nU++;const reply=JSON.stringify({ok:true,on:j.notif?(srv=!!j.notif.on):srv,hour:null,freq:1});   // сервер помнит настройку, как настоящий
       if(nU===1&&slowFirstU)return setTimeout(()=>r.fulfill({contentType:'application/json',body:reply}),slowFirstU);return r.fulfill({contentType:'application/json',body:reply})}
     r.fulfill({contentType:'application/json',body:'{"ok":true}'})});
-  await p.route('**/telegram-web-app.js',r=>r.fulfill({contentType:'application/javascript',body:`window.__tg=[];window.__cloud={};
+  await p.route('**/telegram-web-app.js',r=>r.fulfill({contentType:'application/javascript',body:`window.__tg=[];window.__cloud=${cloud?JSON.stringify({aybuben_n:'1',aybuben_0:JSON.stringify(cloud)}):'{}'};
     window.Telegram={WebApp:{initData:'user=%7B%22id%22%3A1%7D&hash=x',initDataUnsafe:{user:{id:1},start_param:${JSON.stringify(sp)}},colorScheme:'dark',platform:'ios',version:'8.0',
       ready(){},expand(){},onEvent(){},offEvent(){},setHeaderColor(){},setBackgroundColor(){},setBottomBarColor(){},disableVerticalSwipes(){},isVersionAtLeast:()=>true,
       CloudStorage:{setItem(k,v,cb){__cloud[k]=v;cb&&cb(null,true)},getItem(k,cb){cb(null,__cloud[k]||'')},getItems(ks,cb){const o={};ks.forEach(k=>o[k]=__cloud[k]||'');cb(null,o)},getKeys(cb){cb(null,Object.keys(__cloud))},removeItems(ks,cb){ks.forEach(k=>delete __cloud[k]);cb&&cb(null,true)},removeItem(k,cb){delete __cloud[k];cb&&cb(null,true)}},
@@ -75,6 +75,12 @@ test('ссылка на канал открывается внутри Теле�
 test('прогресс сохраняется в облако Телеграма',async b=>{const p=await page(b);const out=[];await p.evaluate(()=>{startLesson(LESSONS[0],false);return __solveAll()});await p.evaluate(()=>closeLesson());await p.waitForTimeout(2500);
   const c=await p.evaluate(()=>{const k=Object.keys(__cloud);return k.map(x=>x+':'+String(__cloud[x]).length)});if(!c.length)out.push('в облако ничего не записано');
   const has=await p.evaluate(()=>Object.values(__cloud).join('').includes('ab1a'));if(!has)out.push('пройденного урока нет в облаке: '+c.join(', '));return out.concat(p.errs)});
+test('заморозка: не тратится, если облако говорит, что вчера занимались на другом устройстве; тратится, если правда пропустил',async b=>{const out=[];
+  let p=await page(b,{st:{v:3,xp:100,done:{ab1a:1},streak:4,best:4,lastDay:d(-2),ts:1},cloud:{v:3,xp:120,done:{ab1a:1},streak:5,best:5,lastDay:d(-1),ts:2}});
+  let r=await p.evaluate(()=>({used:S.frzUsed|0,st:streakNow(),last:S.lastDay}));if(r.used!==0||r.st!==5)out.push('сгорела зря: '+JSON.stringify(r));await p.close();
+  p=await page(b,{st:{v:3,xp:100,done:{ab1a:1},streak:4,best:4,lastDay:d(-2),ts:2},cloud:{v:3,xp:100,done:{ab1a:1},streak:4,best:4,lastDay:d(-2),ts:1}});
+  r=await p.evaluate(()=>({used:S.frzUsed|0,st:streakNow(),last:S.lastDay}));if(r.used!==1||r.st!==4)out.push('не сработала: '+JSON.stringify(r));
+  out.push(...p.errs);await p.close();return out});
 test('приглашение: метка друга из start_param запоминается у новичка',async b=>{const p=await page(b,{sp:'rabc123def'});const r=await p.evaluate(()=>S.refBy);return (r==='abc123def'?[]:['refBy='+r]).concat(p.errs)});
 
 test('айфон: двойное касание «Проверить» не проскакивает объяснение',async b=>{const {devices}=require('playwright');const ctx=await b.newContext({...devices['iPhone 13']});const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));

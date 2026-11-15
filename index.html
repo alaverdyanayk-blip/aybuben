@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="927f2e05b8"</script>
+<script>window.BUILD_ID="ca2441e4b8"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -2308,7 +2308,10 @@ function addXP(n){applyFreeze();S.xp+=n;const t=today();S.daily[t]=(S.daily[t]||
    Замороженные дни (frzDays) серию не увеличивают — она просто не прерывается. */
 const FRZ_MAX=2,FRZ={got:0,saved:0};   // got — новая заморозка за этот урок, saved — сколько дней спасено при этом входе
 const frzLeft=()=>Math.max(0,Math.min(FRZ_MAX,(S.frzGot|0)-(S.frzUsed|0)));
-function applyFreeze(){if(!S.lastDay||!S.streak)return 0;const t=today(),gap=daysBetween(S.lastDay,t),miss=gap-1;
+/* Пока не ответило облако Телеграма, заморозку не трогаем: вдруг вчера занимались на другом устройстве */
+{const W=window.Telegram&&Telegram.WebApp;if(W&&W.initData&&W.CloudStorage&&W.isVersionAtLeast&&W.isVersionAtLeast('6.9')){window.__cloudPending=true;
+  setTimeout(()=>{if(window.__cloudPending){window.__cloudPending=false;if(applyFreeze())route()}},6000)}}   // облако молчит — решаем по своей копии
+function applyFreeze(){if(!S.lastDay||!S.streak||window.__cloudPending)return 0;const t=today(),gap=daysBetween(S.lastDay,t),miss=gap-1;
   if(miss<1||miss>frzLeft())return 0;
   for(let i=1;i<=miss;i++){const d=new Date(S.lastDay+'T12:00');d.setDate(d.getDate()+i);S.frzDays.push(dstr(d))}
   S.frzDays=S.frzDays.slice(-60);S.frzUsed=(S.frzUsed|0)+miss;
@@ -3188,7 +3191,7 @@ async function achShare(id){const a=ACH.find(v=>v.id===id);if(!a||!S.ach[id])ret
     if(TGW&&TGW.openTelegramLink)TGW.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(SHARE_TEXT(a)));
     else if(navigator.share)navigator.share({text:SHARE_TEXT(a),url:link}).catch(()=>{});
     else{try{await navigator.clipboard.writeText(SHARE_TEXT(a)+' '+link);go.textContent='Текст скопирован'}catch(e){}}};
-  sv.onclick=()=>{if(TGW){note.hidden=false;note.textContent='Нажмите на картинку и удерживайте — появится «Сохранить изображение».';return}
+  sv.onclick=()=>{note.hidden=false;note.textContent='Если файл не скачался — нажмите на картинку и удерживайте, появится «Сохранить изображение».';if(TGW)return;
     const l=document.createElement('a');l.href=url;l.download=`aybuben-${a.id}.jpg`;document.body.appendChild(l);l.click();l.remove()}}
 /* Тест на уровень: для тех, кто уже знает часть букв. Идёт по шагам алфавита (6 шагов), на каждом
    три вопроса по буквам и одно слово. Шаг засчитан, если ошибок не больше одной; на первом незачтённом шаге тест
@@ -3214,7 +3217,8 @@ function finishPlacement(){LS.state='end';const k=placeLevel(LS.lesson.place.res
   let marked=0;
   LESSONS.forEach(l=>{const m=/^ab(\d)[abw]$/.exec(l.id);if(m&&+m[1]<=k&&!S.done[l.id]){S.done[l.id]=1;marked++}});
   S.placed=Math.max(S.placed||0,k);if(marked){seedMem()}
-  addXP(10);const newA=checkAch();save();syncU();track('place',String(k));
+  /* XP только за первый тест: пересдача не копит очки */
+  if(!S.placedOnce){S.placedOnce=1;addXP(10)}const newA=checkAch();save();syncU();track('place',String(k));
   const nL=LETTERS.filter(l=>l.L<=k).length,nxt=LESSONS.find((l,i)=>unlocked(i)&&!S.done[l.id]);
   const head=k===GROUPS.length?'Весь алфавит — ваш!':k?`Знаете ${nL} ${plural(nL,'букву','буквы','букв')} из ${LETTERS.length}`:'Начнём с самого начала';
   const line=k===GROUPS.length?'Ни одна буква вас не смутила. Дальше — правила чтения: там прячутся звуки, которых нет на письме.':
@@ -3298,7 +3302,7 @@ route();
   };
   // При входе: копия из облака сливается с копией на устройстве (ничего не теряется), результат сохраняется в обе стороны
   window.__cloudPending=true;
-  var ready=function(){window.__cloudPending=false};
+  var ready=function(){if(!window.__cloudPending)return;window.__cloudPending=false;try{if(window.applyFreeze&&applyFreeze())route()}catch(x){}};
   setTimeout(ready,5000);                              // облако молчит — работаем с локальной копией
   CS.getItem(P+'n',function(err,n){
     n=+n;if(err){ready();return}

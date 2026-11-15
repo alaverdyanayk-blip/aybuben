@@ -94,7 +94,10 @@ function addXP(n){applyFreeze();S.xp+=n;const t=today();S.daily[t]=(S.daily[t]||
    Замороженные дни (frzDays) серию не увеличивают — она просто не прерывается. */
 const FRZ_MAX=2,FRZ={got:0,saved:0};   // got — новая заморозка за этот урок, saved — сколько дней спасено при этом входе
 const frzLeft=()=>Math.max(0,Math.min(FRZ_MAX,(S.frzGot|0)-(S.frzUsed|0)));
-function applyFreeze(){if(!S.lastDay||!S.streak)return 0;const t=today(),gap=daysBetween(S.lastDay,t),miss=gap-1;
+/* Пока не ответило облако Телеграма, заморозку не трогаем: вдруг вчера занимались на другом устройстве */
+{const W=window.Telegram&&Telegram.WebApp;if(W&&W.initData&&W.CloudStorage&&W.isVersionAtLeast&&W.isVersionAtLeast('6.9')){window.__cloudPending=true;
+  setTimeout(()=>{if(window.__cloudPending){window.__cloudPending=false;if(applyFreeze())route()}},6000)}}   // облако молчит — решаем по своей копии
+function applyFreeze(){if(!S.lastDay||!S.streak||window.__cloudPending)return 0;const t=today(),gap=daysBetween(S.lastDay,t),miss=gap-1;
   if(miss<1||miss>frzLeft())return 0;
   for(let i=1;i<=miss;i++){const d=new Date(S.lastDay+'T12:00');d.setDate(d.getDate()+i);S.frzDays.push(dstr(d))}
   S.frzDays=S.frzDays.slice(-60);S.frzUsed=(S.frzUsed|0)+miss;

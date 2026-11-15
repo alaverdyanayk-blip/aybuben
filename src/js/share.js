@@ -58,5 +58,5 @@ async function achShare(id){const a=ACH.find(v=>v.id===id);if(!a||!S.ach[id])ret
     if(TGW&&TGW.openTelegramLink)TGW.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(SHARE_TEXT(a)));
     else if(navigator.share)navigator.share({text:SHARE_TEXT(a),url:link}).catch(()=>{});
     else{try{await navigator.clipboard.writeText(SHARE_TEXT(a)+' '+link);go.textContent='Текст скопирован'}catch(e){}}};
-  sv.onclick=()=>{if(TGW){note.hidden=false;note.textContent='Нажмите на картинку и удерживайте — появится «Сохранить изображение».';return}
+  sv.onclick=()=>{note.hidden=false;note.textContent='Если файл не скачался — нажмите на картинку и удерживайте, появится «Сохранить изображение».';if(TGW)return;
     const l=document.createElement('a');l.href=url;l.download=`aybuben-${a.id}.jpg`;document.body.appendChild(l);l.click();l.remove()}}

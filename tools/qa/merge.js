@@ -23,7 +23,7 @@ const R=await p.evaluate(()=>{const T=[];const C=o=>JSON.stringify(o,(k,v)=>v&&t
  const old=mergeState({xp:10,done:{a1a:1,a1b:1,a1w:1},ts:10},{});ok('old schema migrated',old.v===3&&old.done.a1a===1&&Object.keys(old.done).some(k=>/^ab/.test(k)));
  ok('garbage',mergeState(null,'x').v===3&&mergeState({done:null,xp:'a',mem:5},{}).xp===0);
  ok('future version kept',mergeState({v:9,ts:5,xp:1,zz:{q:1}},{}).v===9&&mergeState({v:9,ts:5,xp:1,zz:{q:1}},{}).zz.q===1);
- const F1={v:3,ts:10,frzGot:2,frzUsed:1,frzDays:['2026-11-05']},F2={v:3,ts:20,frzGot:1,frzUsed:1,frzDays:['2026-11-08']};const fm=mergeState(F1,F2);
+ const F1={v:3,ts:10,heartsTs:1,frzGot:2,frzUsed:1,frzDays:['2026-11-05']},F2={v:3,ts:20,heartsTs:1,frzGot:1,frzUsed:1,frzDays:['2026-11-08']};const fm=mergeState(F1,F2);
  ok('freeze: earned max, used counts both devices',fm.frzGot===2&&fm.frzUsed===2&&fm.frzDays.length===2&&C(fm)===C(mergeState(F2,F1)));
  return T});
 console.log(R.join('\n'),errs);await b.close()})();

@@ -63,7 +63,7 @@
   };
   // При входе: копия из облака сливается с копией на устройстве (ничего не теряется), результат сохраняется в обе стороны
   window.__cloudPending=true;
-  var ready=function(){window.__cloudPending=false};
+  var ready=function(){if(!window.__cloudPending)return;window.__cloudPending=false;try{if(window.applyFreeze&&applyFreeze())route()}catch(x){}};
   setTimeout(ready,5000);                              // облако молчит — работаем с локальной копией
   CS.getItem(P+'n',function(err,n){
     n=+n;if(err){ready();return}

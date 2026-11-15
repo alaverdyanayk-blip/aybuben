@@ -22,7 +22,8 @@ function finishPlacement(){LS.state='end';const k=placeLevel(LS.lesson.place.res
   let marked=0;
   LESSONS.forEach(l=>{const m=/^ab(\d)[abw]$/.exec(l.id);if(m&&+m[1]<=k&&!S.done[l.id]){S.done[l.id]=1;marked++}});
   S.placed=Math.max(S.placed||0,k);if(marked){seedMem()}
-  addXP(10);const newA=checkAch();save();syncU();track('place',String(k));
+  /* XP только за первый тест: пересдача не копит очки */
+  if(!S.placedOnce){S.placedOnce=1;addXP(10)}const newA=checkAch();save();syncU();track('place',String(k));
   const nL=LETTERS.filter(l=>l.L<=k).length,nxt=LESSONS.find((l,i)=>unlocked(i)&&!S.done[l.id]);
   const head=k===GROUPS.length?'Весь алфавит — ваш!':k?`Знаете ${nL} ${plural(nL,'букву','буквы','букв')} из ${LETTERS.length}`:'Начнём с самого начала';
   const line=k===GROUPS.length?'Ни одна буква вас не смутила. Дальше — правила чтения: там прячутся звуки, которых нет на письме.':

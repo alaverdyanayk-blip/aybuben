@@ -115,6 +115,7 @@ test('тест на уровень: всё верно — весь алфави�
   __fresh();t=run(3);const a=LESSONS.filter(l=>/^ab[12]/.test(l.id)).every(l=>S.done[l.id]),b=LESSONS.some(l=>/^ab[3-6]/.test(l.id)&&S.done[l.id]);
   if(!a||b||!/Знаете/.test(t))out.push('ошибки на шаге 3: '+t+' 1–2:'+a+' дальше:'+b);if(S.hearts!==MAXH)out.push('потрачены сердца: '+S.hearts);
   __fresh({done:{ab5a:1,h1:1}});run(1);if(!S.done.ab5a||!S.done.h1)out.push('стёрт прежний прогресс');if(!/Начнём/.test(document.body.textContent+'Начнём'))out.push('?');
+  __fresh();run(0);const x1=S.xp;run(0);if(S.xp!==x1)out.push('пересдача снова даёт XP: '+x1+' → '+S.xp);
   __fresh();location.hash='learn';route();if(!document.querySelector('#place'))out.push('нет кнопки у новичка');return out});
 test('новые слова: сначала «как читается», значение — когда слово уже встречалось; пары с новыми — по звучанию',()=>{const out=[];
   __fresh();const L=LESSONS.filter(l=>/^ab\dw$/.test(l.id)||/^ab\d[ab]$/.test(l.id));
