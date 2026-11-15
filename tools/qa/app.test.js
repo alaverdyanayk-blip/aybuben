@@ -199,9 +199,10 @@ test('все игры открываются и играются без ошиб
 /* ================= Фразы, канал, напоминания ================= */
 test('«Фразы»: звёзды пройденных уроков горят',()=>{__fresh({phr:{[PHR[0].id]:{l1:1,l2:1},[PHR[1].id]:{l1:1}}});location.hash='phrases';route();
   const st=[...document.querySelectorAll('.phc')].slice(0,3).map(c=>c.querySelectorAll('.phc-st i.on').length);return st.join()==='2,1,0'?[]:['звёзды: '+st.join()]});
-test('карточка «Что нового» про канал: один раз и только тем, кто занимался',()=>{const out=[];
-  __fresh({xp:100,done:{ab1a:1},newsSeen:'old'});NEWS_NOW=false;NEWS_CLOSED=false;location.hash='learn';route();
-  const a=document.querySelector('[data-news-ch]');if(!a||a.getAttribute('href')!=='https://t.me/aybubenciro')out.push('нет кнопки «Подписаться»');
+test('карточка «Что нового» об обновлении: один раз, только тем, кто занимался, со ссылкой на канал',()=>{const out=[];
+  __fresh({xp:100,done:{ab1a:1},newsSeen:'channel1'});NEWS_NOW=false;NEWS_CLOSED=false;location.hash='learn';route();
+  const a=document.querySelector('[data-news-ch]');if(!a||a.getAttribute('href')!=='https://t.me/aybubenciro')out.push('нет кнопки канала');
+  if(!/Я обновился/.test((document.querySelector('.news-card')||{}).textContent||''))out.push('нет текста об обновлении для тех, кто видел прошлую новость');
   NEWS_NOW=false;route();if(document.querySelector('.news-card'))out.push('показалась второй раз');
   __fresh();NEWS_NOW=false;NEWS_CLOSED=false;route();if(document.querySelector('.news-card'))out.push('показалась новичку');
   location.hash='profile';route();if(!document.querySelector('[data-ch-row][href="https://t.me/aybubenciro"]'))out.push('нет строки канала в профиле');return out});

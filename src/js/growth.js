@@ -26,14 +26,16 @@ function inviteBox(){const f=S.friends||0,nt=nextTier();
    <button class="btn" data-invite>Пригласить</button></div>`}
 function inviteNudge(){const nt=nextTier();if(!nt)return '';return `<button class="link" data-invite style="font-size:14px">Пригласить друга — костюм «${esc(nt.t)}» для Циро</button>`}
 /* «Что нового» — один раз для тех, кто занимался до обновления */
-const NEWS_ID='channel1';
+const NEWS_ID='upd-2026-11';
 const CHANNEL='https://t.me/aybubenciro';
 /* показываем один раз: отметка ставится сразу при показе, до конца этого открытия карточка видна, потом — никогда */
 let NEWS_NOW=false,NEWS_CLOSED=false;
 function whatsNew(){if(NEWS_CLOSED)return '';if(S.newsSeen===NEWS_ID&&!NEWS_NOW)return '';if(!Object.keys(S.done).length&&!(S.xp>0)){S.newsSeen=NEWS_ID;return ''}
   if(!NEWS_NOW){NEWS_NOW=true;S.newsSeen=NEWS_ID;save()}
-  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle')}<div class="bubble"><p><b>У меня теперь свой канал!</b> Подписывайтесь — там первыми узнаете про обновления, новые уроки и функции.</p>
-   <div class="btns"><a class="btn" href="${CHANNEL}" target="_blank" rel="noopener" data-news-ch>Подписаться</a></div></div></div></section>`}
+  return `<section class="news-card"><button class="x" data-news-x aria-label="Закрыть">✕</button><div class="ciro-say stack">${mascot('cheer','m-idle')}<div class="bubble"><p><b>Я обновился!</b> Что нового:</p>
+   <ul class="news-list"><li><b>Истории</b> — люди и события армянской истории, первая о Гарегине Нжде</li><li><b>Задания дня</b> и сундучок с наградой</li><li><b>Заморозка серии</b> — пропущенный день не гасит огонёк</li><li>Новые главная, профиль и справка</li></ul>
+   <p>За обновлениями следите в моём канале.</p>
+   <div class="btns"><a class="btn" href="${CHANNEL}" target="_blank" rel="noopener" data-news-ch>Открыть канал</a></div></div></div></section>`}
 function wireNews(){const done=()=>{NEWS_CLOSED=true;const c=$('.news-card');c&&c.remove()};
   const x=$('[data-news-x]');if(x)x.onclick=done;
   const ch=$('[data-news-ch]');if(ch)ch.addEventListener('click',()=>{track('channel','news');setTimeout(done,600)})}
