@@ -11,7 +11,7 @@ function refClaim(){api('/r/claim',{code:S.refBy}).then(j=>{if(j&&(j.ok||j.reaso
 function friendSheet(c){const s=sheet(`<div class="end" style="padding:0">${mascot('cheer','m-jump',c.id)}<h2>Друг прошёл первый урок!</h2><div class="bubble">Циро получил костюм <b>«${esc(c.t)}»</b>. ${esc(c.d)}.</div><div class="btns two" style="width:100%"><button class="btn" data-wear2="${c.id}">Надеть</button><button class="btn plain" data-close>Потом</button></div></div>`);
   s.el.querySelector('[data-wear2]').onclick=()=>{S.outfit=c.id;save();s.close();route()};confetti()}
 function inviteLink(){return `https://t.me/${BOT}?startapp=r${S.refCode}`}
-const INV_TEXT='Учу читать по-армянски с абрикосом Циро 🍑 Присоединяйся — тебе сразу костюм для Циро!';
+const INV_TEXT='Учу читать по-армянски с абрикосом Циро. Присоединяйся — тебе сразу костюм для Циро!';
 /* Без кода (нет связи с сервером) зовём просто в бота — друг не засчитается, но ссылка рабочая. */
 function invite(btn){const go=()=>{
    const link=S.refCode?inviteLink():`https://t.me/${BOT}`;
@@ -60,7 +60,7 @@ function notifRow(){const n=S.notif||{},on=!!(TGW&&n.on),can=!!(TGW&&TGW.request
 function wireGrowth(){
   document.querySelectorAll('[data-invite]').forEach(b=>b.onclick=()=>invite(b));
   document.querySelectorAll('[data-nt]').forEach(b=>b.onclick=()=>{const box=$('#ask-nt'),k=box?box.dataset.ask:'1';
-    if(b.dataset.nt==='1')enableNotif(ok=>{track(ok?'nt_yes':'nt_no',k);if(box)box.innerHTML=ok?'<p>Договорились! 🍑 Выключить можно в профиле или кнопкой под сообщением.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'});
+    if(b.dataset.nt==='1')enableNotif(ok=>{track(ok?'nt_yes':'nt_no',k);if(box)box.innerHTML=ok?'<p>Договорились! Выключить можно в профиле или кнопкой под сообщением.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'});
     else{track('nt_no',k);S.notif=Object.assign({freq:1,hour:null},S.notif||{},{on:false});save();syncU(true,true);if(box)box.innerHTML='<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'}});
   /* выключил сам — больше не предлагаем */
   const sw=$('#sw-nt');if(sw)sw.onclick=()=>{if(S.notif&&S.notif.on){S.notif.on=false;S.notif.off=1;save();syncU(true,true);renderProfile()}else enableNotif(()=>renderProfile())};

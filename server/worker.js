@@ -202,7 +202,7 @@ async function botHook(req, env, sec) {
   };
   if (up.callback_query) {
     const q = up.callback_query, id = q.from && q.from.id, d = q.data;
-    if (id && d === 'less') { await setRow(id, 'freq=3, chat_id=?', id); await tg(env, 'answerCallbackQuery', { callback_query_id: q.id, text: 'Хорошо, буду писать раз в 3 дня 🍑' }); }
+    if (id && d === 'less') { await setRow(id, 'freq=3, chat_id=?', id); await tg(env, 'answerCallbackQuery', { callback_query_id: q.id, text: 'Хорошо, буду писать раз в 3 дня.' }); }
     else if (id && d === 'off') {
       await setRow(id, 'enabled=0, chat_id=NULL');
       await tg(env, 'answerCallbackQuery', { callback_query_id: q.id, text: 'Больше не напоминаю. Включить можно в профиле приложения.', show_alert: true });
@@ -214,7 +214,7 @@ async function botHook(req, env, sec) {
   if (m && m.chat && m.chat.type === 'private' && m.from && typeof m.text === 'string') {
     if (/^\/start/.test(m.text)) {
       await setRow(m.from.id, 'enabled=1, chat_id=?', m.chat.id);
-      await tg(env, 'sendPhoto', { chat_id: m.chat.id, photo: art(env, 'cheer'), caption: 'Барев! Я Циро 🍑\nНаучу читать и писать по-армянски.\n\nИногда буду напоминать о себе — не чаще раза в день. Выключить можно кнопкой под напоминанием или командой /stop.', reply_markup: { inline_keyboard: [[{ text: 'Начать учить', web_app: { url: appUrl(env) } }], [{ text: 'Канал Циро', url: CHANNEL }]] } });
+      await tg(env, 'sendPhoto', { chat_id: m.chat.id, photo: art(env, 'cheer'), caption: 'Барев! Я Циро.\nНаучу читать и писать по-армянски.\n\nИногда буду напоминать о себе — не чаще раза в день. Выключить можно кнопкой под напоминанием или командой /stop.', reply_markup: { inline_keyboard: [[{ text: 'Начать учить', web_app: { url: appUrl(env) } }], [{ text: 'Канал Циро', url: CHANNEL }]] } });
     } else if (/^\/stop/.test(m.text)) {
       await setRow(m.from.id, 'enabled=0, chat_id=NULL');
       await tg(env, 'sendMessage', { chat_id: m.chat.id, text: 'Больше не напоминаю. Включить снова — /start или в профиле приложения.' });
@@ -465,6 +465,11 @@ export default {
       const pw = (await req.formData()).get('pw') || '';
       if (!safeEq(await sha(String(pw)), await sha(env.ADMIN_PASSWORD))) return new Response(loginPage(true), { status: 401, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
       return new Response(null, { status: 303, headers: { Location: '/', 'Set-Cookie': `ays=${await sessionToken(env)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=2592000` } });
+    }
+    // те же обезличенные цифры, что на странице статистики, — для планового аудита (пароль тот же)
+    if (url.pathname === '/stats.json') {
+      if (env.ADMIN_PASSWORD && !(await authed(req, env))) return json({ error: 'auth' }, 401);
+      return new Response(JSON.stringify(await gather(env)), { headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
     }
     if (url.pathname === '/logout') return new Response(null, { status: 303, headers: { Location: '/', 'Set-Cookie': 'ays=; Path=/; Max-Age=0' } });
     if (url.pathname === '/' || url.pathname === '/stats') {

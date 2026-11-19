@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Айбубен — учим читать и писать по-армянски вместе с абрикосом Циро">
 <link rel="icon" href="icon.png">
-<script>window.BUILD_ID="4e8275f521"</script>
+<script>window.BUILD_ID="1047601d2c"</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}html,body{-webkit-tap-highlight-color:transparent}</style>
 <title>Айбубен</title>
@@ -2034,7 +2034,7 @@ function refClaim(){api('/r/claim',{code:S.refBy}).then(j=>{if(j&&(j.ok||j.reaso
 function friendSheet(c){const s=sheet(`<div class="end" style="padding:0">${mascot('cheer','m-jump',c.id)}<h2>Друг прошёл первый урок!</h2><div class="bubble">Циро получил костюм <b>«${esc(c.t)}»</b>. ${esc(c.d)}.</div><div class="btns two" style="width:100%"><button class="btn" data-wear2="${c.id}">Надеть</button><button class="btn plain" data-close>Потом</button></div></div>`);
   s.el.querySelector('[data-wear2]').onclick=()=>{S.outfit=c.id;save();s.close();route()};confetti()}
 function inviteLink(){return `https://t.me/${BOT}?startapp=r${S.refCode}`}
-const INV_TEXT='Учу читать по-армянски с абрикосом Циро 🍑 Присоединяйся — тебе сразу костюм для Циро!';
+const INV_TEXT='Учу читать по-армянски с абрикосом Циро. Присоединяйся — тебе сразу костюм для Циро!';
 function invite(btn){const go=()=>{
    const link=S.refCode?inviteLink():`https://t.me/${BOT}`;
    if(TGW&&TGW.openTelegramLink)TGW.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(INV_TEXT));
@@ -2076,7 +2076,7 @@ function notifRow(){const n=S.notif||{},on=!!(TGW&&n.on),can=!!(TGW&&TGW.request
 function wireGrowth(){
   document.querySelectorAll('[data-invite]').forEach(b=>b.onclick=()=>invite(b));
   document.querySelectorAll('[data-nt]').forEach(b=>b.onclick=()=>{const box=$('#ask-nt'),k=box?box.dataset.ask:'1';
-    if(b.dataset.nt==='1')enableNotif(ok=>{track(ok?'nt_yes':'nt_no',k);if(box)box.innerHTML=ok?'<p>Договорились! 🍑 Выключить можно в профиле или кнопкой под сообщением.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'});
+    if(b.dataset.nt==='1')enableNotif(ok=>{track(ok?'nt_yes':'nt_no',k);if(box)box.innerHTML=ok?'<p>Договорились! Выключить можно в профиле или кнопкой под сообщением.</p>':'<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'});
     else{track('nt_no',k);S.notif=Object.assign({freq:1,hour:null},S.notif||{},{on:false});save();syncU(true,true);if(box)box.innerHTML='<p>Хорошо, не буду. Если передумаете — включите в профиле.</p>'}});
   const sw=$('#sw-nt');if(sw)sw.onclick=()=>{if(S.notif&&S.notif.on){S.notif.on=false;S.notif.off=1;save();syncU(true,true);renderProfile()}else enableNotif(()=>renderProfile())};
   document.querySelectorAll('[data-nh]').forEach(b=>b.onclick=()=>{S.notif.hour=b.dataset.nh===''?null:+b.dataset.nh;save();syncU(true,true);renderProfile()});
@@ -2132,9 +2132,9 @@ async function drawAchCard(a){
   const sline=shareStats();x.font='700 36px "Golos Text",system-ui,sans-serif';const sw=Math.min(W-120,x.measureText(sline).width+80);
   x.fillStyle='rgba(0,0,0,.22)';x.beginPath();x.roundRect?x.roundRect(W/2-sw/2,1150,sw,76,38):x.rect(W/2-sw/2,1150,sw,76);x.fill();
   x.fillStyle='#fff';x.fillText(sline,W/2,1201);
-  x.fillStyle='rgba(255,255,255,.8)';x.font='600 32px "Golos Text",system-ui,sans-serif';x.fillText('Учу армянский с Циро  ·  @'+BOT,W/2,1300);
+  x.fillStyle='rgba(255,255,255,.8)';x.font='600 32px "Golos Text",system-ui,sans-serif';x.fillText('Учу читать по-армянски  ·  @'+BOT,W/2,1300);
   return c}
-const SHARE_TEXT=a=>`Новое достижение в Айбубене: «${a.t}» 🍑 Учу читать по-армянски с абрикосом Циро.`;
+const SHARE_TEXT=a=>`Новое достижение в Айбубене: «${a.t}». Учу читать по-армянски с абрикосом Циро.`;
 async function achShare(id){const a=ACH.find(v=>v.id===id);if(!a||!S.ach[id])return;
   const s=sheet(`<div class="sheet-top"><b>Достижение</b><button class="x" data-close aria-label="Закрыть">✕</button></div>
    <div class="sh-card"><div class="sh-wait">Рисую карточку…</div></div>

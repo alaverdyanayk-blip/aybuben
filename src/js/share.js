@@ -37,9 +37,9 @@ async function drawAchCard(a){
   const sline=shareStats();x.font='700 36px "Golos Text",system-ui,sans-serif';const sw=Math.min(W-120,x.measureText(sline).width+80);
   x.fillStyle='rgba(0,0,0,.22)';x.beginPath();x.roundRect?x.roundRect(W/2-sw/2,1150,sw,76,38):x.rect(W/2-sw/2,1150,sw,76);x.fill();
   x.fillStyle='#fff';x.fillText(sline,W/2,1201);
-  x.fillStyle='rgba(255,255,255,.8)';x.font='600 32px "Golos Text",system-ui,sans-serif';x.fillText('Учу армянский с Циро  ·  @'+BOT,W/2,1300);
+  x.fillStyle='rgba(255,255,255,.8)';x.font='600 32px "Golos Text",system-ui,sans-serif';x.fillText('Учу читать по-армянски  ·  @'+BOT,W/2,1300);
   return c}
-const SHARE_TEXT=a=>`Новое достижение в Айбубене: «${a.t}» 🍑 Учу читать по-армянски с абрикосом Циро.`;
+const SHARE_TEXT=a=>`Новое достижение в Айбубене: «${a.t}». Учу читать по-армянски с абрикосом Циро.`;
 /* Окно карточки: картинка, «Поделиться» (файлом, если устройство умеет, иначе ссылкой в Телеграме) и «Сохранить» */
 async function achShare(id){const a=ACH.find(v=>v.id===id);if(!a||!S.ach[id])return;
   const s=sheet(`<div class="sheet-top"><b>Достижение</b><button class="x" data-close aria-label="Закрыть">✕</button></div>
